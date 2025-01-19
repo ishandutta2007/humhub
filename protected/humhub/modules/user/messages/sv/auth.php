@@ -1,5 +1,5 @@
 <?php
-return array (
+return [
   '<strong>Account</strong> registration' => '<strong>Konto</strong> registrering',
   '<strong>Change</strong> Password' => '<strong>Ändra</strong> lösenord',
   '<strong>Change</strong> your password' => '<strong>Ändra</strong> ditt lösenord',
@@ -26,12 +26,14 @@ return array (
   'Group' => 'Grupp',
   'Hello {displayName}' => 'Hej {displayName}',
   'Hello {displayName},' => 'Hej {displayName},',
+  'If a user account associated with this email address exists, further instructions will be sent to you by email shortly.' => 'Om det finns ett användarkonto kopplat till denna e-postadress kommer ytterligare instruktioner att skickas till dig via e-post inom kort.',
   'If you don\'t use this link within 24 hours, it will expire.' => 'Om du inte använder länken inom 24 timmar kommer den sluta fungera.',
   'If you\'re already a member, please login with your username/email and password.' => 'Om du redan är en medlem, logga in med ditt användarnamn/e-postadress och lösenord.',
   'Just enter your e-mail address. We\'ll send you recovery instructions!' => 'Skriv in din e-postadress så skickar vi återställningsinstruktioner!',
   'Log out' => 'Logga ut',
   'Login' => 'Logga In',
   'New user needs approval' => 'Ny användare behöver godkännande',
+  'Password' => 'lösenord',
   'Password recovery' => 'Lösenordsåterställning',
   'Password reset' => 'Lösenordet återställt',
   'Please check your email and follow the instructions!' => 'Vänligen kontrollera din e-post och följ instruktionerna!',
@@ -48,14 +50,11 @@ return array (
   'Sign in' => 'Logga in',
   'To log in with your new account, click the button below.' => 'För att logga in med ditt nya konto, klicka på knappen nedan.',
   'User or Password incorrect.' => 'Användare eller lösenord var felaktigt.',
-  'We’ve sent you an email containing a link that will allow you to reset your password.' => 'Vi har skickat ett e-postmeddelande med en länk som möjliggör för dig att återställa ditt lösenord.',
+  'Username or Email' => 'användarnamn eller e-post',
   'Your email' => 'Din e-Post',
   'Your password' => 'Ditt lösenord',
   'Your password has been successfully changed!' => 'Ditt lösenord har ändrats!',
   'Your password is incorrect!' => 'Ditt lösenord är felaktigt!',
   'a new user {displayName} needs approval.' => 'en ny användare {displayName} behöver godkännande.',
   'back to home' => 'tillbaka till förstasidan',
-  'email' => 'e-post',
-  'password' => 'lösenord',
-  'username or email' => 'användarnamn eller e-post',
-);
+];

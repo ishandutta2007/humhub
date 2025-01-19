@@ -1,5 +1,5 @@
 <?php
-return array (
+return [
   '%y Years' => '%y år',
   '<b>This profile stream is still empty!</b>' => '<b>Det här profilflödet är tomt än så länge!</b>',
   '<b>This profile stream is still empty</b><br>Be the first and post something...' => '<b>Det här profilflödet är tomt än så länge!</b><br>bli den första att posta någonting...',
@@ -28,6 +28,7 @@ return array (
   'Diverse' => 'Olika',
   'E-Mail' => 'E-post',
   'E-mail address of the user' => 'Användarens e-postadress',
+  'Each line must be formatted as Key=>Value!' => 'Varje rad måste formateras som Key=&gt;Value!',
   'Edit account' => 'Ändra konto',
   'Editable' => 'Redigeringsbar',
   'Facebook URL' => 'Facebook URL',
@@ -57,6 +58,7 @@ return array (
   'LinkedIn URL' => 'LinkedIn URL',
   'Male' => 'Man',
   'Markdown' => 'Markdown',
+  'Mastodon URL' => 'Mastodon URL',
   'Maximum length' => 'Maximal längd',
   'Maximum value' => 'Maximalt värde',
   'Minimum length' => 'Minsta längd',
@@ -89,16 +91,19 @@ return array (
   'Stream' => 'Flöde',
   'Street' => 'Gata',
   'Supported ISO3166 country codes' => 'Stödjer ISO3166 landskoder',
+  'Template' => 'Mall',
   'Text' => 'Text',
   'Text Area' => 'Textruta',
   'Text Field Options' => 'Alternativ för textfält',
   'Text area field options' => 'Inställningar för textyta',
+  'This profile is disabled!' => 'Den här profilen är inaktiverad!',
   'This profile is no longer available!' => 'Den här profilen är inte längre tillgänglig!',
   'This user account is not approved yet!' => 'Det här kontot är inte godkänt ännu!',
   'This will add an additional input element for custom values' => 'Detta lägger till ytterligare inmatningsfält för anpassade värden',
   'TikTok URL' => 'TikTok URL',
   'Title' => 'Titel',
   'Translation Category ID' => 'ID för kategori för översättning',
+  'Twig template that will be used to render this field. You can use the internal names as variables, e.g. `{{ firstname }} {{ lastname }}`' => 'Kvistmall som kommer att användas för att rendera detta fält. Du kan använda de interna namnen som variabler, t.ex.`{{ firstname }} {{ lastname }}`',
   'Twitter URL' => 'Twitter URL',
   'Type Config' => 'Typ av konfig',
   'Updated at' => 'Uppdaterad',
@@ -115,4 +120,4 @@ return array (
   'YouTube URL' => 'YouTube URL',
   'Zip' => 'Postnr',
   '{attribute} is required!' => '{attribute} krävs!',
-);
+];

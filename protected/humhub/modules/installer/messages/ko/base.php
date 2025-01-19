@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'Next' => '다음',
     '<strong>Admin</strong> Account' => '',
     '<strong>Configuration</strong>' => '',
     '<strong>Congratulations</strong>. You\'re done.' => '',
@@ -19,6 +20,8 @@ return [
     'Congratulations! Everything is ok and ready to start over!' => '',
     'Create Admin Account' => '',
     'Create the database if it doesn\'t exist yet.' => '',
+    'Default Language' => '',
+    'Default Timezone' => '',
     'Downloading & Installing Modules...' => '',
     'External users can register (show registration form on login)' => '',
     'Here you can decide how new, unregistered users can access HumHub.' => '',
@@ -30,6 +33,8 @@ return [
     'In order to activate this feature, it is necessary to edit the HumHub configuration and, potentially, the configuration of the WebServer.' => '',
     'Initializing database...' => '',
     'Installation Example:' => '',
+    'Language and timezone are automatically set according to the user\'s browser settings. If that is not possible, the default settings are used.' => '',
+    'Localisation' => '',
     'My club' => '',
     'My community' => '',
     'My company (Social Intranet / Project management)' => '',
@@ -37,7 +42,6 @@ return [
     'Name of Database' => '',
     'Name of your network' => '',
     'Newly registered users have to be activated by an admin first' => '',
-    'Next' => '',
     'Nike – Just buy it. :wink:' => '',
     'Of course, your new social network needs a name. Please change the default name with one you like. (For example the name of your company, organization or club)' => '',
     'Ohh, something went wrong!' => '',

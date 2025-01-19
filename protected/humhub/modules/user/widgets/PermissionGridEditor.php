@@ -8,6 +8,7 @@
 
 namespace humhub\modules\user\widgets;
 
+use humhub\modules\user\components\PermissionManager;
 use Yii;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
@@ -24,9 +25,8 @@ use humhub\libs\DropDownGridColumn;
  */
 class PermissionGridEditor extends GridView
 {
-
     /**
-     * @var boolean hide not changeable permissions
+     * @var bool hide not changeable permissions
      */
     public $hideFixedPermissions = true;
 
@@ -36,7 +36,7 @@ class PermissionGridEditor extends GridView
     public $showHeader = false;
 
     /**
-     * @var \humhub\modules\user\components\PermissionManager
+     * @var PermissionManager
      */
     public $permissionManager;
 
@@ -74,7 +74,7 @@ class PermissionGridEditor extends GridView
                             Html::tag('span', $module->getName(), ['class' => 'badge', 'data-module-id' => $data['moduleId']]) .
                             Html::tag('br') .
                             $data['description'];
-                    }
+                    },
                 ],
                 [
                     'label' => '',
@@ -84,7 +84,7 @@ class PermissionGridEditor extends GridView
                         return !($data['changeable']);
                     },
                     'submitAttributes' => ['permissionId', 'moduleId'],
-                    'dropDownOptions' => 'states'
+                    'dropDownOptions' => 'states',
                 ],
             ],
         ]);

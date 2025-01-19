@@ -17,7 +17,6 @@ use yii\base\InvalidArgumentException;
  */
 class Formatter extends \yii\i18n\Formatter
 {
-
     /**
      * @inheritdoc
      */
@@ -37,7 +36,7 @@ class Formatter extends \yii\i18n\Formatter
     {
         parent::init();
 
-        if (Yii::$app->params['installed'] && Yii::$app->getModule('admin') !== null && !empty(Yii::$app->getModule('admin')->settings->get('defaultDateInputFormat'))) {
+        if (Yii::$app->isInstalled() && Yii::$app->getModule('admin') !== null && !empty(Yii::$app->getModule('admin')->settings->get('defaultDateInputFormat'))) {
             $this->dateInputFormat = Yii::$app->getModule('admin')->settings->get('defaultDateInputFormat');
         }
     }
@@ -103,5 +102,41 @@ class Formatter extends \yii\i18n\Formatter
             default:
                 return Yii::t('base', '{nFormatted}B', $params, $this->language); // Billion
         }
+    }
+
+    /**
+     * Fix unicode chars
+     *
+     * @param string $value
+     * @return string
+     */
+    private function fixUnicodeChars($value): string
+    {
+        // Replace newly introduced Unicode separator whitespace, which a standard one, to sway backward compatible.
+        return str_replace(' ', ' ', $value);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function asDate($value, $format = null)
+    {
+        return $this->fixUnicodeChars(parent::asDate($value, $format));
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function asTime($value, $format = null)
+    {
+        return $this->fixUnicodeChars(parent::asTime($value, $format));
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function asDatetime($value, $format = null)
+    {
+        return $this->fixUnicodeChars(parent::asDatetime($value, $format));
     }
 }

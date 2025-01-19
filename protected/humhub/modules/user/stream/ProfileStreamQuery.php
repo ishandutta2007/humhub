@@ -2,9 +2,9 @@
 
 namespace humhub\modules\user\stream;
 
+use humhub\modules\stream\models\ContentContainerStreamQuery;
 use humhub\modules\stream\models\filters\ContentContainerStreamFilter;
 use humhub\modules\user\stream\filters\IncludeAllContributionsFilter;
-use humhub\modules\stream\models\ContentContainerStreamQuery;
 
 /**
  * ProfileStream
@@ -13,7 +13,6 @@ use humhub\modules\stream\models\ContentContainerStreamQuery;
  */
 class ProfileStreamQuery extends ContentContainerStreamQuery
 {
-
     /**
      * @var bool|null can be used to set a default state for the IncludeAllContributionsFilter
      */
@@ -31,7 +30,7 @@ class ProfileStreamQuery extends ContentContainerStreamQuery
             'container' => $this->container,
             'scope' => $this->includeContributions
                 ? IncludeAllContributionsFilter::SCOPE_ALL
-                : IncludeAllContributionsFilter::SCOPE_PROFILE
+                : IncludeAllContributionsFilter::SCOPE_PROFILE,
         ]));
 
         parent::beforeApplyFilters();

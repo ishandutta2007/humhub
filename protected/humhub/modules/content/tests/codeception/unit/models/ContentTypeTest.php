@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
@@ -18,7 +19,6 @@ use modules\content\tests\codeception\_support\ContentModelTest;
 
 class ContentTypeTest extends ContentModelTest
 {
-
     public function _before()
     {
         parent::_before();

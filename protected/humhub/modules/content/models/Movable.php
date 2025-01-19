@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: kingb
@@ -7,7 +8,6 @@
  */
 
 namespace humhub\modules\content\models;
-
 
 use humhub\modules\content\components\ContentContainerActiveRecord;
 

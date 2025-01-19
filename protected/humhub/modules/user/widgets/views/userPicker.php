@@ -12,10 +12,10 @@
  * @since 0.5
  * @deprecated since 1.2 use UserPickerField instead.
  */
-use \humhub\modules\user\models\User;
-use \yii\helpers\Html;
 
-$this->registerJsFile("@web-static/js/jquery.highlight.min.js");
+use humhub\modules\user\models\User;
+use yii\helpers\Html;
+
 $this->registerJsFile("@web-static/resources/user/userpicker.js");
 ?>
 

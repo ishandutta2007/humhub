@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2018 HumHub GmbH & Co. KG
@@ -7,7 +8,6 @@
  */
 
 namespace humhub\controllers;
-
 
 use humhub\components\Controller;
 use humhub\models\UrlOembed;
@@ -71,7 +71,7 @@ class OembedController extends Controller
 
         return $this->asJson([
             'success' => true,
-            'content' => $urlOembed ? $urlOembed->preview : UrlOembed::loadUrl($url)
+            'content' => $urlOembed ? $urlOembed->preview : UrlOembed::loadUrl($url),
         ]);
     }
 }

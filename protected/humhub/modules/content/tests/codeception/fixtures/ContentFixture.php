@@ -12,10 +12,9 @@ use yii\test\ActiveFixture;
 
 class ContentFixture extends ActiveFixture
 {
-
     public $modelClass = 'humhub\modules\content\models\Content';
     public $dataFile = '@modules/content/tests/codeception/fixtures/data/content.php';
-    
+
     public $depends = [
         'humhub\modules\content\tests\codeception\fixtures\ContentContainerFixture',
         'humhub\modules\content\tests\codeception\fixtures\ContentTagFixture',
@@ -24,7 +23,7 @@ class ContentFixture extends ActiveFixture
         'humhub\modules\content\tests\codeception\fixtures\ContentContainerTagRelationFixture',
         'humhub\modules\post\tests\codeception\fixtures\PostFixture',
         'humhub\modules\comment\tests\codeception\fixtures\CommentFixture',
-        'humhub\modules\like\tests\codeception\fixtures\LikeFixture'
+        'humhub\modules\like\tests\codeception\fixtures\LikeFixture',
     ];
 
 }

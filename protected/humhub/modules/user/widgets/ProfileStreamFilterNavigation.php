@@ -1,8 +1,6 @@
 <?php
 
-
 namespace humhub\modules\user\widgets;
-
 
 use humhub\modules\stream\widgets\WallStreamFilterNavigation;
 use humhub\modules\ui\filter\widgets\RadioFilterInput;
@@ -15,12 +13,11 @@ use Yii;
  */
 class ProfileStreamFilterNavigation extends WallStreamFilterNavigation
 {
-
     /**
      * Extra filter category for profile scope
      * @since 1.6
      */
-    const FILTER_BLOCK_SCOPE = 'scope';
+    public const FILTER_BLOCK_SCOPE = 'scope';
 
     /**
      * @inheritDoc
@@ -37,13 +34,13 @@ class ProfileStreamFilterNavigation extends WallStreamFilterNavigation
      */
     protected function initScopeFilterBlock()
     {
-        if(!$this->isScopeFilterSupported()) {
+        if (!$this->isScopeFilterSupported()) {
             return;
         }
 
         $this->addFilterBlock('scope', [
             'title' => Yii::t('StreamModule.filter', 'Scope'),
-            'sortOrder' => 90
+            'sortOrder' => 90,
         ], static::PANEL_COLUMN_2);
     }
 
@@ -62,7 +59,7 @@ class ProfileStreamFilterNavigation extends WallStreamFilterNavigation
      */
     protected function initScopeFilter()
     {
-        if(!$this->isScopeFilterSupported()) {
+        if (!$this->isScopeFilterSupported()) {
             return;
         }
 
@@ -77,7 +74,7 @@ class ProfileStreamFilterNavigation extends WallStreamFilterNavigation
             'radioGroup' => 'scope',
             'force' => true,
             'sortOrder' => 500,
-            'checked' => $module->includeAllUserContentsOnProfile
+            'checked' => $module->includeAllUserContentsOnProfile,
         ], static::FILTER_BLOCK_SCOPE);
 
         $this->addFilter([
@@ -88,7 +85,7 @@ class ProfileStreamFilterNavigation extends WallStreamFilterNavigation
             'radioGroup' => 'scope',
             'force' => true,
             'sortOrder' => 510,
-            'checked' => !$module->includeAllUserContentsOnProfile
+            'checked' => !$module->includeAllUserContentsOnProfile,
         ], static::FILTER_BLOCK_SCOPE);
     }
 

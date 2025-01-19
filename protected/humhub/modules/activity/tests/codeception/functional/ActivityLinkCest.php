@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
@@ -27,13 +28,13 @@ class ActivityLinkCest
         (new MailSummaryForm([
             'user' => User::findOne(['id' => 2]),
             'interval' => MailSummary::INTERVAL_DAILY,
-            'activities' => [ContentCreated::class]
+            'activities' => [ContentCreated::class],
         ]))->save();
 
         $activity = TestActivity::instance()->about(Post::findOne(1))->create();
 
         $I->amOnRoute('/activity/link', ['id' => $activity->record->id]);
-        $I->see('Account settings');
+        $I->see('Settings');
     }
 
     public function testNonViewableNotification(FunctionalTester $I)
@@ -45,7 +46,7 @@ class ActivityLinkCest
         (new MailSummaryForm([
             'user' => User::findOne(['id' => 2]),
             'interval' => MailSummary::INTERVAL_DAILY,
-            'activities' => [ContentCreated::class]
+            'activities' => [ContentCreated::class],
         ]))->save();
 
         $activity = TestActivity::instance()->about(Post::findOne(1))->create();

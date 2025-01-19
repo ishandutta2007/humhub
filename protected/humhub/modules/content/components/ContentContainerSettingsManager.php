@@ -8,8 +8,8 @@
 
 namespace humhub\modules\content\components;
 
-use Yii;
 use humhub\libs\BaseSettingsManager;
+use Yii;
 
 /**
  * ContentContainerSettingManager
@@ -19,44 +19,45 @@ use humhub\libs\BaseSettingsManager;
  */
 class ContentContainerSettingsManager extends BaseSettingsManager
 {
-
     /**
      * @inheritdoc
      */
-    public $modelClass = 'humhub\modules\content\models\ContentContainerSetting';
+    public string $modelClass = 'humhub\modules\content\models\ContentContainerSetting';
 
     /**
      * @var ContentContainerActiveRecord the content container this settings manager belongs to
      */
     public $contentContainer;
-    
+
     /**
      * Returns the setting value of this container for the given setting $name.
      * If there is not container specific setting, this function will search for a global setting or
      * return default or null if there is also no global setting.
-     * 
+     *
      * @param string $name
      * @param string $default
-     * @return boolean
+     * @return bool
      * @since 1.2
      */
-    public function getInherit($name, $default = null) {
+    public function getInherit($name, $default = null)
+    {
         $result = $this->get($name);
         return ($result !== null) ? $result
             : Yii::$app->getModule($this->moduleId)->settings->get($name, $default);
     }
-    
+
     /**
      * Returns the setting value of this container for the given setting $name.
      * If there is not container specific setting, this function will search for a global setting or
      * return default or null if there is also no global setting.
-     * 
+     *
      * @param string $name
      * @param string $default
-     * @return boolean
+     * @return bool
      * @since 1.2
      */
-    public function getSerializedInherit($name, $default = null) {
+    public function getSerializedInherit($name, $default = null)
+    {
         $result = $this->getSerialized($name);
         return ($result !== null) ? $result
             : Yii::$app->getModule($this->moduleId)->settings->getSerialized($name, $default);
@@ -68,7 +69,7 @@ class ContentContainerSettingsManager extends BaseSettingsManager
     protected function createRecord()
     {
         $record = parent::createRecord();
-        $record->contentcontainer_id = $this->contentContainer->contentContainerRecord->id;
+        $record->contentcontainer_id = $this->contentContainer->contentcontainer_id;
         return $record;
     }
 
@@ -77,15 +78,17 @@ class ContentContainerSettingsManager extends BaseSettingsManager
      */
     protected function find()
     {
-        return parent::find()->andWhere(['contentcontainer_id' => $this->contentContainer->contentContainerRecord->id]);
+        return parent::find()->andWhere(['contentcontainer_id' => $this->contentContainer->contentcontainer_id]);
     }
 
     /**
      * @inheritdoc
      */
-    protected function getCacheKey()
+    protected function getCacheKey(): string
     {
-        return parent::getCacheKey() . '-' . $this->contentContainer->contentcontainer_id;
+        /** @var SettingActiveRecord $modelClass */
+        $modelClass = $this->modelClass;
+        return $modelClass::getCacheKey($this->moduleId, $this->contentContainer->contentcontainer_id);
     }
 
 }

@@ -14,11 +14,11 @@ use humhub\modules\marketplace\models\Licence;
 use humhub\modules\marketplace\Module;
 use humhub\modules\space\models\Space;
 use humhub\modules\user\models\User;
+use Throwable;
 use Yii;
 use yii\base\Component;
-use yii\base\InvalidConfigException;
 use yii\base\Event;
-
+use yii\base\InvalidConfigException;
 
 /**
  * Class LicenceManager
@@ -27,31 +27,30 @@ use yii\base\Event;
  */
 class LicenceManager extends Component
 {
-
     /**
      * @var Licence
      */
     private static $_licence = null;
 
     /**
-     * @event Event an event that is triggered when the current licence is requested
+     * @event Event an event that is triggered when the current license is requested
      */
-    const EVENT_GET_LICENCE = 'getLicence';
+    public const EVENT_GET_LICENCE = 'getLicence';
 
 
-    const SETTING_KEY_PE_LICENCE_KEY = 'licenceKey';
-    const SETTING_KEY_PE_LAST_FETCH = 'lastFetch';
-    const SETTING_KEY_PE_LICENCED_TO = 'licencedTo';
-    const SETTING_KEY_PE_MAX_USERS = 'maxUsers';
+    public const SETTING_KEY_PE_LICENCE_KEY = 'licenceKey';
+    public const SETTING_KEY_PE_LAST_FETCH = 'lastFetch';
+    public const SETTING_KEY_PE_LICENCED_TO = 'licencedTo';
+    public const SETTING_KEY_PE_MAX_USERS = 'maxUsers';
 
-    const PE_FETCH_INTERVAL = 60 * 60 * 2;
-    const PE_FETCH_TOLERANCE = 60 * 60 * 24 * 5;
+    public const PE_FETCH_INTERVAL = 60 * 60 * 2;
+    public const PE_FETCH_TOLERANCE = 60 * 60 * 24 * 5;
 
 
     /**
-     * Returns the current licence object
+     * Returns the current license object
      *
-     * @param boolean $useCache
+     * @param bool $useCache
      * @return Licence
      */
     public static function get($useCache = true)
@@ -66,7 +65,7 @@ class LicenceManager extends Component
 
 
     /**
-     * Returns the current licence object
+     * Returns the current license object
      *
      * @return Licence
      */
@@ -88,7 +87,7 @@ class LicenceManager extends Component
                     } catch (InvalidConfigException $e) {
                         Yii::error($e->getMessage(), 'marketplace');
                     }
-                    Yii::error('Could not fetch PE licence since: ' . $lastFetchDateTime, 'marketplace');
+                    Yii::error('Could not fetch PE license since: ' . $lastFetchDateTime, 'marketplace');
                     return $licence;
                 }
             }
@@ -103,7 +102,7 @@ class LicenceManager extends Component
         }
 
         if (isset(Yii::$app->params['hosting'])) {
-            // In our demo hosting, we allow pro licences without registration
+            // In our demo hosting, we allow pro licenses without registration
             $licence->type = Licence::LICENCE_TYPE_PRO;
         }
 
@@ -112,7 +111,7 @@ class LicenceManager extends Component
     }
 
     /**
-     * Fetches the licence from the HumHub API
+     * Fetches the license from the HumHub API
      *
      * @return bool The retrieval of the license worked, whether it is valid or not.
      */
@@ -137,8 +136,8 @@ class LicenceManager extends Component
                 if (static::remove()) {
                     return true;
                 }
-            } catch (\Throwable $e) {
-                Yii::error('Could not fetch/remove licence: ' . $e->getMessage());
+            } catch (Throwable $e) {
+                Yii::error('Could not fetch/remove license: ' . $e->getMessage());
             }
         }
 
@@ -147,9 +146,9 @@ class LicenceManager extends Component
 
 
     /**
-     * Removes the licence from this installation and the HumHub Marketplace
+     * Removes the license from this installation and the HumHub Marketplace
      *
-     * @return boolean
+     * @return bool
      */
     public static function remove()
     {

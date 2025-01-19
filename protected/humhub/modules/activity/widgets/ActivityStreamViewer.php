@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
@@ -35,7 +36,7 @@ class ActivityStreamViewer extends StreamViewer
             'view' => 'activityStream',
             'streamAction' => '/activity/stream/stream',
             'jsWidget' => 'activity.ActivityStream',
-            'options' => ['class' => 'panel-body', 'style' => 'padding:0px']
+            'options' => ['class' => 'panel-body', 'style' => 'padding:0px'],
         ];
 
         parent::__construct(array_merge($defaults, $config));

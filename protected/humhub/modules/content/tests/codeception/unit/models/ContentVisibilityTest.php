@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
@@ -12,20 +13,19 @@ use humhub\modules\content\tests\codeception\unit\TestContent;
 use modules\content\tests\codeception\_support\ContentModelTest;
 use tests\codeception\_support\HumHubDbTestCase;
 use Codeception\Specify;
-
 use humhub\modules\space\models\Space;
 use humhub\modules\content\models\Content;
 use Yii;
+use yii\base\Exception;
 
 class ContentVisibilityTest extends ContentModelTest
 {
-
     public function testDefaultVisibilityPrivateSpace()
     {
         $this->space->visibility = Space::VISIBILITY_NONE;
 
         $newModel = new TestContent($this->space, [
-            'message' => 'Test'
+            'message' => 'Test',
         ]);
 
         $this->assertTrue($newModel->save());
@@ -37,7 +37,7 @@ class ContentVisibilityTest extends ContentModelTest
         $this->space->visibility = Space::VISIBILITY_REGISTERED_ONLY;
 
         $newModel = new TestContent($this->space, [
-            'message' => 'Test'
+            'message' => 'Test',
         ]);
 
         $this->assertTrue($newModel->save());
@@ -49,7 +49,7 @@ class ContentVisibilityTest extends ContentModelTest
         $this->space->visibility = Space::VISIBILITY_ALL;
 
         $newModel = new TestContent($this->space, [
-            'message' => 'Test'
+            'message' => 'Test',
         ]);
 
         $this->assertTrue($newModel->save());
@@ -61,7 +61,7 @@ class ContentVisibilityTest extends ContentModelTest
         $this->space->visibility = Space::VISIBILITY_ALL;
 
         $newModel = new TestContent($this->space, Content::VISIBILITY_PUBLIC, [
-            'message' => 'Test'
+            'message' => 'Test',
         ]);
 
         $this->assertTrue($newModel->save());
@@ -70,10 +70,11 @@ class ContentVisibilityTest extends ContentModelTest
 
     public function testCreatePublicContentOnProtectedSpace()
     {
+        $this->space->addMember(Yii::$app->user->id);
         $this->space->visibility = Space::VISIBILITY_REGISTERED_ONLY;
 
         $newModel = new TestContent($this->space, Content::VISIBILITY_PUBLIC, [
-            'message' => 'Test'
+            'message' => 'Test',
         ]);
 
         $this->assertTrue($newModel->save());
@@ -86,7 +87,7 @@ class ContentVisibilityTest extends ContentModelTest
         $this->space->default_content_visibility = Content::VISIBILITY_PUBLIC;
 
         $newModel = new TestContent($this->space, [
-            'message' => 'Test'
+            'message' => 'Test',
         ]);
 
         $this->assertTrue($newModel->save());
@@ -99,7 +100,7 @@ class ContentVisibilityTest extends ContentModelTest
         $this->space->default_content_visibility = Content::VISIBILITY_PRIVATE;
 
         $newModel = new TestContent($this->space, [
-            'message' => 'Test'
+            'message' => 'Test',
         ]);
 
         $this->assertTrue($newModel->save());
@@ -112,14 +113,14 @@ class ContentVisibilityTest extends ContentModelTest
      * Visibility integrity check missing!
      *
      * @skip
-     * @throws \yii\base\Exception
+     * @throws Exception
      */
     public function testCreatePublicContentOnPrivateSpace()
     {
         $this->space->visibility = Space::VISIBILITY_NONE;
 
         $newModel = new TestContent($this->space, Content::VISIBILITY_PUBLIC, [
-            'message' => 'Test'
+            'message' => 'Test',
         ]);
 
         $this->assertTrue($newModel->save());

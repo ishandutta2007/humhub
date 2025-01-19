@@ -1,5 +1,5 @@
 <?php
-return array (
+return [
   '%y Years' => '',
   '<b>This profile stream is still empty!</b>' => '',
   '<b>This profile stream is still empty</b><br>Be the first and post something...' => '',
@@ -28,6 +28,7 @@ return array (
   'Diverse' => '',
   'E-Mail' => 'Correu electrònic',
   'E-mail address of the user' => '',
+  'Each line must be formatted as Key=>Value!' => '',
   'Edit account' => 'Edita el compte',
   'Editable' => '',
   'Facebook URL' => '',
@@ -57,6 +58,7 @@ return array (
   'LinkedIn URL' => '',
   'Male' => '',
   'Markdown' => '',
+  'Mastodon URL' => '',
   'Maximum length' => '',
   'Maximum value' => '',
   'Minimum length' => '',
@@ -89,16 +91,19 @@ return array (
   'Stream' => 'Activitat',
   'Street' => '',
   'Supported ISO3166 country codes' => '',
+  'Template' => 'Plantilla',
   'Text' => '',
   'Text Area' => '',
   'Text Field Options' => '',
   'Text area field options' => '',
+  'This profile is disabled!' => '',
   'This profile is no longer available!' => '',
   'This user account is not approved yet!' => '',
   'This will add an additional input element for custom values' => '',
   'TikTok URL' => '',
   'Title' => 'Títol',
   'Translation Category ID' => '',
+  'Twig template that will be used to render this field. You can use the internal names as variables, e.g. `{{ firstname }} {{ lastname }}`' => '',
   'Twitter URL' => '',
   'Type Config' => '',
   'Updated at' => 'Actualitzat el',
@@ -115,4 +120,4 @@ return array (
   'YouTube URL' => '',
   'Zip' => '',
   '{attribute} is required!' => '',
-);
+];

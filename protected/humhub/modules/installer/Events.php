@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2021 HumHub GmbH & Co. KG
@@ -7,14 +8,14 @@
 
 namespace humhub\modules\installer;
 
+use yii\base\BaseObject;
 use yii\db\Connection;
 
 /**
  * Events provides callbacks to handle events.
  */
-class Events extends \yii\base\BaseObject
+class Events extends BaseObject
 {
-
     public static function onConnectionAfterOpen($event)
     {
         /* @var $connection Connection */

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2018 HumHub GmbH & Co. KG
@@ -7,10 +8,12 @@
 
 namespace humhub\modules\ui\commands;
 
+use Exception;
 use humhub\libs\DynamicConfig;
 use humhub\modules\ui\view\bootstrap\ThemeLoader;
 use humhub\modules\ui\view\helpers\ThemeHelper;
 use Yii;
+use yii\console\Controller;
 use yii\console\ExitCode;
 use yii\console\widgets\Table;
 use yii\helpers\Console;
@@ -20,9 +23,8 @@ use yii\helpers\Console;
  *
  * @since 1.3.3
  */
-class ThemeController extends \yii\console\Controller
+class ThemeController extends Controller
 {
-
     /**
      * {@inheritdoc}
      */
@@ -32,7 +34,7 @@ class ThemeController extends \yii\console\Controller
      * Shows all available and active themes
      *
      * @return int
-     * @throws \Exception
+     * @throws Exception
      */
     public function actionInfo()
     {
@@ -78,8 +80,7 @@ class ThemeController extends \yii\console\Controller
         (new ThemeLoader())->bootstrap(Yii::$app);
 
         $this->stdout("\nSuccessfully switched to theme: \n", Console::BOLD);
-        $this->stdout(Yii::$app->view->theme->name. "\n\n", Console::FG_GREEN);
+        $this->stdout(Yii::$app->view->theme->name . "\n\n", Console::FG_GREEN);
         return ExitCode::OK;
     }
-
 }

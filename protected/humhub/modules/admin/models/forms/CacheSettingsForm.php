@@ -15,7 +15,7 @@ use yii\base\Model;
  */
 class CacheSettingsForm extends Model
 {
-    const EVENT_FETCH_RELOADABLE_SCRIPTS = 'fetchReloadableScripts';
+    public const EVENT_FETCH_RELOADABLE_SCRIPTS = 'fetchReloadableScripts';
 
     public $type;
     public $expireTime;
@@ -29,9 +29,9 @@ class CacheSettingsForm extends Model
         parent::init();
 
         $settingsManager = Yii::$app->settings;
-        $this->type = $settingsManager->get('cache.class');
-        $this->expireTime = $settingsManager->get('cache.expireTime');
-        $this->reloadableScripts = $settingsManager->get('cache.reloadableScripts');
+        $this->type = $settingsManager->get('cacheClass');
+        $this->expireTime = $settingsManager->get('cacheExpireTime');
+        $this->reloadableScripts = $settingsManager->get('cacheReloadableScript');
     }
 
     /**
@@ -40,11 +40,16 @@ class CacheSettingsForm extends Model
     public function rules()
     {
         return [
-            [['type', 'expireTime'], 'required'],
+            [['expireTime'], 'required'],
             ['reloadableScripts', 'string'],
             ['type', 'checkCacheType'],
             ['expireTime', 'integer'],
-            ['type', 'in', 'range' => array_keys($this->getTypes())],
+            ['type', 'required', 'when' => function () {
+                return !Yii::$app->settings->isFixed('cacheClass');
+            }],
+            ['type', 'in', 'range' => array_keys($this->getTypes()), 'when' => function () {
+                return !Yii::$app->settings->isFixed('cacheClass');
+            }],
         ];
     }
 
@@ -54,9 +59,9 @@ class CacheSettingsForm extends Model
     public function attributeLabels()
     {
         return [
-            'type' => \Yii::t('AdminModule.settings', 'Cache Backend'),
-            'expireTime' => \Yii::t('AdminModule.settings', 'Default Expire Time (in seconds)'),
-            'reloadableScripts' => \Yii::t('AdminModule.settings', 'Prevent client caching of following scripts'),
+            'type' => Yii::t('AdminModule.settings', 'Cache Backend'),
+            'expireTime' => Yii::t('AdminModule.settings', 'Default Expire Time (in seconds)'),
+            'reloadableScripts' => Yii::t('AdminModule.settings', 'Prevent client caching of following scripts'),
         ];
     }
 
@@ -66,13 +71,13 @@ class CacheSettingsForm extends Model
     public function getTypes()
     {
         $cacheTypes = [
-            'yii\caching\DummyCache' => \Yii::t('AdminModule.settings', 'No caching'),
-            'yii\caching\FileCache' => \Yii::t('AdminModule.settings', 'File'),
-            'yii\caching\ApcCache' => \Yii::t('AdminModule.settings', 'APC(u)'),
+            'yii\caching\DummyCache' => Yii::t('AdminModule.settings', 'No caching'),
+            'yii\caching\FileCache' => Yii::t('AdminModule.settings', 'File'),
+            'yii\caching\ApcCache' => Yii::t('AdminModule.settings', 'APC(u)'),
         ];
 
         if (isset(Yii::$app->redis)) {
-            $cacheTypes['yii\redis\Cache'] = \Yii::t('AdminModule.settings', 'Redis');
+            $cacheTypes['yii\redis\Cache'] = Yii::t('AdminModule.settings', 'Redis');
         }
 
         return $cacheTypes;
@@ -84,24 +89,25 @@ class CacheSettingsForm extends Model
     public function checkCacheType($attribute, $params)
     {
         if ($this->type == 'yii\caching\ApcCache' && !function_exists('apc_add') && !function_exists('apcu_add')) {
-            $this->addError($attribute, \Yii::t('AdminModule.settings', "PHP APC(u) Extension missing - Type not available!"));
+            $this->addError($attribute, Yii::t('AdminModule.settings', "PHP APC(u) Extension missing - Type not available!"));
         }
     }
 
     /**
      * Saves the form
      *
-     * @return boolean
+     * @return bool
      */
     public function save()
     {
         $settingsManager = Yii::$app->settings;
 
-        $settingsManager->set('cache.class', $this->type);
-        $settingsManager->set('cache.expireTime', $this->expireTime);
-        $settingsManager->set('cache.reloadableScripts', $this->reloadableScripts);
+        $settingsManager->set('cacheClass', $this->type);
+        $settingsManager->set('cacheExpireTime', $this->expireTime);
+        $settingsManager->set('cacheReloadableScript', $this->reloadableScripts);
 
         DynamicConfig::rewrite();
+        self::flushCache();
 
         return true;
     }
@@ -122,11 +128,28 @@ class CacheSettingsForm extends Model
 
     public function getReloadableScriptsAsArray()
     {
-        if(is_string($this->reloadableScripts) && !empty($this->reloadableScripts)) {
+        if (is_string($this->reloadableScripts) && !empty($this->reloadableScripts)) {
             return array_map('trim', explode("\n", $this->reloadableScripts));
         }
 
         return [];
     }
 
+    /**
+     * @return string Activity output that can be used for logging
+     * @since 1.16
+     */
+    public static function flushCache(): string
+    {
+        $output = "Flushing cache ...";
+        Yii::$app->cache->flush();
+
+        $output .= "\nFlushing asset manager ...";
+        Yii::$app->assetManager->clear();
+
+        $output .= "\nFlushing theme cache ...";
+        Yii::$app->view->theme->activate();
+
+        return $output;
+    }
 }

@@ -2,7 +2,7 @@
 
 use tests\codeception\_pages\LoginPage;
 use yii\helpers\Url;
-use \Facebook\WebDriver\WebDriverKeys;
+use Facebook\WebDriver\WebDriverKeys;
 
 /**
  * Inherited Methods
@@ -32,7 +32,7 @@ class AcceptanceTester extends BaseTester
 
     public function amSpaceAdmin($logout = false, $spaceId = 2)
     {
-        switch($spaceId) {
+        switch ($spaceId) {
             case 1:
             case 3:
                 $this->amAdmin($logout);
@@ -83,11 +83,11 @@ class AcceptanceTester extends BaseTester
 
     public function amOnSpace($guid, $path = '/space/space', $params = [])
     {
-        if(!$path) {
+        if (!$path) {
             $path = '/space/space';
         }
 
-        if(is_int($guid)) {
+        if (is_int($guid)) {
             $guid = $this->getFixtureSpaceGuid(--$guid);
         }
 
@@ -97,21 +97,24 @@ class AcceptanceTester extends BaseTester
         $this->amOnRoute($params);
     }
 
-    public function dontSeeInDropDown($selector, $text) {
+    public function dontSeeInDropDown($selector, $text)
+    {
         $this->click($selector);
         $this->wait(1);
         $this->dontSee($text, $selector);
         $this->click($selector);
     }
 
-    public function seeInDropDown($selector, $text) {
+    public function seeInDropDown($selector, $text)
+    {
         $this->click($selector);
         $this->wait(1);
         $this->see($text, $selector);
         $this->click($selector);
     }
 
-    public function allowGuestAccess() {
+    public function allowGuestAccess()
+    {
         $this->amOnRoute(['/admin/authentication']);
         $this->jsClick('#authenticationsettingsform-allowguestaccess');
         $this->click('button.btn-primary', '#authentication-settings-form');
@@ -119,7 +122,8 @@ class AcceptanceTester extends BaseTester
         $this->guestAccessAllowed = true;
     }
 
-    public function amOnRoute($route) {
+    public function amOnRoute($route)
+    {
         $this->amOnPage(Url::to($route));
     }
 
@@ -128,14 +132,14 @@ class AcceptanceTester extends BaseTester
         $this->amOnSpace($guid, '/topic/manage');
         $this->waitForText('Topic Overview');
 
-        if(is_string($topics)) {
+        if (is_string($topics)) {
             $topics = [$topics];
         }
 
         foreach ($topics as $topic) {
             $this->fillField('#topic-name', $topic);
             $this->click('.input-group-btn .btn-default');
-            $this->waitForText($topic, null,'.layout-content-container .table-hover');
+            $this->waitForText($topic, null, '.layout-content-container .table-hover');
         }
     }
 
@@ -147,8 +151,8 @@ class AcceptanceTester extends BaseTester
         $this->executeJS("$('#contentForm_message').trigger('focusout');");
         $this->wait(1);
 
-        if($topics) {
-            $this->click('.dropdown-toggle', '.contentForm_options');
+        if ($topics) {
+            $this->click('.dropdown-toggle', '.contentForm_options .preferences');
             $this->wait(1);
             $this->click('Topics', '.contentForm_options');
             $this->waitForElementVisible('#postTopicContainer');
@@ -242,7 +246,7 @@ class AcceptanceTester extends BaseTester
     {
         $this->wait(2);
         $this->jsClick('[data-menu-id="account-logout"]');
-        if(!$this->guestAccessAllowed) {
+        if (!$this->guestAccessAllowed) {
             $this->waitForElementVisible('#login-form');
         } else {
             $this->waitForText('Sign in / up');
@@ -253,9 +257,9 @@ class AcceptanceTester extends BaseTester
     public function enableModule($guid, $moduleId)
     {
         $this->amOnSpace($guid, '/space/manage/module');
-        $this->seeElement('.enable-module-'.$moduleId);
-        $this->jsClick('.enable-module-'.$moduleId);
-        $this->waitForElement('.disable-module-'.$moduleId);
+        $this->seeElement('.enable-module-' . $moduleId);
+        $this->jsClick('.enable-module-' . $moduleId);
+        $this->waitForElement('.disable-module-' . $moduleId);
         $this->amOnSpace($guid);
     }
 
@@ -297,8 +301,8 @@ class AcceptanceTester extends BaseTester
         $this->waitForText('Notifications', 5, '.notifications');
         $this->waitForText($text, 5, '.notifications');
 
-        if($click) {
-            $this->click($text,'.notifications');
+        if ($click) {
+            $this->click($text, '.notifications');
             $this->wait(2);
         } else {
             $this->click('.notifications .fa-bell');
@@ -321,7 +325,7 @@ class AcceptanceTester extends BaseTester
 
     public function selectFromPicker($selector, $search)
     {
-        if(is_array($search)) {
+        if (is_array($search)) {
             foreach ($search as $searchItem) {
                 $this->selectFromPicker($selector, $searchItem);
                 $this->wait(1);
@@ -329,14 +333,9 @@ class AcceptanceTester extends BaseTester
         } else {
             $select2Input = $selector . ' ~ span input';
             $this->fillField($select2Input, $search);
-            $this->waitForElementVisible('.select2-container--open');
-            $this->waitForElementVisible('.select2-results__option.select2-results__option--highlighted');
-            $this->see($search, '.select2-container--open');
-            $this->wait(1);
+            $this->waitForText($search, null, '.select2-results__option.select2-results__option--highlighted .picker-text');
             $this->pressKey($select2Input, WebDriverKeys::ENTER);
         }
-
-
     }
 
     public function dontSeeInNotifications($text)

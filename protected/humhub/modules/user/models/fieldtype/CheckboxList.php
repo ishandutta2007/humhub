@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
@@ -36,14 +37,14 @@ class CheckboxList extends BaseType
 
     /**
      * Allow other selection
-     * @var boolean
+     * @var bool
      */
     public $allowOther;
 
     /**
      * @var string
      */
-    public $other_value;
+    public $other;
 
     /**
      * @inheritdoc
@@ -51,7 +52,8 @@ class CheckboxList extends BaseType
     public function rules()
     {
         return [
-            [['options', 'other'], 'safe'],
+            [['options'], 'validateListOptions'],
+            [['other'], 'safe'],
             [['allowOther'], 'integer'],
         ];
     }
@@ -72,15 +74,15 @@ class CheckboxList extends BaseType
                         'type' => 'textarea',
                         'label' => Yii::t('UserModule.profile', 'Possible values'),
                         'class' => 'form-control autosize',
-                        'hint' => Yii::t('UserModule.profile', 'One option per line. Key=>Value Format (e.g. yes=>Yes)')
+                        'hint' => Yii::t('UserModule.profile', 'One option per line. Key=>Value Format (e.g. yes=>Yes)'),
                     ],
                     'allowOther' => [
                         'type' => 'checkbox',
                         'label' => Yii::t('UserModule.profile', 'Allow other selection'),
                         'class' => 'form-control',
-                        'hint' => Yii::t('UserModule.profile', 'This will add an additional input element for custom values')
-                    ]
-                ]
+                        'hint' => Yii::t('UserModule.profile', 'This will add an additional input element for custom values'),
+                    ],
+                ],
             ]]);
     }
 
@@ -112,7 +114,7 @@ class CheckboxList extends BaseType
             Yii::$app->db->createCommand($sql)->execute();
         }
 
-        return parent::delete();
+        parent::delete();
     }
 
     /**
@@ -146,23 +148,11 @@ class CheckboxList extends BaseType
     }
 
     /**
-     * Returns a list of possible options
-     *
-     * @return array
+     * @inheritdoc
      */
-    public function getSelectItems()
+    public function getSelectItems(): array
     {
-        $items = [];
-
-        foreach (explode("\n", $this->options) as $option) {
-            if (strpos($option, "=>") !== false) {
-                list($key, $value) = explode("=>", $option);
-                $items[trim($key)] = Yii::t($this->profileField->getTranslationCategory(), trim($value));
-            } else {
-                $items[trim($option)] = Yii::t($this->profileField->getTranslationCategory(), trim($option));
-            }
-
-        }
+        $items = parent::getSelectItems();
 
         if ($this->allowOther) {
             $items['other'] = Yii::t('UserModule.profile', 'Other:');

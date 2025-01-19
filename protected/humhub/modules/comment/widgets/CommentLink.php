@@ -22,9 +22,8 @@ use Yii;
  */
 class CommentLink extends Widget
 {
-
-    const MODE_INLINE = 'inline';
-    const MODE_POPUP = 'popup';
+    public const MODE_INLINE = 'inline';
+    public const MODE_POPUP = 'popup';
 
     /**
      * @var CommentModel|ContentActiveRecord
@@ -50,14 +49,14 @@ class CommentLink extends Widget
 
         /** @var Module $module */
         $module = Yii::$app->getModule('comment');
-        
+
         if (
             !$module->canComment($this->object)
             || (
                 CommentModel::isSubComment($this->object)
                 && !$module->canComment($this->object->content->getPolymorphicRelation())
             )
-        ){
+        ) {
             return '';
         }
 
@@ -73,7 +72,7 @@ class CommentLink extends Widget
             'commentCount' => CommentModel::GetCommentCount(get_class($this->object), $this->object->getPrimaryKey()),
             'isNestedComment' => ($this->object instanceof CommentModel),
             'comment' => $this->object,
-            'module' => $module
+            'module' => $module,
         ]);
     }
 }

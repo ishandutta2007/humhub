@@ -2,17 +2,17 @@
 
 
 use humhub\components\Migration;
+use yii\db\Query;
 
 class m140705_065525_emailing_settings extends Migration
 {
-
     public function up()
     {
 
-        $rows = (new \yii\db\Query())
-                ->select("*")
-                ->from('user')
-                ->all();
+        $rows = (new Query())
+            ->select("*")
+            ->from('user')
+            ->all();
         foreach ($rows as $row) {
 
             // Ignore deleted users
@@ -55,12 +55,12 @@ class m140705_065525_emailing_settings extends Migration
             $this->insert('setting', [
                 'name' => 'receive_email_activities',
                 'value' => '1',
-                'name' => 'mailing'
+                'name' => 'mailing',
             ]);
             $this->insert('setting', [
                 'name' => 'receive_email_notifications',
                 'value' => '2',
-                'name' => 'mailing'
+                'name' => 'mailing',
             ]);
         }
     }

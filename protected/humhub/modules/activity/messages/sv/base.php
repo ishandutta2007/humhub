@@ -1,5 +1,5 @@
 <?php
-return array (
+return [
   '<strong>E-Mail</strong> Summaries' => '<strong>E-post</strong> -sammanfattning',
   '<strong>Latest</strong> activities' => '<strong>Senaste</strong> händelser',
   'Activities' => 'Händelser',
@@ -11,6 +11,7 @@ return array (
   'Hourly' => 'Per timme',
   'Interval' => 'Intervall',
   'Latest news' => 'Senaste nyheterna',
+  'Monthly' => 'Månatlig',
   'Never' => 'Aldrig',
   'On this page you can configure the contents and the interval of these e-mail updates.' => 'På denna sida kan du konfigurera innehållet och intervallerna av dessa e-postuppdateringar.',
   'On this page you can define the default behavior for your users. These settings can be overwritten by users in their account settings page.' => 'På denna sida kan du ställa in standardinställningar för användare. De här inställningarna kan ändras av en användare via deras egna Kontoinställningar.',
@@ -22,6 +23,7 @@ return array (
   'Weekly' => 'Veckovis',
   'You will only receive an e-mail if there is something new.' => 'Du får bara e-post om det har hänt någonting nytt.',
   'Your daily summary' => 'Din dagliga sammanställning',
+  'Your monthly summary' => 'Din månadssammanfattning',
   'Your weekly summary' => 'Din veckovisa sammanställning',
   'see online' => 'visa online',
   'via' => 'via',
@@ -34,4 +36,4 @@ return array (
   '{spaceName} has been archived' => '{spaceName} har blivit inaktiverad',
   '{spaceName} has been unarchived' => '{spaceName} har blivit återaktiverad',
   '{user1} now follows {user2}.' => '{user1} följer nu {user2}',
-);
+];

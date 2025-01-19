@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2021 HumHub GmbH & Co. KG
@@ -8,6 +9,7 @@
 namespace humhub\modules\user\widgets;
 
 use humhub\libs\Html;
+use humhub\modules\user\models\User;
 use yii\helpers\Url;
 use humhub\components\Widget;
 
@@ -19,9 +21,8 @@ use humhub\components\Widget;
  */
 class PeopleTagList extends Widget
 {
-
     /**
-     * @var \humhub\modules\user\models\User
+     * @var User
      */
     public $user;
 

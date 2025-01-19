@@ -17,14 +17,8 @@
 
 @media @responsive {
 
-    body {
-        padding-top: 105px;
-    }
-
-    .modal-open #layout-content {
-        > .container {
-            overflow-x: unset; // This fixes broken (invisible) richtext editor nav in ios safari...
-        }
+    :root {
+        --hh-fixed-header-height: 105px;
     }
 
     // Layout Contents: Adjusting the contents to fit perfectly on mobile devices
@@ -36,7 +30,6 @@
                 white-space: nowrap;
                 overflow-x: auto;
             }
-
         }
 
         .left-navigation .list-group::-webkit-scrollbar {
@@ -100,18 +93,31 @@
         > .container {
             padding-right: 2px !important;
             padding-left: 2px !important;
-            overflow-x: hidden;
-        }
 
+            .row {
+                margin-right: -2px !important;
+                margin-left: -2px !important;
+            }
+
+            .col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
+                padding-right: 2px !important;
+                padding-left: 2px !important;
+            }
+        }
 
         .layout-nav-container .panel-heading {
             display: none;
         }
 
         .panel-profile-header {
-            #profilefileupload, .profile-user-photo-container, .space-acronym, .profile-user-photo {
+            #profilefileupload, .profile-user-photo-container, .space-acronym {
                 height: 100px !important;
                 width: 100px !important;
+            }
+
+            .profile-user-photo {
+                height: 95px !important;
+                width: 95px !important;
             }
         }
 
@@ -121,17 +127,13 @@
 
 
         // Space
-        .space-acronym {
-            padding: 6px 0 !important;
-        }
-
         .panel-profile .panel-profile-header .img-profile-header-background {
             min-height: 80px !important;
         }
 
         .panel-profile .panel-profile-header .img-profile-data {
             padding-top: 50px !important;
-            padding-left: 130px;
+            padding-left: 125px;
         }
     }
 
@@ -142,23 +144,15 @@
         margin: 2px !important;
     }
 
-    .dropdown-menu > li a,
-    .nav-pills .dropdown-menu li a,
-    .nav-tabs .dropdown-menu li a,
-    .account .dropdown-menu li a,
-    .modal .dropdown-menu li a,
-    .panel .dropdown-menu li a,
-    .nav-tabs .dropdown-menu li a {
-        padding-top: 10px;
-        padding-bottom: 10px;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-    }
-
     .dropdown-menu {
         max-width: 320px;
-
+        > li:not(.dropdown-header) a {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
     }
 
     select.form-control:not([multiple]) {

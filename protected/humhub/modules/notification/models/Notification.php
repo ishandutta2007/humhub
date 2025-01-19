@@ -5,8 +5,10 @@ namespace humhub\modules\notification\models;
 use humhub\components\ActiveRecord;
 use humhub\components\behaviors\PolymorphicRelation;
 use humhub\components\Module;
+use humhub\modules\content\models\Content;
 use humhub\modules\notification\components\BaseNotification;
 use humhub\modules\user\models\User;
+use Throwable;
 use Yii;
 use yii\base\Exception;
 use yii\db\ActiveQuery;
@@ -17,19 +19,18 @@ use yii\db\Query;
 /**
  * This is the model class for table "notification".
  *
- * @property integer $id
+ * @property int $id
  * @property string $class
- * @property integer $user_id
- * @property integer $seen
+ * @property int $user_id
+ * @property int $seen
  * @property string $source_class
- * @property integer $source_pk
- * @property integer $space_id
- * @property integer $emailed
+ * @property int $source_pk
+ * @property int $space_id
+ * @property int $emailed
  * @property string module
  * @property string $created_at
- * @property integer $desktop_notified
- * @property integer $originator_user_id
- * @property integer $send_web_notifications
+ * @property int $originator_user_id
+ * @property int $send_web_notifications
  * @property string $payload
  * @property User|null $originator
  * @property User $user
@@ -38,7 +39,6 @@ use yii\db\Query;
  */
 class Notification extends ActiveRecord
 {
-
     /**
      * @var int number of found grouped notifications
      */
@@ -96,11 +96,11 @@ class Notification extends ActiveRecord
         return [
             [['class', 'user_id'], 'required'],
             [
-                ['user_id', 'seen', 'source_pk', 'space_id', 'emailed', 'desktop_notified', 'originator_user_id'],
+                ['user_id', 'seen', 'source_pk', 'space_id', 'emailed', 'originator_user_id'],
                 'integer',
             ],
             [['class', 'source_class'], 'string', 'max' => 100],
-            [['payload'], 'safe']
+            [['payload'], 'safe'],
         ];
     }
 
@@ -140,12 +140,11 @@ class Notification extends ActiveRecord
                     ->andWhere(['class' => $this->class, 'user_id' => $this->user_id, 'group_key' => $this->group_key])
                     ->one();
                 $params['originator'] = $params['record']->originator;
-
             } else {
                 $params['record'] = $this;
             }
 
-            $object = new $this->class;
+            $object = new $this->class();
             Yii::configure($object, $params);
             return $object;
         }
@@ -216,10 +215,10 @@ class Notification extends ActiveRecord
     /**
      * Loads a certain amount ($limit) of grouped notifications from a given id set by $from.
      *
-     * @param integer $from notification id which was the last loaded entry.
+     * @param int $from notification id which was the last loaded entry.
      * @param int $limit count of results.
      * @return Notification[]
-     * @throws \Throwable
+     * @throws Throwable
      * @since 1.2
      */
     public static function loadMore($from = 0, $limit = 6)
@@ -227,7 +226,7 @@ class Notification extends ActiveRecord
         $query = Notification::findGrouped();
 
         if ($from != 0) {
-            $query->andWhere(['<', 'id', $from]);
+            $query->andWhere(['<', 'notification.id', $from]);
         }
 
         $query->limit($limit);
@@ -242,7 +241,7 @@ class Notification extends ActiveRecord
      * @param User|null $user
      * @param int $sendWebNotifications
      * @return ActiveQuery
-     * @throws \Throwable
+     * @throws Throwable
      */
     public static function findGrouped(User $user = null, $sendWebNotifications = 1)
     {
@@ -251,18 +250,24 @@ class Notification extends ActiveRecord
         $query = self::find();
         $query->addSelect([
             'notification.*',
-            new Expression('count(distinct(originator_user_id)) as group_user_count'),
+            new Expression('count(distinct(notification.originator_user_id)) as group_user_count'),
             new Expression('count(*) as group_count'),
-            new Expression('max(created_at) as group_created_at'),
-            new Expression('min(seen) as group_seen'),
+            new Expression('max(notification.created_at) as group_created_at'),
+            new Expression('min(notification.seen) as group_seen'),
         ]);
 
-        $query->andWhere(['user_id' => $user->id]);
+        $query->andWhere(['notification.user_id' => $user->id]);
 
-        $query->andWhere(['send_web_notifications' => $sendWebNotifications]);
+        // Exclude all not published contents
+        $query->leftJoin('content', 'content.object_model = notification.source_class AND content.object_id = notification.source_pk')
+            ->andWhere(['OR',
+                ['content.state' => Content::STATE_PUBLISHED],
+                ['IS', 'content.id', new Expression('NULL')]]);
+
+        $query->andWhere(['notification.send_web_notifications' => $sendWebNotifications]);
         $query->addGroupBy([
-            'COALESCE(group_key, id)',
-            'class',
+            'COALESCE(notification.group_key, notification.id)',
+            'notification.class',
         ]);
         $query->orderBy(['group_seen' => SORT_ASC, 'group_created_at' => SORT_DESC]);
 
@@ -275,27 +280,13 @@ class Notification extends ActiveRecord
      *
      * @param User $user
      * @return ActiveQuery
-     * @throws \Throwable
+     * @throws Throwable
      * @since 1.2
      */
     public static function findUnseen(User $user = null)
     {
         return Notification::findGrouped($user)
-            ->andWhere(['seen' => 0])
-            ->orWhere(['IS', 'seen', new Expression('NULL')]);
+            ->andWhere(['notification.seen' => 0])
+            ->orWhere(['IS', 'notification.seen', new Expression('NULL')]);
     }
-
-    /**
-     * Finds all grouped unseen notifications which were not already sent to the frontend.
-     *
-     * @param User $user
-     * @return ActiveQuery
-     * @throws \Throwable
-     * @since 1.2
-     */
-    public static function findUnnotifiedInFrontend(User $user = null)
-    {
-        return self::findUnseen($user)->andWhere(['desktop_notified' => 0]);
-    }
-
 }

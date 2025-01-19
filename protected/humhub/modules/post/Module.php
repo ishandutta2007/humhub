@@ -20,7 +20,6 @@ use humhub\modules\post\models\Post;
  */
 class Module extends ContentContainerModule
 {
-
     /**
      * @inheritdoc
      */
@@ -33,13 +32,19 @@ class Module extends ContentContainerModule
     public bool $enableDynamicFontSize = false;
 
     /**
+     * @since 1.15
+     * @var int collapsed post block height
+     */
+    public int $collapsedPostHeight = 300;
+
+    /**
      * @inheritdoc
      */
     public function getPermissions($contentContainer = null)
     {
         if ($contentContainer !== null) {
             return [
-                new permissions\CreatePost()
+                new permissions\CreatePost(),
             ];
         }
 
@@ -53,5 +58,4 @@ class Module extends ContentContainerModule
     {
         return [Post::class];
     }
-
 }

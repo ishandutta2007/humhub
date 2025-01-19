@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2018 HumHub GmbH & Co. KG
@@ -19,7 +20,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
  */
 class ExportResultTest extends Unit
 {
-    const TEST_FILE = 'test.csv';
+    public const TEST_FILE = 'test.csv';
 
     /**
      * @var \UnitTester

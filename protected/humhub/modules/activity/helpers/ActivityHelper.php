@@ -3,13 +3,13 @@
 namespace humhub\modules\activity\helpers;
 
 use humhub\components\ActiveRecord;
+use humhub\components\behaviors\PolymorphicRelation;
 use humhub\modules\activity\models\Activity;
 use Yii;
 use yii\db\ActiveQuery;
 
 class ActivityHelper
 {
-
     public static function getActivitiesQuery(?ActiveRecord $record): ?ActiveQuery
     {
         if ($record === null) {
@@ -25,7 +25,7 @@ class ActivityHelper
 
         return Activity::find()->where([
             'object_id' => $pk,
-            'object_model' => get_class($record)
+            'object_model' => PolymorphicRelation::getObjectModel($record),
         ]);
     }
 

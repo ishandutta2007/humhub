@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2018 HumHub GmbH & Co. KG
@@ -17,19 +18,18 @@ use humhub\modules\file\models\File;
  */
 class MimeHelper
 {
-
     /** IconClass */
-    const ICON_WORD = 'mime-word';
-    const ICON_EXCEL = 'mime-excel';
-    const ICON_POWERPOINT = 'mime-powerpoint';
-    const ICON_PDF = 'mime-pdf';
-    const ICON_ZIP = 'mime-zip';
-    const ICON_IMAGE = 'mime-image';
-    const ICON_AUDIO = 'mime-audio';
-    const ICON_VIDEO = 'mime-video';
-    const ICON_PHOTOSHOP = 'mime-photoshop';
-    const ICON_ILLUSTRATOR = 'mime-illustrator';
-    const ICON_FILE = 'mime-file';
+    public const ICON_WORD = 'mime-word';
+    public const ICON_EXCEL = 'mime-excel';
+    public const ICON_POWERPOINT = 'mime-powerpoint';
+    public const ICON_PDF = 'mime-pdf';
+    public const ICON_ZIP = 'mime-zip';
+    public const ICON_IMAGE = 'mime-image';
+    public const ICON_AUDIO = 'mime-audio';
+    public const ICON_VIDEO = 'mime-video';
+    public const ICON_PHOTOSHOP = 'mime-photoshop';
+    public const ICON_ILLUSTRATOR = 'mime-illustrator';
+    public const ICON_FILE = 'mime-file';
 
     /** @var array Map for Extension to IconClass */
     private static $extensionToIconClass = [
@@ -81,7 +81,7 @@ class MimeHelper
         // Adobe Photoshop
         'psd' => self::ICON_PHOTOSHOP,
         // Adobe Illustrator
-        'ai' => self::ICON_ILLUSTRATOR
+        'ai' => self::ICON_ILLUSTRATOR,
     ];
 
     /**

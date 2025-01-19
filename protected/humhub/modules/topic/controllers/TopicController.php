@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
@@ -24,7 +25,7 @@ class TopicController extends ContentContainerController
     protected function getAccessRules()
     {
         return [
-            ['json']
+            ['json'],
         ];
     }
 

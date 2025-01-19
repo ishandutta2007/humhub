@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
@@ -17,7 +18,6 @@ use humhub\components\assets\AssetBundle;
  */
 class ImagesLoadedAsset extends AssetBundle
 {
-
     /**
      * @inheritdoc
      */

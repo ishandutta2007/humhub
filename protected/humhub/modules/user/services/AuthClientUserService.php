@@ -67,7 +67,9 @@ class AuthClientUserService
             }
         } else {
             Yii::error(
-                'Could not store auth client without given ID attribute. User: ' . $this->user->displayName . ' (' . $this->user->id . ')', 'user');
+                'Could not store auth client without given ID attribute. User: ' . $this->user->displayName . ' (' . $this->user->id . ')',
+                'user',
+            );
         }
     }
 
@@ -75,7 +77,7 @@ class AuthClientUserService
     {
         Auth::deleteAll([
             'user_id' => $this->user->id,
-            'source' => (string)$authClient->getId()
+            'source' => (string)$authClient->getId(),
         ]);
     }
 
@@ -114,7 +116,7 @@ class AuthClientUserService
     /**
      * Determines if this user is able to change the password.
      *
-     * @return boolean
+     * @return bool
      */
     public function canChangePassword(): bool
     {

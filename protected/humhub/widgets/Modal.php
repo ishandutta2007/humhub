@@ -63,7 +63,7 @@ class Modal extends JsWidget
      * there is no headtext available, or set to false if the button should not
      * be rendered.
      *
-     * @var boolean
+     * @var bool
      */
     public $showClose;
 
@@ -77,25 +77,25 @@ class Modal extends JsWidget
 
     /**
      * Defines if a click on the modal background should close the modal
-     * @var boolean
+     * @var bool
      */
     public $backdrop = true;
 
     /**
      * Defines if the modal can be closed by pressing escape
-     * @var boolean
+     * @var bool
      */
     public $keyboard = true;
 
     /**
      * Defines if the modal should be shown at startup
-     * @var boolean
+     * @var bool
      */
     public $show = false;
 
     /**
      * Defines if the text should be centered
-     * @var boolean
+     * @var bool
      */
     public $centerText = false;
 
@@ -103,7 +103,7 @@ class Modal extends JsWidget
      * Can be set to false if the modal body should not be initialized with an
      * loader animation. Default is true, if no body is provided.
      *
-     * @var boolean
+     * @var bool
      */
     public $initialLoader;
 
@@ -117,7 +117,7 @@ class Modal extends JsWidget
             'animation' => $this->animation,
             'size' => $this->size,
             'centerText' => $this->centerText,
-            'initialLoader' => $this->initialLoader
+            'initialLoader' => $this->initialLoader,
         ]);
     }
 
@@ -127,7 +127,7 @@ class Modal extends JsWidget
             'class' => "modal",
             'tabindex' => "-1",
             'role' => "dialog",
-            'aria-hidden' => "true"
+            'aria-hidden' => "true",
         ];
     }
 
@@ -135,15 +135,15 @@ class Modal extends JsWidget
     {
         $result = [];
 
-        if(!$this->closable || !$this->backdrop) {
+        if (!$this->closable || !$this->backdrop) {
             $result['backdrop'] = 'static';
         }
 
-        if(!$this->closable || !$this->keyboard) {
+        if (!$this->closable || !$this->keyboard) {
             $result['keyboard'] = 'false';
         }
 
-        if($this->show) {
+        if ($this->show) {
             $result['show'] = 'true';
         }
 

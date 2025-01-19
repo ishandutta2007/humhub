@@ -1,8 +1,6 @@
 <?php
 
-
 namespace humhub\modules\live\assets;
-
 
 use humhub\assets\SocketIoAsset;
 use humhub\components\assets\AssetBundle;
@@ -26,7 +24,7 @@ class LivePushAsset extends AssetBundle
      */
     public $depends = [
         LiveAsset::class,
-        SocketIoAsset::class
+        SocketIoAsset::class,
     ];
 
 }

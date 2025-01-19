@@ -97,11 +97,12 @@ class m210211_051243_container_tag extends Migration
             }
 
             // Preset cache field
-            $this->update('contentcontainer',
+            $this->update(
+                'contentcontainer',
                 [
-                    'tags_cached' => implode(', ', ContentContainerTagRelation::getNamesByContainer($contentContainer))
+                    'tags_cached' => implode(', ', ContentContainerTagRelation::getNamesByContainer($contentContainer)),
                 ],
-                ['id' => $contentContainer->contentcontainer_id]
+                ['id' => $contentContainer->contentcontainer_id],
             );
         }
     }

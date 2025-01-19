@@ -19,17 +19,20 @@ use humhub\modules\content\models\Movable;
 use humhub\modules\content\permissions\ManageContent;
 use humhub\modules\content\widgets\stream\StreamEntryWidget;
 use humhub\modules\content\widgets\stream\WallStreamEntryWidget;
+use humhub\modules\content\widgets\WallEntry;
+use humhub\modules\file\models\File;
 use humhub\modules\topic\models\Topic;
 use humhub\modules\topic\widgets\TopicLabel;
 use humhub\modules\user\behaviors\Followable;
 use humhub\modules\user\models\User;
-use humhub\modules\content\widgets\WallEntry;
 use humhub\widgets\Label;
+use Throwable;
 use Yii;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
 use yii\base\ModelEvent;
 use yii\db\ActiveQuery;
+use yii\db\StaleObjectException;
 
 /**
  * ContentActiveRecord is the base ActiveRecord [[\yii\db\ActiveRecord]] for Content.
@@ -66,6 +69,7 @@ use yii\db\ActiveQuery;
  * @mixin Followable
  * @property User $createdBy
  * @property User $owner
+ * @property-read File[] $files
  * @author Luke
  */
 class ContentActiveRecord extends ActiveRecord implements ContentOwner, Movable, SoftDeletable
@@ -77,7 +81,7 @@ class ContentActiveRecord extends ActiveRecord implements ContentOwner, Movable,
     public $wallEntryClass;
 
     /**
-     * @var boolean should the originator automatically follows this content when saved.
+     * @var bool should the originator automatically follows this content when saved.
      */
     public $autoFollow = true;
 
@@ -201,9 +205,10 @@ class ContentActiveRecord extends ActiveRecord implements ContentOwner, Movable,
 
             if (!$content) {
                 $content = new Content();
-                $content->setPolymorphicRelation($this);
                 $this->populateRelation('content', $content);
             }
+
+            $content->setPolymorphicRelation($this);
 
             return $content;
         }
@@ -218,7 +223,7 @@ class ContentActiveRecord extends ActiveRecord implements ContentOwner, Movable,
      */
     public function getContentName()
     {
-        return static::class;
+        return static::getObjectModel();
     }
 
     /**
@@ -244,7 +249,7 @@ class ContentActiveRecord extends ActiveRecord implements ContentOwner, Movable,
      *
      * @param array $labels
      * @param bool $includeContentName
-     * @return Label[]|\string[] content labels used for example in wallentrywidget
+     * @return Label[]|string[] content labels used for example in wallentrywidget
      * @throws \Exception
      */
     public function getLabels($labels = [], $includeContentName = true)
@@ -267,7 +272,7 @@ class ContentActiveRecord extends ActiveRecord implements ContentOwner, Movable,
 
         foreach (Topic::findByContent($this->content)->all() as $topic) {
             /** @var $topic Topic */
-            $labels[] = TopicLabel::forTopic($topic);
+            $labels[] = TopicLabel::forTopic($topic, $this->content->getPolymorphicRelation());
         }
 
         return Label::sort($labels);
@@ -304,7 +309,7 @@ class ContentActiveRecord extends ActiveRecord implements ContentOwner, Movable,
     /**
      * Determines whether or not the record has an additional createPermission set.
      *
-     * @return boolean
+     * @return bool
      * @since 1.13
      */
     public function hasCreatePermission()
@@ -363,7 +368,7 @@ class ContentActiveRecord extends ActiveRecord implements ContentOwner, Movable,
     /**
      * Determines weather or not this records has an additional managePermission set.
      *
-     * @return boolean
+     * @return bool
      * @since 1.2.1
      */
     public function hasManagePermission()
@@ -382,7 +387,7 @@ class ContentActiveRecord extends ActiveRecord implements ContentOwner, Movable,
     {
         if (is_subclass_of($this->wallEntryClass, StreamEntryWidget::class, true)) {
             $params['model'] = $this;
-        } else if (!empty($this->wallEntryClass)) {
+        } elseif (!empty($this->wallEntryClass)) {
             $params['contentObject'] = $this; // legacy WallEntry widget
         }
 
@@ -405,7 +410,7 @@ class ContentActiveRecord extends ActiveRecord implements ContentOwner, Movable,
 
         if (is_subclass_of($this->wallEntryClass, WallEntry::class)) {
             $class = $this->wallEntryClass;
-            $widget = new $class;
+            $widget = new $class();
             $widget->contentObject = $this;
             return $widget;
         }
@@ -427,7 +432,7 @@ class ContentActiveRecord extends ActiveRecord implements ContentOwner, Movable,
     {
         if (!$this->content->validate()) {
             throw new Exception(
-                'Could not validate associated Content record! (' . $this->content->getErrorMessage() . ')'
+                'Could not validate associated Content record! (' . $this->content->getErrorMessage() . ')',
             );
         }
 
@@ -480,29 +485,6 @@ class ContentActiveRecord extends ActiveRecord implements ContentOwner, Movable,
     }
 
     /**
-     * Returns the class used in the polymorphic content relation.
-     * By default this function will return the static class.
-     *
-     * Subclasses of existing content record classes may overwrite this function in order to remain the actual
-     * base type as follows:
-     *
-     * ```
-     * public static function getObjectModel() {
-     *     return BaseType::class
-     * }
-     * ```
-     *
-     * This will force the usage of the `BaseType` class when creating, deleting or querying the content relation.
-     * This is used in cases in which a subclass extends the a base record class without implementing a custom content type.
-     *
-     * @return string
-     */
-    public static function getObjectModel()
-    {
-        return static::class;
-    }
-
-    /**
      * Marks this content for deletion (soft delete).
      * Use `hardDelete()` method to delete record immediately.
      *
@@ -552,10 +534,12 @@ class ContentActiveRecord extends ActiveRecord implements ContentOwner, Movable,
 
     /**
      * @inheritdoc
+     * @throws Throwable
+     * @throws StaleObjectException
      */
     public function hardDelete(): bool
     {
-        return (parent::delete() !== false);
+        return parent::delete() !== false;
     }
 
     /**
@@ -584,7 +568,7 @@ class ContentActiveRecord extends ActiveRecord implements ContentOwner, Movable,
      * Checks if the given user or the current logged in user if no user was given, is the owner of this content
      * @param null $user
      * @return bool
-     * @throws \Throwable
+     * @throws Throwable
      * @since 1.3
      */
     public function isOwner($user = null)
@@ -602,12 +586,19 @@ class ContentActiveRecord extends ActiveRecord implements ContentOwner, Movable,
     /**
      * Related Content model
      *
-     * @return \yii\db\ActiveQuery|ActiveQueryContent
+     * @return ActiveQuery|ActiveQueryContent
      */
     public function getContent()
     {
         return $this->hasOne(Content::class, ['object_id' => 'id'])
             ->andWhere(['content.object_model' => static::getObjectModel()]);
+    }
+
+    public function getFiles()
+    {
+        return $this
+            ->hasMany(File::class, ['object_id' => 'id'])
+            ->andOnCondition(['object_model' => static::getObjectModel()]);
     }
 
     /**
@@ -683,5 +674,17 @@ class ContentActiveRecord extends ActiveRecord implements ContentOwner, Movable,
      */
     public function afterMove(ContentContainerActiveRecord $container = null)
     {
+    }
+
+    /**
+     * Returns a Key=>Value array with additional contents to be indexed.
+     * General information and addons like comments, authors, files and tags will be indexed automatically.
+     *
+     * @return array
+     * @since 1.16
+     */
+    public function getSearchAttributes()
+    {
+        return [];
     }
 }

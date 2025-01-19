@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
@@ -21,7 +22,7 @@ class PermissionManagerMock extends PermissionManager
     public $permissions = [
         2 => [
             ManageUsers::class,
-            ManageGroups::class
+            ManageGroups::class,
         ],
         3 => [
             ManageUsers::class,
@@ -29,8 +30,8 @@ class PermissionManagerMock extends PermissionManager
             ManageModules::class,
             ManageSettings::class,
             ManageSpaces::class,
-            SeeAdminInformation::class
-        ]
+            SeeAdminInformation::class,
+        ],
     ];
 
     protected function verify(BasePermission $permission)

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2021 HumHub GmbH & Co. KG
@@ -14,13 +15,12 @@ use Yii;
 
 /**
  * ModuleInstallActionButtons shows actions for module with available update
- * 
+ *
  * @since 1.11
  * @author Luke
  */
 class ModuleUpdateActionButtons extends Widget
 {
-
     /**
      * @var Module
      */

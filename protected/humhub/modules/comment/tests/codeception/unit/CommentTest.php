@@ -2,6 +2,8 @@
 
 namespace tests\codeception\unit\modules\comment\components;
 
+use humhub\modules\activity\models\Activity;
+use humhub\modules\notification\models\Notification;
 use humhub\modules\user\models\User;
 use tests\codeception\_support\HumHubDbTestCase;
 use Codeception\Specify;
@@ -10,7 +12,6 @@ use humhub\modules\comment\models\Comment;
 
 class CommentTest extends HumHubDbTestCase
 {
-
     use Specify;
 
     public function testCreateComment()
@@ -20,7 +21,7 @@ class CommentTest extends HumHubDbTestCase
         $comment = new Comment([
             'message' => 'User2 comment!',
             'object_model' => Post::class,
-            'object_id' => 11
+            'object_id' => 11,
         ]);
 
         $comment->save();
@@ -30,8 +31,8 @@ class CommentTest extends HumHubDbTestCase
         $this->assertNotEmpty($comment->id);
         $this->assertNotEmpty($comment->content->getPolymorphicRelation()->getFollowersWithNotificationQuery());
 
-        $this->assertNotNull(\humhub\modules\activity\models\Activity::findOne(['object_model' => Comment::class, 'object_id' => $comment->id]));
-        $this->assertNotNull(\humhub\modules\notification\models\Notification::findOne(['source_class' => Comment::class, 'source_pk' => $comment->id]));
+        $this->assertNotNull(Activity::findOne(['object_model' => Comment::class, 'object_id' => $comment->id]));
+        $this->assertNotNull(Notification::findOne(['source_class' => Comment::class, 'source_pk' => $comment->id]));
     }
 
     public function testDeleteUser()
@@ -41,7 +42,7 @@ class CommentTest extends HumHubDbTestCase
         $comment = new Comment([
             'message' => 'User2 comment!',
             'object_model' => Post::class,
-            'object_id' => 11
+            'object_id' => 11,
         ]);
 
         $comment->save();
@@ -59,7 +60,7 @@ class CommentTest extends HumHubDbTestCase
         $comment = new Comment([
             'message' => 'User2 comment!',
             'object_model' => Post::class,
-            'object_id' => 11
+            'object_id' => 11,
         ]);
 
         $comment->save();
@@ -77,19 +78,19 @@ class CommentTest extends HumHubDbTestCase
         (new Comment([
             'message' => 'Test comment1',
             'object_model' => Post::class,
-            'object_id' => 11
+            'object_id' => 11,
         ]))->save();
 
         (new Comment([
             'message' => 'Test comment2',
             'object_model' => Post::class,
-            'object_id' => 11
+            'object_id' => 11,
         ]))->save();
 
         (new Comment([
             'message' => 'Test comment3',
             'object_model' => Post::class,
-            'object_id' => 11
+            'object_id' => 11,
         ]))->save();
 
         $comments = Comment::GetCommentsLimited(Post::class, 11, 2);
@@ -111,19 +112,19 @@ class CommentTest extends HumHubDbTestCase
         (new Comment([
             'message' => 'Test comment1',
             'object_model' => Post::class,
-            'object_id' => 11
+            'object_id' => 11,
         ]))->save();
 
         (new Comment([
             'message' => 'Test comment2',
             'object_model' => Post::class,
-            'object_id' => 11
+            'object_id' => 11,
         ]))->save();
 
         (new Comment([
             'message' => 'Test comment3',
             'object_model' => Post::class,
-            'object_id' => 11
+            'object_id' => 11,
         ]))->save();
 
         $count = Comment::GetCommentCount(Post::class, 11);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: kingb
@@ -10,7 +11,6 @@ namespace humhub\modules\space\tests\codeception\functional;
 
 use FunctionalTester;
 use humhub\modules\space\models\Space;
-
 
 class ArchiveCest
 {

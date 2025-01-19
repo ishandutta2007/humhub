@@ -12,7 +12,7 @@ class OverviewWidget extends JsWidget implements Reloadable
     public $id = 'notification_overview_list';
 
     public $init = true;
-    
+
     public $notifications;
 
     public $pagination;
@@ -28,7 +28,7 @@ class OverviewWidget extends JsWidget implements Reloadable
         return $this->render('notificationOverviewList', [
             'notifications' => $this->notifications,
             'pagination' => $this->pagination,
-            'options' => $this->getOptions()
+            'options' => $this->getOptions(),
         ]);
     }
 

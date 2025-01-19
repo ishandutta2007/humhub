@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2018 HumHub GmbH & Co. KG
@@ -7,13 +8,14 @@
 
 namespace space\acceptance;
 
+use Exception;
 use space\AcceptanceTester;
 
 class InviteCest
 {
     /**
      * @param AcceptanceTester $I
-     * @throws \Exception
+     * @throws Exception
      */
     public function testSpaceUserInviteAccept(AcceptanceTester $I)
     {
@@ -40,7 +42,7 @@ class InviteCest
 
     /**
      * @param AcceptanceTester $I
-     * @throws \Exception
+     * @throws Exception
      */
     public function testSpaceUserInviteDecline(AcceptanceTester $I)
     {
@@ -58,7 +60,7 @@ class InviteCest
         $I->waitForText('Accept Invite', null, '.controls-header');
 
         $I->click('.dropdown-toggle', '.controls-header');
-        $I->waitForText('Decline Invite', null,'.controls-header');
+        $I->waitForText('Decline Invite', null, '.controls-header');
         $I->click('Decline Invite');
         $I->waitForText('Join');
 
@@ -68,11 +70,11 @@ class InviteCest
 
     /**
      * @param AcceptanceTester $I
-     * @throws \Exception
+     * @throws Exception
      */
     public function testSpaceUserInviteRevoke(AcceptanceTester $I)
     {
-        $I->wantTo('ensure that declining an user invitation to a space works.');
+        $I->wantTo('ensure that revoking an user invitation to a space works.');
 
         $I->amUser1();
         $I->amOnSpace2();

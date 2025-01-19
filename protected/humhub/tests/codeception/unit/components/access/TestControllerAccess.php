@@ -1,20 +1,12 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
  * @license https://www.humhub.com/licences
- *
- */
-
-/**
- * Created by PhpStorm.
- * User: buddha
- * Date: 27.07.2017
- * Time: 13:27
  */
 
 namespace humhub\tests\codeception\unit\components\access;
-
 
 use humhub\commands\TestController;
 use humhub\components\access\AccessValidator;
@@ -31,7 +23,7 @@ class TestControllerAccess extends HumHubDbTestCase
     {
         // Guest not allowed for global loggedInOnly rule
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'rules' => [
-            [ControllerAccess::RULE_LOGGED_IN_ONLY]
+            [ControllerAccess::RULE_LOGGED_IN_ONLY],
         ]]);
 
         $this->assertFalse($controllerAccess->run());
@@ -39,14 +31,14 @@ class TestControllerAccess extends HumHubDbTestCase
 
         // Guest not allowed for not action related loggedInOnly rule
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'rules' => [
-            [ControllerAccess::RULE_LOGGED_IN_ONLY => ['testAction2']]
+            [ControllerAccess::RULE_LOGGED_IN_ONLY => ['testAction2']],
         ]]);
 
         $this->assertTrue($controllerAccess->run());
 
         // Guest not allowed for action related loggedInOnly rule
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'rules' => [
-            [ControllerAccess::RULE_LOGGED_IN_ONLY => ['testAction', 'testAction2']]
+            [ControllerAccess::RULE_LOGGED_IN_ONLY => ['testAction', 'testAction2']],
         ]]);
 
         $this->assertFalse($controllerAccess->run());
@@ -56,7 +48,7 @@ class TestControllerAccess extends HumHubDbTestCase
         $this->becomeUser('User1');
 
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'rules' => [
-            [ControllerAccess::RULE_LOGGED_IN_ONLY]
+            [ControllerAccess::RULE_LOGGED_IN_ONLY],
         ]]);
 
         $this->assertTrue($controllerAccess->run());
@@ -66,7 +58,7 @@ class TestControllerAccess extends HumHubDbTestCase
     {
         // Guest
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'rules' => [
-            [ControllerAccess::RULE_ADMIN_ONLY]
+            [ControllerAccess::RULE_ADMIN_ONLY],
         ]]);
 
         $this->assertFalse($controllerAccess->run());
@@ -76,7 +68,7 @@ class TestControllerAccess extends HumHubDbTestCase
         $this->becomeUser('User1');
 
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'rules' => [
-            [ControllerAccess::RULE_ADMIN_ONLY]
+            [ControllerAccess::RULE_ADMIN_ONLY],
         ]]);
 
         $this->assertFalse($controllerAccess->run());
@@ -86,7 +78,7 @@ class TestControllerAccess extends HumHubDbTestCase
         $this->becomeUser('Admin');
 
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'rules' => [
-            [ControllerAccess::RULE_ADMIN_ONLY]
+            [ControllerAccess::RULE_ADMIN_ONLY],
         ]]);
 
         $this->assertTrue($controllerAccess->run());
@@ -98,7 +90,7 @@ class TestControllerAccess extends HumHubDbTestCase
         $this->allowGuestAccess(false);
 
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'rules' => [
-            [ControllerAccess::RULE_STRICT]
+            [ControllerAccess::RULE_STRICT],
         ]]);
 
         $this->assertFalse($controllerAccess->run());
@@ -108,7 +100,7 @@ class TestControllerAccess extends HumHubDbTestCase
         $this->allowGuestAccess(true);
 
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'rules' => [
-            [ControllerAccess::RULE_STRICT]
+            [ControllerAccess::RULE_STRICT],
         ]]);
 
         $this->assertTrue($controllerAccess->run());
@@ -118,7 +110,7 @@ class TestControllerAccess extends HumHubDbTestCase
         $this->becomeUser('User1');
 
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'rules' => [
-            [ControllerAccess::RULE_STRICT]
+            [ControllerAccess::RULE_STRICT],
         ]]);
 
         $this->assertTrue($controllerAccess->run());
@@ -129,7 +121,7 @@ class TestControllerAccess extends HumHubDbTestCase
         // Guests should not be affected
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'rules' => [
             [ControllerAccess::RULE_DISABLED_USER],
-            [ControllerAccess::RULE_UNAPPROVED_USER]
+            [ControllerAccess::RULE_UNAPPROVED_USER],
         ]]);
 
         $this->assertTrue($controllerAccess->run());
@@ -139,7 +131,7 @@ class TestControllerAccess extends HumHubDbTestCase
 
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'rules' => [
             [ControllerAccess::RULE_DISABLED_USER],
-            [ControllerAccess::RULE_UNAPPROVED_USER]
+            [ControllerAccess::RULE_UNAPPROVED_USER],
         ]]);
 
         $this->assertTrue($controllerAccess->run());
@@ -149,7 +141,7 @@ class TestControllerAccess extends HumHubDbTestCase
 
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'rules' => [
             [ControllerAccess::RULE_DISABLED_USER],
-            [ControllerAccess::RULE_UNAPPROVED_USER]
+            [ControllerAccess::RULE_UNAPPROVED_USER],
         ]]);
 
         $this->assertFalse($controllerAccess->run());
@@ -161,7 +153,7 @@ class TestControllerAccess extends HumHubDbTestCase
 
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'rules' => [
             [ControllerAccess::RULE_DISABLED_USER],
-            [ControllerAccess::RULE_UNAPPROVED_USER]
+            [ControllerAccess::RULE_UNAPPROVED_USER],
         ]]);
 
         $this->assertFalse($controllerAccess->run());
@@ -188,26 +180,26 @@ class TestControllerAccess extends HumHubDbTestCase
 
         // If global guest restriction is given allow for all actions
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'rules' => [
-            ['guestAccess']
+            ['guestAccess'],
         ]]);
         #$this->assertTrue($controllerAccess->run());
 
         // Non action related guestAccess rule should fail
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'rules' => [
-            ['guestAccess' => ['testAction2']]
+            ['guestAccess' => ['testAction2']],
         ]]);
         $this->assertFalse($controllerAccess->run());
 
         // Action related guestAccess rule should succeed
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'rules' => [
-            ['guestAccess' => ['testAction']]
+            ['guestAccess' => ['testAction']],
         ]]);
         $this->assertTrue($controllerAccess->run());
 
         // LoggedIn users should not be affected
         $this->becomeUser('User1');
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'rules' => [
-            ['guestAccess' => ['testAction2']]
+            ['guestAccess' => ['testAction2']],
         ]]);
         $this->assertTrue($controllerAccess->run());
     }
@@ -217,9 +209,9 @@ class TestControllerAccess extends HumHubDbTestCase
         // Guest has no permission
         $accessCheck = new ControllerAccess([
             'rules' => [
-                ['permission' => [AccessTestPermission1::class]]
+                ['permission' => [AccessTestPermission1::class]],
             ],
-            'action' => 'testAction'
+            'action' => 'testAction',
         ]);
         $this->assertFalse($accessCheck->run());
 
@@ -228,28 +220,28 @@ class TestControllerAccess extends HumHubDbTestCase
         $this->becomeUser('User1');
         $accessCheck = new ControllerAccess([
             'rules' => [
-                ['permission' => [AccessTestPermission2::class]]
+                ['permission' => [AccessTestPermission2::class]],
             ],
-            'action' => 'testAction'
+            'action' => 'testAction',
         ]);
         $this->assertFalse($accessCheck->run());
 
         // Permission2 included
         $accessCheck->rules = [
-            ['permission' => [AccessTestPermission1::class, AccessTestPermission2::class]]
+            ['permission' => [AccessTestPermission1::class, AccessTestPermission2::class]],
         ];
         $this->assertTrue($accessCheck->run());
 
         // In strict mode both permission have to be granted
         $accessCheck->rules = [
-            ['permission' => [AccessTestPermission1::class, AccessTestPermission2::class], 'strict' => true]
+            ['permission' => [AccessTestPermission1::class, AccessTestPermission2::class], 'strict' => true],
         ];
         $this->assertFalse($accessCheck->run());
 
         // Check two permission rules one action related and one global valid one. The non action related should be ignored
         $accessCheck->rules = [
             ['permission' => [AccessTestPermission2::class], 'actions' => 'otherPermission'],
-            ['permission' => [AccessTestPermission1::class, AccessTestPermission2::class]]
+            ['permission' => [AccessTestPermission1::class, AccessTestPermission2::class]],
         ];
         $this->assertTrue($accessCheck->run());
 
@@ -258,14 +250,14 @@ class TestControllerAccess extends HumHubDbTestCase
         // This check passes, since only one of them has to pass.
         $accessCheck->rules = [
             ['permission' => [AccessTestPermission2::class]],
-            ['permission' => [AccessTestPermission1::class], 'actions' => 'testAction']
+            ['permission' => [AccessTestPermission1::class], 'actions' => 'testAction'],
         ];
         $this->assertTrue($accessCheck->run());
 
 
         // Check string permission definition
         $accessCheck->rules = [
-            ['permission' => AccessTestPermission1::class]
+            ['permission' => AccessTestPermission1::class],
         ];
         $this->assertTrue($accessCheck->run());
 
@@ -273,7 +265,7 @@ class TestControllerAccess extends HumHubDbTestCase
         $accessCheck->rules = [
             [ControllerAccess::RULE_ADMIN_ONLY],
             ['permission' => [AccessTestPermission2::class], 'actions' => 'otherPermission'],
-            ['permission' => [AccessTestPermission1::class, AccessTestPermission2::class]]
+            ['permission' => [AccessTestPermission1::class, AccessTestPermission2::class]],
         ];
         $this->assertFalse($accessCheck->run());
     }
@@ -286,9 +278,9 @@ class TestControllerAccess extends HumHubDbTestCase
         $accessCheck = new ControllerAccess([
             'rules' => [
                 [ControllerAccess::RULE_ADMIN_ONLY],
-                ['guestAccess' => ['testAction']]
+                ['guestAccess' => ['testAction']],
             ],
-            'action' => 'testAction'
+            'action' => 'testAction',
         ]);
 
         $this->assertFalse($accessCheck->run());
@@ -296,28 +288,28 @@ class TestControllerAccess extends HumHubDbTestCase
         // AdminOnly setting should overwrite the guestAccess
         $accessCheck->rules = [
             ['guestAccess' => ['otherTestAction', 'testAction']],
-            [ControllerAccess::RULE_ADMIN_ONLY => ['testAction']]
+            [ControllerAccess::RULE_ADMIN_ONLY => ['testAction']],
         ];
         $this->assertFalse($accessCheck->run());
 
         // AdminOnly setting should overwrite the guestAccess
         $accessCheck->rules = [
             ['guestAccess' => ['testAction']],
-            [ControllerAccess::RULE_ADMIN_ONLY => ['otherTestAction']]
+            [ControllerAccess::RULE_ADMIN_ONLY => ['otherTestAction']],
         ];
         $this->assertTrue($accessCheck->run());
 
         // LoggedInOnly setting should overwrite the guestAccess
         $accessCheck->rules = [
             ['guestAccess'],
-            [ControllerAccess::RULE_LOGGED_IN_ONLY]
+            [ControllerAccess::RULE_LOGGED_IN_ONLY],
         ];
         $this->assertFalse($accessCheck->run());
 
         // Non action related adminOnly and loggedInOnly
         $accessCheck->rules = [
             [ControllerAccess::RULE_ADMIN_ONLY => ['otherTestAction']],
-            [ControllerAccess::RULE_LOGGED_IN_ONLY => 'otherTestAction']
+            [ControllerAccess::RULE_LOGGED_IN_ONLY => 'otherTestAction'],
         ];
         $this->assertTrue($accessCheck->run());
 
@@ -325,25 +317,25 @@ class TestControllerAccess extends HumHubDbTestCase
         $accessCheck->rules = [
             [ControllerAccess::RULE_ADMIN_ONLY => ['otherTestAction']],
             [ControllerAccess::RULE_LOGGED_IN_ONLY => 'testAction'],
-            ['guestAccess' => 'testAction']
+            ['guestAccess' => 'testAction'],
         ];
         $this->assertFalse($accessCheck->run());
 
         // Global permission rule
         $accessCheck->rules = [
-            ['permission' => [AccessTestPermission1::class]]
+            ['permission' => [AccessTestPermission1::class]],
         ];
         $this->assertFalse($accessCheck->run());
 
         // Non action related permission rule
         $accessCheck->rules = [
-            ['permission' => AccessTestPermission1::class, 'actions' => ['otherTestAction']]
+            ['permission' => AccessTestPermission1::class, 'actions' => ['otherTestAction']],
         ];
         $this->assertTrue($accessCheck->run());
 
         // Matching action related permission setting
         $accessCheck->rules = [
-            ['permission' => [AccessTestPermission1::class], 'actions' => ['otherTestAction', 'testAction']]
+            ['permission' => [AccessTestPermission1::class], 'actions' => ['otherTestAction', 'testAction']],
         ];
         $this->assertFalse($accessCheck->run());
 
@@ -403,7 +395,7 @@ class TestControllerAccess extends HumHubDbTestCase
     public function testCustomOwnerRule()
     {
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'owner' => $this, 'rules' => [
-            ['validateTestRule', 'return' => false]
+            ['validateTestRule', 'return' => false],
         ]]);
 
         $this->assertFalse($controllerAccess->run());
@@ -411,7 +403,7 @@ class TestControllerAccess extends HumHubDbTestCase
         $this->assertEquals('Not you again!', $controllerAccess->reason);
 
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'owner' => $this, 'rules' => [
-            ['validateTestRule', 'return' => true]
+            ['validateTestRule', 'return' => true],
         ]]);
 
         $this->assertTrue($controllerAccess->run());
@@ -434,7 +426,7 @@ class TestControllerAccess extends HumHubDbTestCase
     public function testCustomClassRule()
     {
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'owner' => $this, 'rules' => [
-            [TestActionValidator::class, 'return' => false]
+            [TestActionValidator::class, 'return' => false],
         ]]);
 
         $this->assertFalse($controllerAccess->run());
@@ -442,7 +434,7 @@ class TestControllerAccess extends HumHubDbTestCase
         $this->assertEquals('Not you again!', $controllerAccess->reason);
 
         $controllerAccess = new ControllerAccess(['action' => 'testAction', 'owner' => $this, 'rules' => [
-            [TestActionValidator::class, 'return' => true]
+            [TestActionValidator::class, 'return' => true],
         ]]);
 
         $this->assertTrue($controllerAccess->run());

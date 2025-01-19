@@ -1,4 +1,11 @@
 <?php
+
+/*
+ * @link      https://www.humhub.org/
+ * @copyright Copyright (c) 2023 HumHub GmbH & Co. KG
+ * @license   https://www.humhub.com/licences
+ */
+
 return [
     ['name' => 'name', 'value' => 'HumHub', 'module_id' => 'base'],
     ['name' => 'baseUrl', 'value' => 'http://localhost:8080', 'module_id' => 'base'],
@@ -16,8 +23,8 @@ return [
     ['name' => 'receive_email_notifications', 'value' => '2', 'module_id' => 'notification'],
     ['name' => 'maxFileSize', 'value' => '1048576', 'module_id' => 'file'],
     ['name' => 'forbiddenExtensions', 'value' => 'exe', 'module_id' => 'file'],
-    ['name' => 'cache.class', 'value' => 'CFileCache', 'module_id' => 'base'],
-    ['name' => 'cache.expireTime', 'value' => '3600', 'module_id' => 'base'],
+    ['name' => 'cacheClass', 'value' => 'CFileCache', 'module_id' => 'base'],
+    ['name' => 'cacheExpireTime', 'value' => '3600', 'module_id' => 'base'],
     ['name' => 'installationId', 'value' => '99846c45e9b9b0962238986a6fed519a', 'module_id' => 'admin'],
     ['name' => 'theme', 'value' => 'HumHub', 'module_id' => 'base'],
     ['name' => 'tour', 'value' => '1', 'module_id' => 'base'],
@@ -29,42 +36,48 @@ return [
     ['name' => 'oembedProviders', 'value' => json_encode([
         'Facebook Video' => [
             'pattern' => '/facebook\.com\/(.*)(video)/',
-            'endpoint' => 'https://graph.facebook.com/v12.0/oembed_video?url=%url%&access_token='
+            'endpoint' => 'https://graph.facebook.com/v12.0/oembed_video?url=%url%&access_token=',
         ],
         'Facebook Post' => [
             'pattern' => '/facebook\.com\/(.*)(post|activity|photo|permalink|media|question|note)/',
-            'endpoint' => 'https://graph.facebook.com/v12.0/oembed_post?url=%url%&access_token='
+            'endpoint' => 'https://graph.facebook.com/v12.0/oembed_post?url=%url%&access_token=',
         ],
         'Facebook Page' => [
             'pattern' => '/^(https\:\/\/)*(www\.)*facebook\.com\/((?!video|post|activity|photo|permalink|media|question|note).)*$/',
-            'endpoint' => 'https://graph.facebook.com/v12.0/oembed_post?url=%url%&access_token='
+            'endpoint' => 'https://graph.facebook.com/v12.0/oembed_post?url=%url%&access_token=',
         ],
         'Instagram' => [
             'pattern' => '/instagram\.com/',
-            'endpoint' => 'https://graph.facebook.com/v12.0/instagram_oembed?url=%url%&access_token='
+            'endpoint' => 'https://graph.facebook.com/v12.0/instagram_oembed?url=%url%&access_token=',
         ],
         'Twitter' => [
             'pattern' => '/twitter\.com/',
-            'endpoint' => 'https://publish.twitter.com/oembed?url=%url%&maxwidth=450'
+            'endpoint' => 'https://publish.twitter.com/oembed?url=%url%&maxwidth=450',
         ],
         'YouTube' => [
             'pattern' => '/youtube\.com|youtu.be/',
-            'endpoint' => 'https://www.youtube.com/oembed?scheme=https&url=%url%&format=json&maxwidth=450'
+            'endpoint' => 'https://www.youtube.com/oembed?scheme=https&url=%url%&format=json&maxwidth=450',
         ],
         'Soundcloud' => [
             'pattern' => '/soundcloud\.com/',
-            'endpoint' => 'https://soundcloud.com/oembed?url=%url%&format=json&maxwidth=450'
+            'endpoint' => 'https://soundcloud.com/oembed?url=%url%&format=json&maxwidth=450',
         ],
         'Vimeo' => [
             'pattern' => '/vimeo\.com/',
-            'endpoint' => 'https://vimeo.com/api/oembed.json?scheme=https&url=%url%&format=json&maxwidth=450'
+            'endpoint' => 'https://vimeo.com/api/oembed.json?scheme=https&url=%url%&format=json&maxwidth=450',
         ],
         'SlideShare' => [
             'pattern' => '/slideshare\.net/',
-            'endpoint' => 'https://www.slideshare.net/api/oembed/2?url=%url%&format=json&maxwidth=450'
-        ]
+            'endpoint' => 'https://www.slideshare.net/api/oembed/2?url=%url%&format=json&maxwidth=450',
+        ],
+        'Reddit' => [
+            'pattern' => '/reddit\.com/',
+            'endpoint' => 'https://www.reddit.com/oembed?format=json&url=%url%',
+        ],
     ]), 'module_id' => 'base'],
     ['name' => 'defaultLanguage', 'value' => 'en-US', 'module_id' => 'base'],
     ['name' => 'maintenanceMode', 'value' => '0', 'module_id' => 'base'],
     ['name' => 'enableProfilePermissions', 'value' => '1', 'module_id' => 'user'],
+    ['name' => 'testSetting', 'value' => 'Test Setting for Base', 'module_id' => 'base' ],
+    ['name' => 'testSetting0', 'value' => 'Test Setting 0 for Base', 'module_id' => 'base', ],
 ];

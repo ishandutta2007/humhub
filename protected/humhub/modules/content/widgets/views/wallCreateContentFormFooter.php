@@ -8,21 +8,21 @@
 use humhub\modules\content\components\ContentContainerActiveRecord;
 use humhub\modules\content\models\Content;
 use humhub\modules\file\handler\BaseFileHandler;
+use humhub\modules\file\widgets\FileHandlerButtonDropdown;
 use humhub\modules\file\widgets\FilePreview;
+use humhub\modules\file\widgets\UploadButton;
+use humhub\modules\file\widgets\UploadProgress;
 use humhub\modules\topic\widgets\TopicPicker;
 use humhub\modules\ui\icon\widgets\Icon;
 use humhub\modules\user\widgets\UserPickerField;
-use humhub\modules\file\widgets\UploadButton;
-use humhub\modules\file\widgets\FileHandlerButtonDropdown;
-use humhub\modules\file\widgets\UploadProgress;
-use humhub\widgets\Link;
 use humhub\widgets\Button;
+use humhub\widgets\Link;
 use yii\helpers\Html;
 
 /* @var $submitUrl string */
 /* @var $submitButtonText string */
 /* @var $fileHandlers BaseFileHandler[] */
-/* @var $canSwitchVisibility boolean */
+/* @var $canSwitchVisibility bool */
 /* @var $contentContainer ContentContainerActiveRecord */
 /* @var $pickerUrl string */
 /* @var $scheduleUrl string */
@@ -100,11 +100,12 @@ use yii\helpers\Html;
                         <?php endif; ?>
                         <li>
                             <?= Link::withAction(Yii::t('ContentModule.base', 'Create as draft'), 'changeState')
-                                    ->icon('edit')
-                                    ->options([
-                                        'data-state' => Content::STATE_DRAFT,
-                                        'data-state-title' => Yii::t('ContentModule.base', 'Draft')
-                                    ]) ?>
+                                ->icon('edit')
+                                ->options([
+                                    'data-state' => Content::STATE_DRAFT,
+                                    'data-state-title' => Yii::t('ContentModule.base', 'Draft'),
+                                    'data-button-title' => Yii::t('ContentModule.base', 'Save as draft')
+                                ]) ?>
                         </li>
                         <li>
                             <?= Link::withAction(Yii::t('ContentModule.base', 'Schedule publication'), 'scheduleOptions', $scheduleUrl)

@@ -10,7 +10,6 @@ namespace humhub\modules\admin\controllers;
 
 use humhub\modules\admin\permissions\ManageUsers;
 use Yii;
-
 use yii\web\HttpException;
 use humhub\compat\HForm;
 use humhub\modules\admin\components\Controller;
@@ -25,7 +24,6 @@ use humhub\modules\user\models\fieldtype\BaseType;
  */
 class UserProfileController extends Controller
 {
-
     /**
      * @inheritdoc
      */
@@ -48,7 +46,7 @@ class UserProfileController extends Controller
     protected function getAccessRules()
     {
         return [
-            ['permissions' => ManageUsers::class]
+            ['permissions' => ManageUsers::class],
         ];
     }
 
@@ -66,11 +64,11 @@ class UserProfileController extends Controller
      */
     public function actionEditCategory()
     {
-        $id = (int) Yii::$app->request->get('id');
+        $id = (int)Yii::$app->request->get('id');
 
         $category = ProfileFieldCategory::findOne(['id' => $id]);
         if ($category == null) {
-            $category = new ProfileFieldCategory;
+            $category = new ProfileFieldCategory();
         }
 
         $category->translation_category = $category->getTranslationCategory();
@@ -87,14 +85,16 @@ class UserProfileController extends Controller
      */
     public function actionDeleteCategory()
     {
-        $id = (int) Yii::$app->request->get('id');
+        $id = (int)Yii::$app->request->get('id');
 
         $category = ProfileFieldCategory::findOne(['id' => $id]);
-        if ($category == null)
+        if ($category == null) {
             throw new HttpException(500, Yii::t('AdminModule.user', 'Could not load category.'));
+        }
 
-        if (count($category->fields) != 0)
+        if (count($category->fields) != 0) {
             throw new HttpException(500, Yii::t('AdminModule.user', 'You can only delete empty categories!'));
+        }
 
         $category->delete();
 
@@ -128,7 +128,7 @@ class UserProfileController extends Controller
             'save' => [
                 'type' => 'submit',
                 'label' => Yii::t('AdminModule.user', 'Save'),
-                'class' => 'btn btn-primary'
+                'class' => 'btn btn-primary',
             ],
         ];
 

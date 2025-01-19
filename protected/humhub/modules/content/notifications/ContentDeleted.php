@@ -35,7 +35,7 @@ class ContentDeleted extends BaseNotification
      */
     public function category()
     {
-        return new \humhub\modules\content\notifications\ContentCreatedNotificationCategory();
+        return new ContentCreatedNotificationCategory();
     }
 
     /**
@@ -46,9 +46,7 @@ class ContentDeleted extends BaseNotification
         return Yii::t('ContentModule.notifications', 'Your {contentTitle} has been deleted by {displayName} for \'{reason}\'', [
             'displayName' => Html::tag('strong', Html::encode($this->originator->displayName)),
             'contentTitle' => $this->payload['contentTitle'],
-            'reason' => $this->payload['reason']
+            'reason' => $this->payload['reason'],
         ]);
     }
 }
-
-?>

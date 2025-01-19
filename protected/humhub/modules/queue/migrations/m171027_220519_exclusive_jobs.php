@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
@@ -17,7 +18,7 @@ class m171027_220519_exclusive_jobs extends Migration
             'id' => $this->string(50)->notNull(),
             'job_message_id' => $this->string(50),
             'job_status' => $this->smallInteger()->defaultValue(2),
-            'last_update' => $this->timestamp()
+            'last_update' => $this->timestamp(),
         ]);
         $this->addPrimaryKey('pk_queue_exclusive', $this->tableName, 'id');
     }

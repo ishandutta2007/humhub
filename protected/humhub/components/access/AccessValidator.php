@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2018 HumHub GmbH & Co. KG
@@ -72,7 +73,7 @@ abstract class AccessValidator extends BaseObject
 
     public function init()
     {
-        if(!$this->code) {
+        if (!$this->code) {
             $this->code = Yii::$app->user->isGuest ? 401 : 403;
         }
 
@@ -93,7 +94,7 @@ abstract class AccessValidator extends BaseObject
      * The whole rule set can be retrieved by calling `$this->access->rules`.
      *
      *
-     * @return boolean true if validation passed otherwise true
+     * @return bool true if validation passed otherwise true
      */
     abstract public function run();
 

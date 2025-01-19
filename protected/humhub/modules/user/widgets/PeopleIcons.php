@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2021 HumHub GmbH & Co. KG
@@ -12,13 +13,12 @@ use humhub\modules\user\models\User;
 
 /**
  * PeopleIcons shows footer icons for people cards
- * 
+ *
  * @since 1.9
  * @author Luke
  */
 class PeopleIcons extends Widget
 {
-
     /**
      * @var User
      */
@@ -30,7 +30,7 @@ class PeopleIcons extends Widget
     public function run()
     {
         return $this->render('peopleIcons', [
-            'user' => $this->user
+            'user' => $this->user,
         ]);
     }
 

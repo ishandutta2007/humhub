@@ -6,51 +6,48 @@
  * @license https://www.humhub.com/licences
  */
 
-/* @var $this yii\web\View */
+use humhub\modules\space\models\Space;
+use humhub\modules\ui\mail\DefaultMailStyle;
+use humhub\modules\ui\view\components\View;
+use humhub\widgets\mails\MailButton;
+use humhub\widgets\mails\MailButtonList;
+use humhub\widgets\mails\MailContentContainerInfoBox;
+
+/* @var $this View */
 /* @var $viewable humhub\modules\user\notifications\Followed */
 /* @var $url string */
-/* @var $date string */
-/* @var $isNew boolean */
-/* @var $isNew boolean */
-/* @var $originator \humhub\modules\user\models\User */
-/* @var source yii\db\ActiveRecord */
-/* @var contentContainer \humhub\modules\content\components\ContentContainerActiveRecord */
-/* @var space humhub\modules\space\models\Space */
-/* @var record \humhub\modules\notification\models\Notification */
-/* @var html string */
-/* @var text string */
+/* @var $space Space */
+/* @var $_params_ array */
 ?>
+<?php $this->beginContent('@notification/views/layouts/mail.php', $_params_) ?>
 
-<?php $this->beginContent('@notification/views/layouts/mail.php', $_params_); ?>
-
-<table width="100%" border="0" cellspacing="0" cellpadding="0" align="left">
-    <tr>
-        <td style="font-size: 14px; line-height: 22px; font-family:Open Sans,Arial,Tahoma, Helvetica, sans-serif; color:<?= Yii::$app->view->theme->variable('text-color-highlight', '#555555') ?>; font-weight:300; text-align:left;">
-            <?= $viewable->html(); ?>
-        </td>
-    </tr>
-    <tr>
-        <td height="10"></td>
-    </tr>
-    <tr>
-        <td style="border-top: 1px solid #eee;padding-top:10px;">
-            <?= \humhub\widgets\mails\MailContentContainerInfoBox::widget(['container' => $space])?>
-        </td>
-    </tr>
-    <tr>
-        <td height="10"></td>
-    </tr>
-    <tr>
-        <td>
-            <?=
-
-            \humhub\widgets\mails\MailButtonList::widget(['buttons' => [
-                    humhub\widgets\mails\MailButton::widget(['url' => $url, 'text' => Yii::t('SpaceModule.notification', 'View Online')])
-            ]]);
-
-            ?>
-        </td>
-    </tr>
-</table>
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" align="left">
+        <tr>
+            <td style="font-size: 14px; line-height: 22px; font-family:<?= $this->theme->variable('mail-font-family', DefaultMailStyle::DEFAULT_FONT_FAMILY) ?>; color:<?= $this->theme->variable('text-color-highlight', '#555555') ?>; font-weight:300; text-align:left">
+                <?= $viewable->html() ?>
+            </td>
+        </tr>
+        <tr>
+            <td height="10"></td>
+        </tr>
+        <tr>
+            <td style="border-top: 1px solid #eee;padding-top:10px">
+                <?= MailContentContainerInfoBox::widget(['container' => $space]) ?>
+            </td>
+        </tr>
+        <tr>
+            <td height="10"></td>
+        </tr>
+        <tr>
+            <td>
+                <?= MailButtonList::widget(['buttons' => [
+                    MailButton::widget([
+                        'url' => $url,
+                        'text' => Yii::t('SpaceModule.notification', 'View Online'),
+                    ]),
+                ]]) ?>
+            </td>
+        </tr>
+    </table>
 
 <?php $this->endContent();

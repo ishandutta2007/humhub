@@ -27,7 +27,7 @@ class AccountTopMenu extends Menu
     public $id = 'account-top-menu';
 
     /**
-     * @var boolean show user name
+     * @var bool show user name
      */
     public $showUserName = true;
 
@@ -50,7 +50,7 @@ class AccountTopMenu extends Menu
 
             $this->addEntry(new MenuLink([
                 'link' => ModalButton::primary($signUpText)->load(Url::toRoute('/user/auth/login'))->cssClass('btn-enter'),
-                'sortOrder' => 100
+                'sortOrder' => 100,
             ]));
 
             parent::init();
@@ -60,13 +60,13 @@ class AccountTopMenu extends Menu
         $user = Yii::$app->user->getIdentity();
 
         $this->addEntry(new MenuLink([
-            'label' => Yii::t('base', 'My profile'),
+            'label' => Yii::t('base', 'My Profile'),
             'icon' => 'user',
             'url' => $user->createUrl('/user/profile/home'),
             'sortOrder' => 100]));
 
         $this->addEntry(new MenuLink([
-            'label' => Yii::t('base', 'Account settings'),
+            'label' => Yii::t('base', 'Settings'),
             'icon' => 'edit',
             'url' => Url::toRoute('/user/account/edit'),
             'sortOrder' => 200,
@@ -117,7 +117,7 @@ class AccountTopMenu extends Menu
     public function getAttributes()
     {
         return [
-            'class' => 'nav'
+            'class' => 'nav',
         ];
     }
 

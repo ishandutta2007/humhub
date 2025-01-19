@@ -2,7 +2,9 @@
 
 namespace humhub\modules\comment\widgets;
 
+use humhub\components\behaviors\PolymorphicRelation;
 use humhub\modules\comment\models\Comment;
+use humhub\modules\content\controllers\SearchController;
 use Yii;
 use yii\base\Widget;
 use yii\helpers\Url;
@@ -17,8 +19,8 @@ use yii\helpers\Url;
  */
 class ShowMore extends Widget
 {
-    const TYPE_PREVIOUS = 'previous';
-    const TYPE_NEXT = 'next';
+    public const TYPE_PREVIOUS = 'previous';
+    public const TYPE_NEXT = 'next';
 
     /**
      * Content Object
@@ -57,13 +59,14 @@ class ShowMore extends Widget
         return $this->render('showMore', [
             'text' => $this->getText(),
             'showMoreUrl' => Url::to(['/comment/comment/show',
-                'objectModel' => get_class($this->object),
+                'objectModel' => PolymorphicRelation::getObjectModel($this->object),
                 'objectId' => $this->object->getPrimaryKey(),
                 'pageSize' => $this->pageSize,
                 'commentId' => $this->commentId,
                 'type' => $this->type,
             ]),
             'type' => $this->type,
+            'linkStyleClass' => $this->getLinkStyleClass(),
         ]);
     }
 
@@ -81,6 +84,14 @@ class ShowMore extends Widget
         }
 
         return $this->_count;
+    }
+
+    protected function getLinkStyleClass(): ?string
+    {
+        // Highlight it on Content Search page
+        return Yii::$app->controller instanceof SearchController && Yii::$app->controller->action->id === 'results'
+            ? 'highlight'
+            : null;
     }
 
 }

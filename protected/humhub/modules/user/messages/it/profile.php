@@ -1,5 +1,5 @@
 <?php
-return array (
+return [
   '%y Years' => '%y anni',
   '<b>This profile stream is still empty!</b>' => '<b>Questo profilo è ancora vuoto!</b>',
   '<b>This profile stream is still empty</b><br>Be the first and post something...' => '<b>Questo profilo è ancora vuoto</b><br> sii il primo a postare qualcosa...',
@@ -28,6 +28,7 @@ return array (
   'Diverse' => 'Diverso',
   'E-Mail' => 'E-Mail',
   'E-mail address of the user' => 'Indirizzo e-mail dell\'utente',
+  'Each line must be formatted as Key=>Value!' => '',
   'Edit account' => 'Modifica account',
   'Editable' => 'Modificabile',
   'Facebook URL' => 'Pagina Facebook (URL)',
@@ -57,6 +58,7 @@ return array (
   'LinkedIn URL' => 'Profilo LinkedIn (URL)',
   'Male' => 'Maschio',
   'Markdown' => 'Markdown',
+  'Mastodon URL' => '',
   'Maximum length' => 'Lunghezza massima',
   'Maximum value' => 'Valore massimo',
   'Minimum length' => 'Lunghezza minima',
@@ -89,16 +91,19 @@ return array (
   'Stream' => 'Stream',
   'Street' => 'Strada',
   'Supported ISO3166 country codes' => 'Codici paese ISO3166 supportati',
+  'Template' => 'Modello',
   'Text' => 'Testo',
   'Text Area' => 'Area di testo',
   'Text Field Options' => 'Opzioni del campo di testo',
   'Text area field options' => 'Opzioni del campo area di testo',
+  'This profile is disabled!' => '',
   'This profile is no longer available!' => 'Il profilo non è più disponibile!',
   'This user account is not approved yet!' => 'L\'account utente non è ancora approvato!',
   'This will add an additional input element for custom values' => 'Questo aggiungerà un altro elemento immissione per i valori personalizzati',
   'TikTok URL' => 'URL TikTok',
   'Title' => 'Titolo',
   'Translation Category ID' => 'ID della categoria della traduzione',
+  'Twig template that will be used to render this field. You can use the internal names as variables, e.g. `{{ firstname }} {{ lastname }}`' => '',
   'Twitter URL' => 'Profilo Twitter (URL)',
   'Type Config' => 'Configurazione dei tipi',
   'Updated at' => 'Aggiornato il',
@@ -115,4 +120,4 @@ return array (
   'YouTube URL' => 'Profilo YouTube (URL)',
   'Zip' => 'CAP',
   '{attribute} is required!' => '{attribute} è obbligatorio!',
-);
+];

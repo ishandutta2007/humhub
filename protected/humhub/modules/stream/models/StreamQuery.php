@@ -2,23 +2,23 @@
 
 namespace humhub\modules\stream\models;
 
+use humhub\modules\content\models\Content;
+use humhub\modules\stream\actions\Stream;
 use humhub\modules\stream\models\filters\BlockedUsersStreamFilter;
+use humhub\modules\stream\models\filters\ContentTypeStreamFilter;
 use humhub\modules\stream\models\filters\DateStreamFilter;
+use humhub\modules\stream\models\filters\DefaultStreamFilter;
 use humhub\modules\stream\models\filters\DraftContentStreamFilter;
+use humhub\modules\stream\models\filters\OriginatorStreamFilter;
 use humhub\modules\stream\models\filters\ScheduledContentStreamFilter;
 use humhub\modules\stream\models\filters\StreamQueryFilter;
+use humhub\modules\stream\models\filters\TopicStreamFilter;
+use humhub\modules\user\models\User;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
-use humhub\modules\stream\actions\Stream;
-use humhub\modules\stream\models\filters\ContentTypeStreamFilter;
-use humhub\modules\stream\models\filters\DefaultStreamFilter;
-use humhub\modules\stream\models\filters\OriginatorStreamFilter;
-use humhub\modules\stream\models\filters\TopicStreamFilter;
-use humhub\modules\content\models\Content;
-use humhub\modules\user\models\User;
 
 /**
  * Description of StreamQuery
@@ -31,23 +31,23 @@ class StreamQuery extends Model
     /**
      * @event Event triggered before filterHandlers are applied, this can be used to add custom stream filters.
      */
-    const EVENT_BEFORE_FILTER = 'beforeFilter';
+    public const EVENT_BEFORE_FILTER = 'beforeFilter';
 
     /**
      * @event Event triggered after filterHandlers are applied.
      */
-    const EVENT_AFTER_FILTER = 'afterFilter';
+    public const EVENT_AFTER_FILTER = 'afterFilter';
 
     /**
      * Default channels
      */
-    const CHANNEL_DEFAULT = 'default';
-    const CHANNEL_ACTIVITY = 'activity';
+    public const CHANNEL_DEFAULT = 'default';
+    public const CHANNEL_ACTIVITY = 'activity';
 
     /**
      * Maximum wall entries per request
      */
-    const MAX_LIMIT = 20;
+    public const MAX_LIMIT = 20;
 
     /**
      * Can be set to filter specific content types.
@@ -70,13 +70,13 @@ class StreamQuery extends Model
 
     /**
      * The user which requested the stream. By default the current user identity.
-     * @var \humhub\modules\user\models\User
+     * @var User
      */
     public $user;
 
     /**
      * Can be set to filter content of a specific user
-     * @var \humhub\modules\user\models\User
+     * @var User
      */
     public $originator;
 
@@ -140,7 +140,7 @@ class StreamQuery extends Model
         BlockedUsersStreamFilter::class,
         DateStreamFilter::class,
         DraftContentStreamFilter::class,
-        ScheduledContentStreamFilter::class
+        ScheduledContentStreamFilter::class,
     ];
 
     /**
@@ -166,7 +166,7 @@ class StreamQuery extends Model
     protected $_query;
 
     /**
-     * @var boolean query built
+     * @var bool query built
      */
     protected $_built = false;
 
@@ -407,7 +407,7 @@ class StreamQuery extends Model
     public function all()
     {
         return $this->postProcessAll(
-            $this->query(!$this->_built)->all()
+            $this->query(!$this->_built)->all(),
         );
     }
 
@@ -508,7 +508,7 @@ class StreamQuery extends Model
     {
         if (empty($this->limit)) {
             $this->limit = self::MAX_LIMIT;
-        } else if (Yii::$app->request->isConsoleRequest) {
+        } elseif (Yii::$app->request->isConsoleRequest) {
             $this->limit = (int)$this->limit;
         } else {
             $this->limit = ($this->limit > self::MAX_LIMIT) ? self::MAX_LIMIT : (int)$this->limit;
@@ -520,10 +520,10 @@ class StreamQuery extends Model
      */
     protected function setupCriteria()
     {
-        $this->_query->joinWith('createdBy');
-        $this->_query->joinWith('contentContainer');
-
-        $this->_query->limit($this->limit);
+        $this->_query
+            ->joinWith('createdBy')
+            ->joinWith('contentContainer')
+            ->limit($this->limit);
 
         if (!Yii::$app->getModule('stream')->showDeactivatedUserContent) {
             $this->_query->andWhere(['user.status' => User::STATUS_ENABLED]);
@@ -537,6 +537,9 @@ class StreamQuery extends Model
         /**
          * Setup Sorting
          */
+        /**
+         * Setup Sorting
+         */
         if ($this->sort == Stream::SORT_UPDATED_AT) {
             $this->_query->orderBy('content.stream_sort_date DESC');
             if (!empty($this->from)) {
@@ -545,33 +548,56 @@ class StreamQuery extends Model
                         "content.stream_sort_date < (SELECT stream_sort_date FROM content wd WHERE wd.id=:from)",
                         ['and',
                             "content.stream_sort_date = (SELECT stream_sort_date FROM content wd WHERE wd.id=:from)",
-                            "content.id > :from"
+                            "content.id > :from",
                         ],
-                    ], [':from' => $this->from]);
+                    ],
+                    [':from' => $this->from],
+                );
             } elseif (!empty($this->to)) {
                 $this->_query->andWhere(
                     ['or',
                         "content.stream_sort_date > (SELECT stream_sort_date FROM content wd WHERE wd.id=:to)",
                         ['and',
                             "content.stream_sort_date = (SELECT stream_sort_date FROM content wd WHERE wd.id=:to)",
-                            "content.id < :to"
+                            "content.id < :to",
                         ],
-                    ], [':to' => $this->to]);
+                    ],
+                    [':to' => $this->to],
+                );
             }
         } else {
-            $this->_query->orderBy('content.id DESC');
+            $this->_query->orderBy('content.created_at DESC,content.id DESC');
             if (!empty($this->from)) {
-                $this->_query->andWhere("content.id < :from", [':from' => $this->from]);
+                $this->_query->andWhere(
+                    ['or',
+                        "content.created_at < (SELECT created_at FROM content wd WHERE wd.id=:from)",
+                        ['and',
+                            "content.created_at = (SELECT created_at FROM content wd WHERE wd.id=:from)",
+                            "content.id < :from",
+                        ],
+                    ],
+                    [':from' => $this->from],
+                );
             } elseif (!empty($this->to)) {
-                $this->_query->andWhere("content.id > :to", [':to' => $this->to]);
+                $this->_query->andWhere(
+                    ['or',
+                        "content.created_at > (SELECT created_at FROM content wd WHERE wd.id=:to)",
+                        ['and',
+                            "content.created_at = (SELECT created_at FROM content wd WHERE wd.id=:to)",
+                            "content.id > :to",
+                        ],
+                    ],
+                    [':to' => $this->to],
+                );
             }
         }
+
     }
 
     /**
      * Sets up and apply filters.
      *
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     protected function setupFilters()
     {
@@ -600,7 +626,7 @@ class StreamQuery extends Model
      * }
      * ```
      *
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      * @since 1.6
      */
     protected function beforeApplyFilters()
@@ -611,7 +637,7 @@ class StreamQuery extends Model
     /**
      * Is called right after applying query filters.
      *
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      * @since 1.6
      */
     protected function afterApplyFilters()
@@ -759,7 +785,7 @@ class StreamQuery extends Model
                 'class' => $handler,
                 'streamQuery' => $this,
                 'query' => $this->_query,
-                'formName' => $this->formName()
+                'formName' => $this->formName(),
             ]);
         } elseif ($handler instanceof StreamQueryFilter) {
             $handler->streamQuery = $this;
@@ -783,7 +809,7 @@ class StreamQuery extends Model
     /**
      * Is inital stream requests (show first stream content)
      *
-     * @return boolean Whether or not this query is considered as initial stream query.
+     * @return bool Whether or not this query is considered as initial stream query.
      */
     public function isInitialQuery()
     {

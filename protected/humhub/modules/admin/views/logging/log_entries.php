@@ -41,6 +41,10 @@ use yii\log\Logger;
                             $labelClass = 'label-warning';
                             $levelName = Yii::t('AdminModule.information', 'Warning');
                             break;
+                        case Logger::LEVEL_TRACE:
+                            $labelClass = 'label-default';
+                            $levelName = Yii::t('AdminModule.information', 'Trace');
+                            break;
                         case Logger::LEVEL_ERROR:
                         default:
                             $labelClass = 'label-danger';
@@ -50,7 +54,7 @@ use yii\log\Logger;
 
                     <h4 class="media-heading">
                         <span class="label <?= $labelClass; ?>"><?= Html::encode($levelName) ?></span>&nbsp;
-                        <?= date('r', (int) $entry->log_time) ?>&nbsp;
+                        <?= date('r', (int)$entry->log_time) ?>&nbsp;
                         <span class="pull-right"><?= Html::encode($entry->category) ?></span>
                     </h4>
                     <div data-ui-show-more data-collapse-at="150">

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2018 HumHub GmbH & Co. KG
@@ -9,7 +10,6 @@ namespace humhub\modules\queue\driver;
 
 use yii\queue\db\Command;
 
-
 /**
  * Class MySQLCommand
  *
@@ -18,6 +18,4 @@ use yii\queue\db\Command;
  */
 class MySQLCommand extends Command
 {
-
-
 }

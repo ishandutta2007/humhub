@@ -251,6 +251,12 @@ humhub.module('comment', function (module, require, $) {
                 : $container.append($html);
             evt.$trigger.closest('.showMore').remove();
             additions.applyTo($html);
+
+            // Highlight currently searching keywords in the loaded comments
+            const contentSearchKeyword = $('.container-contents .form-search input[name=keyword]');
+            if (contentSearchKeyword.length) {
+                additions.highlightWords($html, contentSearchKeyword.val());
+            }
         }).catch(function (err) {
             module.log.error(err, true);
             loader.unset(evt.$trigger);
@@ -299,7 +305,7 @@ humhub.module('comment', function (module, require, $) {
             target.slideToggle();
         }
 
-        if(!visible) {
+        if (!visible && !window.comments_collapsed) {
             target.find('.humhub-ui-richtext').trigger('focus');
         }
     }
@@ -324,11 +330,11 @@ humhub.module('comment', function (module, require, $) {
     };
 
     var scrollActive = function (evt) {
-        evt.$trigger.closest('.comment-create-input-group').addClass('scrollActive');
+        evt.$trigger.closest('.content-create-input-group').addClass('scrollActive');
     };
 
     var scrollInactive = function (evt) {
-        evt.$trigger.closest('.comment-create-input-group').removeClass('scrollActive');
+        evt.$trigger.closest('.content-create-input-group').removeClass('scrollActive');
     };
 
     module.export({

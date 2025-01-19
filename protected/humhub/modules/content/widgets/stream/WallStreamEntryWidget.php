@@ -1,6 +1,5 @@
 <?php
 
-
 namespace humhub\modules\content\widgets\stream;
 
 use Exception;
@@ -19,6 +18,7 @@ use humhub\modules\content\widgets\ScheduleLink;
 use humhub\modules\content\widgets\VisibilityLink;
 use humhub\modules\dashboard\controllers\DashboardController;
 use humhub\modules\space\models\Space;
+use humhub\modules\topic\models\Topic;
 use humhub\modules\ui\menu\DropdownDivider;
 use humhub\modules\user\models\User;
 use humhub\modules\user\widgets\Image as UserImage;
@@ -90,17 +90,17 @@ abstract class WallStreamEntryWidget extends StreamEntryWidget
     /**
      * Edit form is loaded to the wallentry itself.
      */
-    const EDIT_MODE_INLINE = 'inline';
+    public const EDIT_MODE_INLINE = 'inline';
 
     /**
      * Opens the edit page in a new window.
      */
-    const EDIT_MODE_NEW_WINDOW = 'new_window';
+    public const EDIT_MODE_NEW_WINDOW = 'new_window';
 
     /**
      * Edit form is loaded into a modal.
      */
-    const EDIT_MODE_MODAL = 'modal';
+    public const EDIT_MODE_MODAL = 'modal';
 
     /**
      * Route to create a content
@@ -188,10 +188,10 @@ abstract class WallStreamEntryWidget extends StreamEntryWidget
         }
 
         if (!$this->renderOptions) {
-            $this->renderOptions = (new WallStreamEntryOptions);
+            $this->renderOptions = (new WallStreamEntryOptions());
         }
 
-        if ($this->renderOptions->isViewContext(WallStreamEntryOptions::VIEW_CONTEXT_SEARCH) || $this->model->content->isArchived()) {
+        if ($this->model->content->isArchived()) {
             // Disable all except permalink
             $this->renderOptions
                 ->disableControlsEntryEdit()
@@ -203,11 +203,11 @@ abstract class WallStreamEntryWidget extends StreamEntryWidget
                 ->disableControlsEntry(DropdownDivider::class);
         }
 
-        if($this->renderOptions->isViewContext(WallStreamEntryOptions::VIEW_CONTEXT_SEARCH)) {
-            $this->renderOptions->disableControlsEntryDelete();
+        if ($this->renderOptions->isViewContext(WallStreamEntryOptions::VIEW_CONTEXT_SEARCH)) {
+            $this->renderOptions->disableControlsEntryPin();
         }
 
-        if($this->model->content->container instanceof User && !$this->renderOptions->isViewContext(WallStreamEntryOptions::VIEW_CONTEXT_DEFAULT)) {
+        if ($this->model->content->container instanceof User && !$this->renderOptions->isViewContext(WallStreamEntryOptions::VIEW_CONTEXT_DEFAULT)) {
             $this->renderOptions->enableContainerInformationInTitle();
         }
     }
@@ -220,10 +220,11 @@ abstract class WallStreamEntryWidget extends StreamEntryWidget
     {
         return $this->render($this->layoutBody, [
             'model' => $this->model,
+            'topics' => Topic::findByContent($this->model->content)->all(),
             'renderOptions' => $this->renderOptions,
             'content' => $this->renderContent(),
             'header' => $this->renderHeader(),
-            'footer' => $this->renderFooter()
+            'footer' => $this->renderFooter(),
         ]);
     }
 
@@ -238,7 +239,7 @@ abstract class WallStreamEntryWidget extends StreamEntryWidget
             'renderOptions' => $this->renderOptions,
             'headImage' => $this->renderHeadImage(),
             'title' => $this->renderTitle(),
-            'permaLink' => $this->getPermaLink()
+            'permaLink' => $this->getPermaLink(),
         ]);
     }
 
@@ -278,7 +279,7 @@ abstract class WallStreamEntryWidget extends StreamEntryWidget
         return UserImage::widget([
             'user' => $this->model->content->createdBy,
             'width' => 40,
-            'htmlOptions' => ['class' => 'pull-left']
+            'htmlOptions' => ['class' => 'pull-left'],
         ]);
     }
 
@@ -290,7 +291,7 @@ abstract class WallStreamEntryWidget extends StreamEntryWidget
     {
         return $this->render($this->layoutFooter, [
             'model' => $this->model,
-            'renderOptions' => $this->renderOptions
+            'renderOptions' => $this->renderOptions,
         ]);
     }
 
@@ -330,12 +331,6 @@ abstract class WallStreamEntryWidget extends StreamEntryWidget
             return [];
         }
 
-        if($this->renderOptions->isViewContext([WallStreamEntryOptions::VIEW_CONTEXT_SEARCH])) {
-            return [
-                [PermaLink::class, ['content' => $this->model], ['sortOrder' => 200]]
-            ];
-        }
-
         $result = [
             [PublishDraftLink::class, ['content' => $this->model], ['sortOrder' => 100]],
             [PermaLink::class, ['content' => $this->model], ['sortOrder' => 200]],
@@ -346,11 +341,11 @@ abstract class WallStreamEntryWidget extends StreamEntryWidget
             [LockCommentsLink::class, ['contentRecord' => $this->model], ['sortOrder' => 450]],
             [NotificationSwitchLink::class, ['content' => $this->model], ['sortOrder' => 500]],
             [MoveContentLink::class, ['model' => $this->model], ['sortOrder' => 700]],
-            [ArchiveLink::class, ['content' => $this->model], ['sortOrder' => 800]]
+            [ArchiveLink::class, ['content' => $this->model], ['sortOrder' => 800]],
         ];
 
-        if($this->renderOptions->isViewContext([WallStreamEntryOptions::VIEW_CONTEXT_DEFAULT, WallStreamEntryOptions::VIEW_CONTEXT_DETAIL])) {
-            $result[] =  [PinLink::class, ['content' => $this->model], ['sortOrder' => 600]];
+        if ($this->renderOptions->isViewContext([WallStreamEntryOptions::VIEW_CONTEXT_DEFAULT, WallStreamEntryOptions::VIEW_CONTEXT_DETAIL])) {
+            $result[] = [PinLink::class, ['content' => $this->model], ['sortOrder' => 600]];
         }
 
         if (!empty($this->getEditUrl())) {
@@ -391,7 +386,7 @@ abstract class WallStreamEntryWidget extends StreamEntryWidget
     public function getAttributes()
     {
         return [
-            'class' => $this->renderOptions->isPinned($this->model) ? 'wall-entry pinned-entry' : 'wall-entry'
+            'class' => $this->renderOptions->isPinned($this->model) ? 'wall-entry pinned-entry' : 'wall-entry',
         ];
     }
 

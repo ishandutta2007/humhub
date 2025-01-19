@@ -13,6 +13,7 @@ use humhub\modules\space\models\Space;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
 
 /**
  * Description of GroupSearch
@@ -21,7 +22,6 @@ use yii\data\ActiveDataProvider;
  */
 class MembershipSearch extends Membership
 {
-
     /**
      * @var string the freetext search string
      */
@@ -53,7 +53,7 @@ class MembershipSearch extends Membership
     {
         return [
             [['user_id', 'status'], 'integer'],
-            [['user.profile.firstname', 'user.profile.lastname', 'user.username', 'group_id', 'freeText'], 'safe']
+            [['user.profile.firstname', 'user.profile.lastname', 'user.username', 'group_id', 'freeText'], 'safe'],
         ];
     }
 
@@ -64,6 +64,11 @@ class MembershipSearch extends Membership
     {
         // bypass scenarios() implementation in the parent class
         return Model::scenarios();
+    }
+
+    public function joinWithOriginator(ActiveQuery $query)
+    {
+        $query->from('user originator');
     }
 
     /**
@@ -79,14 +84,12 @@ class MembershipSearch extends Membership
         $query->joinWith([
             'user',
             'user.profile',
-            'originator' => function ($q) {
-                $q->from('user originator');
-            }
+            'originator' => [$this, 'joinWithOriginator'],
         ]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => ['pageSize' => 50]
+            'pagination' => ['pageSize' => 50],
         ]);
 
 
@@ -112,7 +115,7 @@ class MembershipSearch extends Membership
                 ],
                 'created_at',
                 'group_id',
-            ]
+            ],
         ]);
 
         $this->load($params);

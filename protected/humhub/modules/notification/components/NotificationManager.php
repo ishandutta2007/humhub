@@ -8,6 +8,8 @@
 
 namespace humhub\modules\notification\components;
 
+use humhub\components\Event;
+use humhub\components\Module;
 use humhub\modules\content\components\ContentContainerActiveRecord;
 use humhub\modules\content\models\Content;
 use humhub\modules\content\models\ContentContainerSetting;
@@ -17,8 +19,9 @@ use humhub\modules\space\models\Space;
 use humhub\modules\user\components\ActiveQueryUser;
 use humhub\modules\user\models\Follow;
 use humhub\modules\user\models\User;
-use humhub\components\Module;
 use Yii;
+use yii\base\Exception;
+use yii\base\InvalidConfigException;
 
 /**
  * The NotificationManager component is responsible for sending BaseNotifications to Users over different
@@ -30,6 +33,15 @@ use Yii;
  */
 class NotificationManager
 {
+    /**
+     * Sends the notifications categories in the results
+     */
+    public const EVENT_SEARCH_MODULE_NOTIFICATIONS = 'searchModuleNotifications';
+
+    /**
+     * User setting name to know if the user has modified default notification settings
+     */
+    public const IS_TOUCHED_SETTINGS = 'is_touched_settings';
 
     /**
      *
@@ -58,16 +70,19 @@ class NotificationManager
      * Sends the given $notification to all enabled targets of the given $users if possible
      * as bulk message.
      *
-     * @param \humhub\modules\notification\components\BaseNotification $notification
+     * @param BaseNotification $notification
      * @param ActiveQueryUser $userQuery
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function sendBulk(BaseNotification $notification, $userQuery)
     {
+        if (!$notification->isValid()) {
+            return;
+        }
+
         $processed = [];
         /** @var User $user */
-        foreach ($userQuery->each() as $user)
-        {
+        foreach ($userQuery->each() as $user) {
             if (in_array($user->id, $processed)) {
                 continue;
             }
@@ -93,7 +108,7 @@ class NotificationManager
                     $target->send($notification, $user);
                 }
             } else {
-                Yii::debug('Could not store notification '.get_class($notification). ' for user '. $user->id);
+                Yii::debug('Could not store notification ' . get_class($notification) . ' for user ' . $user->id);
             }
 
             $processed[] = $user->id;
@@ -103,9 +118,9 @@ class NotificationManager
     /**
      * Sends the given $notification to all enabled targets of a single user.
      *
-     * @param \humhub\modules\notification\components\BaseNotification $notification
+     * @param BaseNotification $notification
      * @param User $user target user
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function send(BaseNotification $notification, User $user)
     {
@@ -118,7 +133,7 @@ class NotificationManager
      *
      * @param User $user |null the user
      * @return BaseTarget[] the target
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function getTargets(User $user = null)
     {
@@ -127,7 +142,7 @@ class NotificationManager
             $this->_targets = [];
             foreach ($this->targets as $targetClass => $targetConfig) {
                 $targetConfig = is_array($targetConfig) ? $targetConfig : [];
-                if(!isset($targetConfig['class'])) { // Allow class overwrites
+                if (!isset($targetConfig['class'])) { // Allow class overwrites
                     $targetConfig['class'] = $targetClass;
                 }
                 $this->_targets[] = Yii::createObject($targetConfig);
@@ -149,12 +164,12 @@ class NotificationManager
      *
      * @param string $class
      * @return BaseTarget
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function getTarget($class)
     {
         foreach ($this->getTargets() as $target) {
-            if ($target->className() == $class) {
+            if (get_class($target) == $class) {
                 return $target;
             }
         }
@@ -166,7 +181,7 @@ class NotificationManager
      *
      * @param User $user
      * @param Space $space
-     * @return boolean
+     * @return bool
      */
     public function isFollowingSpace(User $user, Space $space)
     {
@@ -185,7 +200,7 @@ class NotificationManager
      *
      * @param Content $content
      * @return ActiveQueryUser
-     * @throws \yii\base\Exception
+     * @throws Exception
      */
     public function getFollowers(Content $content)
     {
@@ -197,7 +212,7 @@ class NotificationManager
      * only members with send_notifications settings are returned.
      *
      * @param ContentContainerActiveRecord $container
-     * @param boolean $public
+     * @param bool $public
      * @return ActiveQueryUser
      */
     public function getContainerFollowers(ContentContainerActiveRecord $container, $public = true)
@@ -208,17 +223,16 @@ class NotificationManager
         if ($container instanceof Space) {
             $isDefault = $this->isDefaultNotificationSpace($container);
 
-            $query = Membership::getSpaceMembersQuery($container, true, true);
+            $query = $container->getMemberListService()->getNotificationQuery();
 
             if ($public) {
                 // Add explicit follower and non explicit follower if $isDefault
                 $query->union($this->findFollowers($container, $isDefault));
             } elseif ($isDefault) {
                 // Add all members without explicit following and no notification settings.
-                $query->union(Membership::getSpaceMembersQuery($container, true, false)
+                $query->union($container->getMemberListService()->getNotificationQuery(false)
                     ->andWhere(['not exists', $this->findNotExistingSettingSubQuery()]));
             }
-
         } elseif ($container instanceof User) {
             // Note the notification follow logic for users is currently not implemented.
             // TODO: perhaps return only friends if public is false?
@@ -245,7 +259,7 @@ class NotificationManager
         if ($isDefault) {
             // Add all user with no notification setting
             $query->orWhere([
-                'and', 'user.status=1', ['not exists', $this->findNotExistingSettingSubQuery()]
+                'and', 'user.status=1', ['not exists', $this->findNotExistingSettingSubQuery()],
             ]);
         }
 
@@ -257,7 +271,7 @@ class NotificationManager
         return ContentContainerSetting::find()
             ->where('contentcontainer_setting.contentcontainer_id=user.contentcontainer_id')
             ->andWhere(['contentcontainer_setting.module_id' => 'notification'])
-            ->andWhere(['contentcontainer_setting.name' => 'notification.like_email']);
+            ->andWhere(['contentcontainer_setting.name' => self::IS_TOUCHED_SETTINGS]);
     }
 
     /**
@@ -273,16 +287,25 @@ class NotificationManager
 
         $result = array_merge($memberSpaces, $followSpaces);
 
-        if($this->isUntouchedSettings($user)) {
-            $result = array_merge($result, Space::findAll(['guid' => Yii::$app->getModule('notification')->settings->getSerialized('sendNotificationSpaces')]));
+        if (!static::isTouchedSettings($user)) {
+            $result = array_merge($result, Space::find()
+                ->where(['guid' => Yii::$app->getModule('notification')->settings->getSerialized('sendNotificationSpaces')])
+                ->visible($user)
+                ->filterBlockedSpaces($user)
+                ->all());
         }
 
         return $result;
     }
 
-    private function isUntouchedSettings(User $user)
+    /**
+     * @throws \Throwable
+     */
+    public static function isTouchedSettings(User $user): bool
     {
-        return Yii::$app->getModule('notification')->settings->user($user)->get('notification.like_email') === null;
+        /** @var Module $module */
+        $module = Yii::$app->getModule('notification');
+        return (bool)$module->settings->user($user)?->get(self::IS_TOUCHED_SETTINGS);
     }
 
     /**
@@ -334,7 +357,7 @@ class NotificationManager
         Membership::updateAll(['send_notifications' => 0], [
             'and',
             ['user_id' => $user->id],
-            ['not in', 'space_id', $spaceIds]
+            ['not in', 'space_id', $spaceIds],
         ]);
 
         // Update non selected following spaces
@@ -342,7 +365,7 @@ class NotificationManager
             'and',
             ['user_id' => $user->id],
             ['object_model' => Space::class],
-            ['not in', 'object_id', $spaceIds]
+            ['not in', 'object_id', $spaceIds],
         ]);
     }
 
@@ -359,39 +382,11 @@ class NotificationManager
     }
 
     /**
-     * Defines the enable_html5_desktop_notifications setting for the given user or global if no user is given.
-     *
-     * @param integer $value
-     * @param User $user
-     */
-    public function setDesktopNoficationSettings($value = 0, User $user = null)
-    {
-        $module = Yii::$app->getModule('notification');
-        $settingManager = ($user) ? $module->settings->user($user) : $module->settings;
-        $settingManager->set('enable_html5_desktop_notifications', $value);
-    }
-
-    /**
-     * Determines the enable_html5_desktop_notifications setting either for the given user or global if no user is given.
-     * By default the setting is enabled.
-     * @param User $user
-     * @return integer
-     */
-    public function getDesktopNoficationSettings(User $user = null)
-    {
-        if ($user) {
-            return Yii::$app->getModule('notification')->settings->user($user)->getInherit('enable_html5_desktop_notifications', 1);
-        } else {
-            return Yii::$app->getModule('notification')->settings->get('enable_html5_desktop_notifications', 1);
-        }
-    }
-
-    /**
      * Sets the send_notifications settings for the given space and user.
      *
      * @param User $user user instance for which this settings will aplly
      * @param Space $space which notifications will be followed / unfollowed
-     * @param boolean $follow the setting value (true by default)
+     * @param bool $follow the setting value (true by default)
      */
     public function setSpaceSetting(User $user = null, Space $space, $follow = true)
     {
@@ -417,7 +412,7 @@ class NotificationManager
      * Returns all available Notifications
      *
      * @return BaseNotification[]
-     * @throws \yii\base\Exception
+     * @throws Exception
      */
     public function getNotifications()
     {
@@ -457,8 +452,8 @@ class NotificationManager
 
     /**
      * Searches for all Notifications exported by modules.
-     * @return type
-     * @throws \yii\base\Exception
+     * @return array
+     * @throws Exception
      */
     protected function searchModuleNotifications()
     {
@@ -468,7 +463,11 @@ class NotificationManager
                 $result = array_merge($result, $this->createNotifications($module->getNotifications()));
             }
         }
-        return $result;
+
+        $evt = new Event(['result' => $result]);
+        Event::trigger($this, static::EVENT_SEARCH_MODULE_NOTIFICATIONS, $evt);
+
+        return $evt->result;
     }
 
     protected function createNotifications($notificationClasses)
@@ -480,4 +479,29 @@ class NotificationManager
         return $result;
     }
 
+    /**
+     * Check if notifications are sent from the given Space to the given or current user
+     *
+     * @param Space $space
+     * @param User|null $user
+     * @return bool
+     * @since 1.15.6
+     */
+    public function hasSpace(Space $space, User $user = null): bool
+    {
+        if ($user === null) {
+            if (Yii::$app->user->isGuest) {
+                return false;
+            }
+            $user = Yii::$app->user->getIdentity();
+        }
+
+        foreach (self::getSpaces($user) as $notificationSpace) {
+            if ($space->is($notificationSpace)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

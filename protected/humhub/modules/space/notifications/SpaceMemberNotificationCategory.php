@@ -9,9 +9,6 @@
 namespace humhub\modules\space\notifications;
 
 use humhub\modules\notification\components\NotificationCategory;
-use humhub\modules\notification\targets\BaseTarget;
-use humhub\modules\notification\targets\MailTarget;
-use humhub\modules\notification\targets\MobileTarget;
 use humhub\modules\notification\targets\WebTarget;
 use Yii;
 
@@ -34,7 +31,7 @@ class SpaceMemberNotificationCategory extends NotificationCategory
     {
         return Yii::t(
             'SpaceModule.notification',
-            'Space Membership'
+            'Space Membership',
         );
     }
 
@@ -45,23 +42,8 @@ class SpaceMemberNotificationCategory extends NotificationCategory
     {
         return Yii::t(
             'SpaceModule.notification',
-            'Receive Notifications of Space Membership events.'
+            'Receive Notifications of Space Membership events.',
         );
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getDefaultSetting(BaseTarget $target)
-    {
-        switch ($target->id) {
-            case MailTarget::getId():
-            case WebTarget::getId():
-            case MobileTarget::getId():
-                return true;
-            default:
-                return $target->defaultSetting;
-        }
     }
 
     /**

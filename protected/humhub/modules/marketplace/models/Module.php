@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2021 HumHub GmbH & Co. KG
@@ -8,6 +9,8 @@
 namespace humhub\modules\marketplace\models;
 
 use humhub\modules\marketplace\Module as MarketplaceModule;
+use humhub\modules\marketplace\services\FilterService;
+use humhub\widgets\Link;
 use Yii;
 use yii\base\Model;
 use yii\helpers\Url;
@@ -20,6 +23,7 @@ use yii\helpers\Url;
  * @property-read string $image
  * @property-read string $checkoutUrl
  * @property-read bool $isNonFree
+ * @property-read bool $isActivated
  *
  * @since 1.11
  */
@@ -137,6 +141,23 @@ class Module extends Model
         parent::__construct($config);
     }
 
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    public function getKeywords(): array
+    {
+        return $this->isInstalled()
+            ? Yii::$app->moduleManager->getModule($this->id)->getKeywords()
+            : [];
+    }
+
     public function getIsNonFree(): bool
     {
         return (!empty($this->price_eur) || !empty($this->price_request_quote));
@@ -145,6 +166,11 @@ class Module extends Model
     public function getVersion(): string
     {
         return $this->latestVersion;
+    }
+
+    public function getInstalledVersion(): string
+    {
+        return Yii::$app->moduleManager->getModule($this->id)->getVersion();
     }
 
     public function getImage(): string
@@ -159,26 +185,63 @@ class Module extends Model
         return Yii::$app->moduleManager->hasModule($this->id);
     }
 
+    public function isMarketplaced(): bool
+    {
+        /* @var MarketplaceModule */
+        $marketplaceModule = Yii::$app->getModule('marketplace');
+
+        return $this->latestCompatibleVersion &&
+            !($this->isDeprecated && $marketplaceModule->hideLegacyModules);
+    }
+
+    /**
+     * @deprecated since v1.16; use self::getIsEnabled()
+     * @see self::getIsEnabled()
+     */
+    public function getIsActivated(): bool
+    {
+        return $this->getIsEnabled();
+    }
+
+    /**
+     * @since v1.16
+     */
+    public function getIsEnabled(): bool
+    {
+        return Yii::$app->moduleManager->getModule($this->id)->getIsEnabled();
+    }
+
+    public function getConfigUrl(): string
+    {
+        return Yii::$app->moduleManager->getModule($this->id)->getConfigUrl();
+    }
+
     public function isProFeature(): bool
     {
         return !empty($this->professional_only);
     }
 
+    /**
+     * @return bool
+     * @deprecated since 1.17 Use isProFeature()
+     */
     public function isProOnly(): bool
     {
-        if (!$this->isProFeature()) {
-            return false;
-        }
-
-        /* @var MarketplaceModule */
-        $marketplaceModule = Yii::$app->getModule('marketplace');
-        $licence = $marketplaceModule->getLicence();
-
-        return $licence->type !== Licence::LICENCE_TYPE_PRO;
+        return $this->isProFeature();
     }
 
     public function getCheckoutUrl(): string
     {
         return str_replace('-returnToUrl-', Url::to(['/marketplace/purchase/list'], true), $this->checkoutUrl);
+    }
+
+    public function getFilterService(): FilterService
+    {
+        return new FilterService($this);
+    }
+
+    public function marketplaceLink(string $text): Link
+    {
+        return Link::asLink($text, $this->marketplaceUrl)->blank();
     }
 }

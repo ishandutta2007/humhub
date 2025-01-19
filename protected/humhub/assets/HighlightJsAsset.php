@@ -13,7 +13,6 @@ use humhub\components\assets\WebStaticAssetBundle;
 
 class HighlightJsAsset extends WebStaticAssetBundle
 {
-
     /**
      * @inheritdoc
      */
@@ -23,6 +22,6 @@ class HighlightJsAsset extends WebStaticAssetBundle
      * @inheritdoc
      */
     public $depends = [
-        HighlightJsStyleAsset::class
+        HighlightJsStyleAsset::class,
     ];
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link http://www.yiiframework.com/
  * @copyright Copyright (c) 2008 Yii Software LLC
@@ -27,8 +28,8 @@ class m141106_185632_log_init extends Migration
     private $dbTargets = [];
 
     /**
-     * @throws InvalidConfigException
      * @return DbTarget[]
+     * @throws InvalidConfigException
      */
     protected function getDbTargets()
     {

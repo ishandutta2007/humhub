@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2021 HumHub GmbH & Co. KG
@@ -20,7 +21,6 @@ use yii\base\Model;
  */
 class PeopleSettingsForm extends Model
 {
-
     public $detail1;
     public $detail2;
     public $detail3;
@@ -89,7 +89,7 @@ class PeopleSettingsForm extends Model
 
     /**
      * Saves the form
-     * @return boolean
+     * @return bool
      */
     public function save()
     {
@@ -179,8 +179,8 @@ class PeopleSettingsForm extends Model
         $defaultSortingGroupId = PeopleCard::config('defaultSortingGroup');
 
         return $defaultSortingGroupId && Group::find()
-            ->where(['id' => $defaultSortingGroupId])
-            ->exists();
+                ->where(['id' => $defaultSortingGroupId])
+                ->exists();
     }
 
 }

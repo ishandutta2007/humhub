@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2018 HumHub GmbH & Co. KG
@@ -34,7 +35,7 @@ class FilterPanel extends Widget
     public function run()
     {
 
-        if(empty($this->blocks)) {
+        if (empty($this->blocks)) {
             return '';
         }
 

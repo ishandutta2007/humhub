@@ -8,7 +8,9 @@
 
 namespace humhub\modules\user\widgets;
 
+use humhub\modules\user\models\User;
 use Yii;
+use yii\base\Widget;
 use yii\bootstrap\Html;
 
 /**
@@ -17,11 +19,10 @@ use yii\bootstrap\Html;
  * @author luke
  * @since 0.11
  */
-class UserFollowButton extends \yii\base\Widget
+class UserFollowButton extends Widget
 {
-
     /**
-     * @var \humhub\modules\user\models\User
+     * @var User
      */
     public $user;
 
@@ -36,12 +37,12 @@ class UserFollowButton extends \yii\base\Widget
     public $unfollowLabel = null;
 
     /**
-     * @var string options for follow button 
+     * @var string options for follow button
      */
     public $followOptions = ['class' => 'btn btn-primary'];
 
     /**
-     * @var array options for unfollow button 
+     * @var array options for unfollow button
      */
     public $unfollowOptions = ['class' => 'btn btn-primary active'];
 
@@ -79,7 +80,7 @@ class UserFollowButton extends \yii\base\Widget
      */
     public function run()
     {
-        if ($this->user->isCurrentUser() || \Yii::$app->user->isGuest) {
+        if ($this->user->isCurrentUser() || Yii::$app->user->isGuest) {
             return;
         }
 
@@ -112,7 +113,7 @@ class UserFollowButton extends \yii\base\Widget
 
         // Confirm action "Unfollow"
         $this->unfollowOptions['data-action-confirm'] = Yii::t('SpaceModule.base', 'Would you like to unfollow {userName}?', [
-            '{userName}' => '<strong>' . Html::encode($this->user->getDisplayName()) . '</strong>'
+            '{userName}' => '<strong>' . Html::encode($this->user->getDisplayName()) . '</strong>',
         ]);
 
         $module = Yii::$app->getModule('user');
@@ -123,7 +124,7 @@ class UserFollowButton extends \yii\base\Widget
         }
 
         return Html::a($this->unfollowLabel, '#', $this->unfollowOptions) .
-                Html::a($this->followLabel, '#', $this->followOptions);
+            Html::a($this->followLabel, '#', $this->followOptions);
     }
 
 }

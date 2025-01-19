@@ -8,15 +8,14 @@
 
 namespace humhub\modules\space\permissions;
 
-use humhub\libs\BasePermission;
+use humhub\modules\admin\components\BaseAdminPermission;
 use Yii;
 
 /**
  * CreatePublicSpace Permission
  */
-class CreatePublicSpace extends BasePermission
+class CreatePublicSpace extends BaseAdminPermission
 {
-
     /**
      * @inheritdoc
      */
@@ -37,14 +36,10 @@ class CreatePublicSpace extends BasePermission
      */
     protected $moduleId = 'space';
 
-    /**
-     * @inheritdoc
-     */
-    protected $defaultState = self::STATE_ALLOW;
-    
-    public function __construct($config = []) {
+    public function __construct($config = [])
+    {
         parent::__construct($config);
-        
+
         $this->title = Yii::t('SpaceModule.permissions', 'Create Public Spaces');
         $this->description = Yii::t('SpaceModule.permissions', 'Can create Spaces visible to all members.');
     }

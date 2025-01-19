@@ -18,7 +18,6 @@ use humhub\modules\space\models\Space;
  */
 class MailContentContainerImage extends \yii\base\Widget
 {
-
     /**
      * @var \humhub\modules\content\components\ContentContainerActiveRecord
      */
@@ -29,16 +28,14 @@ class MailContentContainerImage extends \yii\base\Widget
      */
     public function run()
     {
-        $url = ($this->container instanceof Space) 
+        $url = ($this->container instanceof Space)
                 ? $this->container->createUrl('/space/space', [], true)
                 : $this->container->createUrl('/user/profile', [], true);
-        
+
         return $this->render('mailContentContainerImage', [
-                    'container' => $this->container,
-                    'url' => $url,
+            'container' => $this->container,
+            'url' => $url,
         ]);
     }
 
 }
-
-?>

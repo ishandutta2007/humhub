@@ -12,15 +12,15 @@ use humhub\modules\user\Module;
 use Yii;
 use humhub\modules\user\models\User;
 use humhub\modules\user\components\CheckPasswordValidator;
+use yii\base\Model;
 
 /**
  * Form Model for username change
  *
  * @since 1.4
  */
-class AccountChangeUsername extends \yii\base\Model
+class AccountChangeUsername extends Model
 {
-
     /**
      * @var string the users password
      */
@@ -78,7 +78,7 @@ class AccountChangeUsername extends \yii\base\Model
 
         $mail = Yii::$app->mailer->compose([
             'html' => '@humhub/modules/user/views/mails/ChangeUsername',
-            'text' => '@humhub/modules/user/views/mails/plaintext/ChangeUsername'
+            'text' => '@humhub/modules/user/views/mails/plaintext/ChangeUsername',
         ], [
             'user' => $user,
             'newUsername' => $this->newUsername,
@@ -96,7 +96,7 @@ class AccountChangeUsername extends \yii\base\Model
      */
     public function validateForbiddenUsername($attribute, $params)
     {
-        if (in_array(strtolower($this->$attribute), Yii::$app->controller->module->forbiddenUsernames)){
+        if (in_array(strtolower($this->$attribute), Yii::$app->controller->module->forbiddenUsernames)) {
             $this->addError($attribute, Yii::t('UserModule.account', 'You cannot use this username.'));
         }
     }

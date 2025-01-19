@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2021 HumHub GmbH & Co. KG
@@ -12,13 +13,12 @@ use humhub\modules\space\models\Space;
 
 /**
  * SpaceDirectoryCard shows a space on spaces directory
- * 
+ *
  * @since 1.9
  * @author Luke
  */
 class SpaceDirectoryCard extends Widget
 {
-
     /**
      * @var Space
      */
@@ -35,7 +35,7 @@ class SpaceDirectoryCard extends Widget
     public function run()
     {
         $card = $this->render('spaceDirectoryCard', [
-            'space' => $this->space
+            'space' => $this->space,
         ]);
 
         return str_replace('{card}', $card, $this->template);

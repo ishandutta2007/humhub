@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2018 HumHub GmbH & Co. KG
@@ -18,5 +19,4 @@ use Yii;
  */
 class TimePicker extends \humhub\modules\ui\form\widgets\TimePicker
 {
-
 }

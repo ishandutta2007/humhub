@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2018 HumHub GmbH & Co. KG
@@ -7,13 +8,15 @@
 
 namespace web\acceptance;
 
+use Exception;
 use web\AcceptanceTester;
+use Yii;
 
 class NonceCest
 {
     /**
      * @param AcceptanceTester $I
-     * @throws \Exception
+     * @throws Exception
      */
     public function testNoNonceScript(AcceptanceTester $I)
     {
@@ -37,7 +40,7 @@ class NonceCest
 
     public function testInvalidStatistic(AcceptanceTester $I)
     {
-        \Yii::$app->settings->set('trackingHtmlCode', '<script>alert("Tracking Script")</script>');
+        Yii::$app->settings->set('trackingHtmlCode', '<script>alert("Tracking Script")</script>');
         $I->amAdmin();
         $I->amOnRoute(['/admin/setting/statistic']);
         $I->wait(2);

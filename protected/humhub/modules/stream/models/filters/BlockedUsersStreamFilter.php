@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2021 HumHub GmbH & Co. KG
@@ -16,7 +17,8 @@ class BlockedUsersStreamFilter extends StreamQueryFilter
      */
     private $blockedUsers;
 
-    public function init() {
+    public function init()
+    {
         parent::init();
 
         if (!empty($this->streamQuery->user) && $this->streamQuery->user instanceof User) {

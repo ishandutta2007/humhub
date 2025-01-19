@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
@@ -11,7 +12,7 @@ namespace tests\codeception\unit\modules\content\widgets;
 use humhub\models\UrlOembed;
 use humhub\modules\content\widgets\richtext\extensions\oembed\OembedExtension;
 use tests\codeception\_support\HumHubDbTestCase;
-
+use yii\base\InvalidConfigException;
 
 class RichTextOembedTest extends HumHubDbTestCase
 {
@@ -36,12 +37,12 @@ class RichTextOembedTest extends HumHubDbTestCase
     {
         static::assertTrue((new UrlOembed([
             'url' => 'https://www.youtube.com/watch?v=yt1',
-            'preview' => 'yt1'
+            'preview' => 'yt1',
         ]))->save());
 
         static::assertTrue((new UrlOembed([
             'url' => 'https://www.youtube.com/watch?v=yt2',
-            'preview' => 'yt2'
+            'preview' => 'yt2',
         ]))->save());
 
         $result = OembedExtension::scanLinkExtension('[https://www.youtube.com/watch?v=yt1](oembed:https://www.youtube.com/watch?v=yt1)');
@@ -51,18 +52,18 @@ class RichTextOembedTest extends HumHubDbTestCase
     }
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function testParseSingleOembed()
     {
         static::assertTrue((new UrlOembed([
             'url' => 'https://www.youtube.com/watch?v=yt1',
-            'preview' => 'yt1'
+            'preview' => 'yt1',
         ]))->save());
 
         static::assertTrue((new UrlOembed([
             'url' => 'https://www.youtube.com/watch?v=yt2',
-            'preview' => 'yt2'
+            'preview' => 'yt2',
         ]))->save());
 
         $text = "[https://www.youtube.com/watch?v=yt1](oembed:https://www.youtube.com/watch?v=yt1)";
@@ -72,18 +73,18 @@ class RichTextOembedTest extends HumHubDbTestCase
     }
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function testParseMultipleOembeds()
     {
         static::assertTrue((new UrlOembed([
             'url' => 'https://www.youtube.com/watch?v=yt1',
-            'preview' => 'yt1'
+            'preview' => 'yt1',
         ]))->save());
 
         static::assertTrue((new UrlOembed([
             'url' => 'https://www.youtube.com/watch?v=yt2',
-            'preview' => 'yt2'
+            'preview' => 'yt2',
         ]))->save());
 
         $text = "[https://www.youtube.com/watch?v=yt1](oembed:https://www.youtube.com/watch?v=yt1)\n\n[https://www.youtube.com/watch?v=yt2](oembed:https://www.youtube.com/watch?v=yt2)";
@@ -94,18 +95,18 @@ class RichTextOembedTest extends HumHubDbTestCase
     }
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function testParseOembedsWithMax()
     {
         static::assertTrue((new UrlOembed([
             'url' => 'https://www.youtube.com/watch?v=yt1',
-            'preview' => 'yt1'
+            'preview' => 'yt1',
         ]))->save());
 
         static::assertTrue((new UrlOembed([
             'url' => 'https://www.youtube.com/watch?v=yt2',
-            'preview' => 'yt2'
+            'preview' => 'yt2',
         ]))->save());
 
         $text = "[https://www.youtube.com/watch?v=yt1](oembed:https://www.youtube.com/watch?v=yt1)\n\n[https://www.youtube.com/watch?v=yt2](oembed:https://www.youtube.com/watch?v=yt2)";
@@ -115,18 +116,18 @@ class RichTextOembedTest extends HumHubDbTestCase
     }
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function testParseOembedsWithZeroMax()
     {
         static::assertTrue((new UrlOembed([
             'url' => 'https://www.youtube.com/watch?v=yt1',
-            'preview' => 'yt1'
+            'preview' => 'yt1',
         ]))->save());
 
         static::assertTrue((new UrlOembed([
             'url' => 'https://www.youtube.com/watch?v=yt2',
-            'preview' => 'yt2'
+            'preview' => 'yt2',
         ]))->save());
 
         $text = "[https://www.youtube.com/watch?v=yt1](oembed:https://www.youtube.com/watch?v=yt1)\n\n[https://www.youtube.com/watch?v=yt2](oembed:https://www.youtube.com/watch?v=yt2)";

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2018 HumHub GmbH & Co. KG
@@ -33,7 +34,6 @@ use yii\base\InvalidArgumentException;
  */
 abstract class FilterNavigation extends JsWidget
 {
-
     /**
      * @inheritdoc
      */
@@ -105,21 +105,21 @@ abstract class FilterNavigation extends JsWidget
     /**
      * Initialization logic for default filter panels
      */
-    protected abstract function initFilterPanels();
+    abstract protected function initFilterPanels();
 
     /**
      * Initialization logic for default filter blocks.
      *
      * This function can make use of the [[addFilterBlock()]] to add filter blocks to the previously initialized panels
      */
-    protected abstract function initFilterBlocks();
+    abstract protected function initFilterBlocks();
 
     /**
      * Initialization logic for default filter blocks.
      *
      * This function can make use of the [[addFilter()]] to add filters the previously initialized blocks
      */
-    protected abstract function initFilters();
+    abstract protected function initFilters();
 
 
     /**
@@ -152,7 +152,8 @@ abstract class FilterNavigation extends JsWidget
     {
         return $this->render($this->view, [
             'panels' => $this->filterOutEmptyPanels(),
-            'options' => $this->getOptions()
+            'options' => $this->getOptions(),
+            'isCollapsed' => $this->isCollapsed(),
         ]);
     }
 
@@ -160,7 +161,7 @@ abstract class FilterNavigation extends JsWidget
     {
         if ($this->componentId) {
             return [
-                'filter-component-id' => $this->componentId
+                'filter-component-id' => $this->componentId,
             ];
         }
 
@@ -268,5 +269,10 @@ abstract class FilterNavigation extends JsWidget
         }
 
         return array_key_exists($filterId, $this->definition) || in_array($filterId, $this->definition);
+    }
+
+    public function isCollapsed(): bool
+    {
+        return true;
     }
 }

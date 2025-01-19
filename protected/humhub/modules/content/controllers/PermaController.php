@@ -8,10 +8,10 @@
 
 namespace humhub\modules\content\controllers;
 
-use Yii;
+use humhub\components\behaviors\AccessControl;
 use humhub\components\Controller;
-use humhub\modules\content\models\WallEntry;
 use humhub\modules\content\models\Content;
+use Yii;
 use yii\web\HttpException;
 
 /**
@@ -23,7 +23,6 @@ use yii\web\HttpException;
  */
 class PermaController extends Controller
 {
-
     /**
      * @inheritdoc
      */
@@ -31,9 +30,9 @@ class PermaController extends Controller
     {
         return [
             'acl' => [
-                'class' => \humhub\components\behaviors\AccessControl::class,
-                'guestAllowedActions' => ['index', 'wall-entry']
-            ]
+                'class' => AccessControl::class,
+                'guestAllowedActions' => ['index', 'wall-entry'],
+            ],
         ];
     }
 
@@ -47,6 +46,10 @@ class PermaController extends Controller
 
         $content = Content::findOne(['id' => $id]);
         if ($content !== null) {
+            $highlight = Yii::$app->request->get('highlight');
+            if ($highlight !== null) {
+                Yii::$app->session->set('contentHighlight', $highlight);
+            }
 
             if (method_exists($content->getPolymorphicRelation(), 'getUrl')) {
                 $url = $content->getPolymorphicRelation()->getUrl();

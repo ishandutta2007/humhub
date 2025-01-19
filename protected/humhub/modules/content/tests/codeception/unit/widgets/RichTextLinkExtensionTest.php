@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
@@ -11,7 +12,6 @@ namespace tests\codeception\unit\modules\content\widgets;
 use humhub\modules\content\widgets\richtext\extensions\link\RichTextLinkExtension;
 use humhub\modules\content\widgets\richtext\extensions\mentioning\MentioningExtension;
 use tests\codeception\_support\HumHubDbTestCase;
-
 
 class RichTextLinkExtensionTest extends HumHubDbTestCase
 {
@@ -77,7 +77,7 @@ class RichTextLinkExtensionTest extends HumHubDbTestCase
         static::assertEquals('Text', $matches[0]->getText());
         static::assertEquals('my-extension', $matches[0]->getExtensionKey());
         static::assertEquals('extensionId', $matches[0]->getExtensionId());
-        static::assertEmpty( $matches[0]->getTitle());
+        static::assertEmpty($matches[0]->getTitle());
         static::assertEmpty($matches[0]->getAddition());
     }
 
@@ -101,7 +101,7 @@ class RichTextLinkExtensionTest extends HumHubDbTestCase
         static::assertEquals('Text', $matches[0]->getText());
         static::assertEquals('my-extension', $matches[0]->getExtensionKey());
         static::assertEquals('extensionId', $matches[0]->getExtensionId());
-        static::assertEmpty( $matches[0]->getTitle());
+        static::assertEmpty($matches[0]->getTitle());
         static::assertEquals('150x150', $matches[0]->getAddition());
     }
 
@@ -112,8 +112,8 @@ class RichTextLinkExtensionTest extends HumHubDbTestCase
         static::assertCount(1, $matches);
         static::assertEquals('Text', $matches[0]->getText());
         static::assertEquals('my-extension', $matches[0]->getExtensionKey());
-        static::assertEmpty( $matches[0]->getExtensionId());
-        static::assertEmpty( $matches[0]->getTitle());
+        static::assertEmpty($matches[0]->getExtensionId());
+        static::assertEmpty($matches[0]->getTitle());
         static::assertEquals('150x150', $matches[0]->getAddition());
     }
 

@@ -1,11 +1,10 @@
 <?php
 
-use yii\db\Migration;
 use yii\db\Expression;
+use yii\db\Migration;
 
 class m160508_005740_settings_cleanup extends Migration
 {
-
     public function up()
     {
         $this->dropColumn('setting', 'created_at');

@@ -8,6 +8,7 @@
 
 namespace humhub\modules\content\permissions;
 
+use humhub\libs\BasePermission;
 use humhub\modules\space\models\Space;
 use humhub\modules\user\models\User;
 use Yii;
@@ -15,7 +16,7 @@ use Yii;
 /**
  * CreatePublicContent Permission
  */
-class CreatePublicContent extends \humhub\libs\BasePermission
+class CreatePublicContent extends BasePermission
 {
     /**
      * @inheritdoc
@@ -42,7 +43,7 @@ class CreatePublicContent extends \humhub\libs\BasePermission
         User::USERGROUP_SELF,
         User::USERGROUP_FRIEND,
         User::USERGROUP_USER,
-        User::USERGROUP_GUEST
+        User::USERGROUP_GUEST,
     ];
 
     /**

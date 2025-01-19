@@ -8,29 +8,31 @@
 
 namespace humhub\modules\like\models;
 
-use Yii;
+use humhub\components\behaviors\PolymorphicRelation;
 use humhub\modules\content\components\ContentAddonActiveRecord;
 use humhub\modules\content\interfaces\ContentOwner;
+use humhub\modules\like\activities\Liked;
 use humhub\modules\like\notifications\NewLike;
+use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "like".
  *
  * The followings are the available columns in table 'like':
- * @property integer $id
- * @property integer $target_user_id
+ * @property int $id
+ * @property int $target_user_id
  * @property string $object_model
- * @property integer $object_id
+ * @property int $object_id
  * @property string $created_at
- * @property integer $created_by
+ * @property int $created_by
  * @property string $updated_at
- * @property integer $updated_by
+ * @property int $updated_by
  *
  * @since 0.5
  */
 class Like extends ContentAddonActiveRecord
 {
-
     /**
      * @inheritdoc
      */
@@ -51,11 +53,11 @@ class Like extends ContentAddonActiveRecord
     {
         return [
             [
-                'class' => \humhub\components\behaviors\PolymorphicRelation::class,
+                'class' => PolymorphicRelation::class,
                 'mustBeInstanceOf' => [
-                    \yii\db\ActiveRecord::class,
-                ]
-            ]
+                    ActiveRecord::class,
+                ],
+            ],
         ];
     }
 
@@ -75,16 +77,19 @@ class Like extends ContentAddonActiveRecord
      */
     public static function GetLikes($objectModel, $objectId)
     {
-        $cacheId = "likes_" . $objectModel . "_" . $objectId;
-        $cacheValue = Yii::$app->cache->get($cacheId);
-
-        if ($cacheValue === false) {
-            $newCacheValue = Like::findAll(['object_model' => $objectModel, 'object_id' => $objectId]);
-            Yii::$app->cache->set($cacheId, $newCacheValue, Yii::$app->settings->get('cache.expireTime'));
-            return $newCacheValue;
-        } else {
-            return $cacheValue;
-        }
+        return Yii::$app->cache->getOrSet(
+            "likes_{$objectModel}_{$objectId}",
+            function () use ($objectModel, $objectId) {
+                return Like::find()
+                    ->where([
+                        'object_model' => $objectModel,
+                        'object_id' => $objectId,
+                    ])
+                    ->with('user')
+                    ->all();
+            },
+            Yii::$app->settings->get('cacheExpireTime'),
+        );
     }
 
     /**
@@ -92,10 +97,10 @@ class Like extends ContentAddonActiveRecord
      */
     public function afterSave($insert, $changedAttributes)
     {
-        Yii::$app->cache->delete('likes_' . $this->object_model . "_" . $this->object_id);
+        $this->flushCache();
 
         if ($insert) {
-            \humhub\modules\like\activities\Liked::instance()->about($this)->save();
+            Liked::instance()->about($this)->save();
 
             if ($this->getSource() instanceof ContentOwner && $this->getSource()->content->createdBy !== null) {
                 // This is required for comments where $this->getSoruce()->createdBy contains the comment author.
@@ -115,8 +120,13 @@ class Like extends ContentAddonActiveRecord
      */
     public function beforeDelete()
     {
-        Yii::$app->cache->delete('likes_' . $this->object_model . "_" . $this->object_id);
+        $this->flushCache();
         return parent::beforeDelete();
+    }
+
+    public function flushCache()
+    {
+        Yii::$app->cache->delete('likes_' . $this->object_model . '_' . $this->object_id);
     }
 
 }

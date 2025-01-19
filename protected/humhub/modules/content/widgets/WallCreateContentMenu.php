@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2022 HumHub GmbH & Co. KG
@@ -81,7 +82,7 @@ class WallCreateContentMenu extends Menu
                 'label' => $label = ucfirst($content->getContentName()),
                 'icon' => $content->getIcon(),
                 'url' => '#',
-                'sortOrder' => [$wallEntryWidget->createFormSortOrder, $label]
+                'sortOrder' => [$wallEntryWidget->createFormSortOrder, $label],
             ];
             $url = $this->contentContainer->createUrl($wallEntryWidget->createRoute);
 
@@ -116,7 +117,7 @@ class WallCreateContentMenu extends Menu
     {
         $this->initEntries();
         $countEntries = count($this->entries);
-        $hasEntryWithForm = self::canCreateEntry($this->contentContainer, 'form');;
+        $hasEntryWithForm = self::canCreateEntry($this->contentContainer, 'form');
 
         if ($hasEntryWithForm && $countEntries > 1) {
             return true;

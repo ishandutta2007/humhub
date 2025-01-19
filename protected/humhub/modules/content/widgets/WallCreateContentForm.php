@@ -8,16 +8,16 @@
 
 namespace humhub\modules\content\widgets;
 
+use humhub\components\Widget;
+use humhub\modules\content\components\ContentActiveRecord;
+use humhub\modules\content\components\ContentContainerActiveRecord;
+use humhub\modules\content\models\Content;
 use humhub\modules\content\permissions\CreatePublicContent;
+use humhub\modules\space\models\Space;
 use humhub\modules\stream\actions\StreamEntryResponse;
 use humhub\modules\topic\models\Topic;
 use humhub\modules\ui\form\widgets\ActiveForm;
-use humhub\components\Widget;
 use humhub\modules\user\models\User;
-use humhub\modules\space\models\Space;
-use humhub\modules\content\models\Content;
-use humhub\modules\content\components\ContentContainerActiveRecord;
-use humhub\modules\content\components\ContentActiveRecord;
 use Yii;
 use yii\web\HttpException;
 
@@ -28,7 +28,6 @@ use yii\web\HttpException;
  */
 abstract class WallCreateContentForm extends Widget
 {
-
     /**
      * @var string form submit route/url (required)
      */
@@ -107,7 +106,7 @@ abstract class WallCreateContentForm extends Widget
     {
         Yii::$app->response->format = 'json';
 
-        $visibility = (int) Yii::$app->request->post('visibility', Content::VISIBILITY_PRIVATE);
+        $visibility = (int)Yii::$app->request->post('visibility', Content::VISIBILITY_PRIVATE);
         if ($visibility === Content::VISIBILITY_PUBLIC && !$contentContainer->can(CreatePublicContent::class)) {
             $visibility = Content::VISIBILITY_PRIVATE;
         }
@@ -115,7 +114,7 @@ abstract class WallCreateContentForm extends Widget
         $record->content->visibility = $visibility;
         $record->content->container = $contentContainer;
         $record->content->getStateService()->set(Yii::$app->request->post('state'), [
-            'scheduled_at' => Yii::$app->request->post('scheduledDate')
+            'scheduled_at' => Yii::$app->request->post('scheduledDate'),
         ]);
 
         // Handle Notify User Features of ContentFormWidget
@@ -132,7 +131,7 @@ abstract class WallCreateContentForm extends Widget
 
         if ($record->save()) {
             $topics = Yii::$app->request->post('postTopicInput');
-            if (!empty($topics)) {
+            if (!empty($topics) && Topic::isAllowedToCreate($contentContainer)) {
                 Topic::attach($record->content, $topics);
             }
 

@@ -8,16 +8,18 @@
 
 namespace humhub\modules\user\controllers;
 
-use humhub\modules\user\Module;
-use Yii;
-use yii\web\Controller;
-use yii\web\HttpException;
 use humhub\components\behaviors\AccessControl;
 use humhub\modules\admin\permissions\ManageGroups;
 use humhub\modules\admin\permissions\ManageUsers;
 use humhub\modules\user\models\Invite;
 use humhub\modules\user\models\forms\Invite as InviteForm;
 use humhub\widgets\ModalClose;
+use Throwable;
+use Yii;
+use yii\base\Exception;
+use yii\base\InvalidConfigException;
+use yii\web\Controller;
+use yii\web\HttpException;
 
 /**
  * InviteController for new user invites
@@ -34,7 +36,7 @@ class InviteController extends Controller
         return [
             'acl' => [
                 'class' => AccessControl::class,
-            ]
+            ],
         ];
     }
 
@@ -42,14 +44,18 @@ class InviteController extends Controller
      * Invite form and processing action
      *
      * @return string the action result
-     * @throws \yii\web\HttpException
+     * @throws HttpException
      */
-    public function actionIndex($adminIsAlwaysAllowed = false)
+    public function actionIndex()
     {
         $model = new InviteForm();
 
-        $canInviteByEmail = $model->canInviteByEmail($adminIsAlwaysAllowed);
-        $canInviteByLink = $model->canInviteByLink($adminIsAlwaysAllowed);
+        if ($target = Yii::$app->request->get('target')) {
+            $model->target = $target;
+        }
+
+        $canInviteByEmail = $model->canInviteByEmail();
+        $canInviteByLink = $model->canInviteByLink();
         if (!$canInviteByEmail && !$canInviteByLink) {
             throw new HttpException(403, 'Invite denied!');
         }
@@ -60,7 +66,7 @@ class InviteController extends Controller
             }
 
             return ModalClose::widget([
-                'success' => Yii::t('UserModule.base', 'User has been invited.')
+                'success' => Yii::t('UserModule.base', 'User has been invited.'),
             ]);
         }
 
@@ -68,7 +74,6 @@ class InviteController extends Controller
             'model' => $model,
             'canInviteByEmail' => $canInviteByEmail,
             'canInviteByLink' => $canInviteByLink,
-            'adminIsAlwaysAllowed' => $adminIsAlwaysAllowed,
         ]);
     }
 
@@ -83,6 +88,7 @@ class InviteController extends Controller
         $userInvite->email = $email;
         $userInvite->source = Invite::SOURCE_INVITE;
         $userInvite->user_originator_id = Yii::$app->user->getIdentity()->id;
+        $userInvite->language = Yii::$app->settings->get('defaultLanguage');
 
         $existingInvite = Invite::findOne(['email' => $email]);
         if ($existingInvite !== null) {
@@ -95,15 +101,18 @@ class InviteController extends Controller
     }
 
     /**
-     * @param $adminIsAlwaysAllowed
      * @return string
-     * @throws \Throwable
-     * @throws \yii\base\Exception
-     * @throws \yii\base\InvalidConfigException
+     * @throws Throwable
+     * @throws Exception
+     * @throws InvalidConfigException
      */
-    public function actionResetInviteLink($adminIsAlwaysAllowed = false)
+    public function actionResetInviteLink()
     {
         $model = new InviteForm();
+
+        if ($target = Yii::$app->request->get('target')) {
+            $model->target = $target;
+        }
 
         if (!Yii::$app->user->can([ManageUsers::class, ManageGroups::class])) {
             $this->forbidden();
@@ -115,9 +124,8 @@ class InviteController extends Controller
 
         return $this->renderAjax('index', [
             'model' => $model,
-            'canInviteByEmail' => $model->canInviteByEmail($adminIsAlwaysAllowed),
-            'canInviteByLink' => $model->canInviteByLink($adminIsAlwaysAllowed),
-            'adminIsAlwaysAllowed' => $adminIsAlwaysAllowed,
+            'canInviteByEmail' => $model->canInviteByEmail(),
+            'canInviteByLink' => $model->canInviteByLink(),
         ]);
     }
 }

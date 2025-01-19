@@ -20,7 +20,6 @@ use yii\helpers\ArrayHelper;
  */
 class DynamicConfig extends BaseObject
 {
-
     /**
      * Add an array to the dynamic configuration
      *
@@ -72,7 +71,7 @@ class DynamicConfig extends BaseObject
         file_put_contents($configFile, $content);
 
         if (function_exists('opcache_invalidate')) {
-            opcache_invalidate($configFile);
+            @opcache_invalidate($configFile);
         }
 
         if (function_exists('apc_compile_file')) {
@@ -91,37 +90,24 @@ class DynamicConfig extends BaseObject
         // Add Application Name to Configuration
         $config['name'] = Yii::$app->settings->get('name');
 
-        // Add Default language
-        $defaultLanguage = Yii::$app->settings->get('defaultLanguage');
-        if ($defaultLanguage !== null && $defaultLanguage != '') {
-            $config['language'] = Yii::$app->settings->get('defaultLanguage');
-        } else {
-            $config['language'] = Yii::$app->language;
-        }
-
-        $defaultTimeZone = Yii::$app->settings->get('defaultTimeZone');
-        if (!empty($defaultTimeZone)) {
-            $config['timeZone'] = $defaultTimeZone;
-            $config['components']['formatter']['defaultTimeZone'] = $defaultTimeZone;
-        }
-
         // Add Caching
-        $cacheClass = Yii::$app->settings->get('cache.class');
+        $cacheClass = Yii::$app->settings->get('cacheClass');
+        $cacheKeyPrefix = empty($config['components']['cache']['keyPrefix']) ? Yii::$app->id : $config['components']['cache']['keyPrefix'];
         if (in_array($cacheClass, ['yii\caching\DummyCache', 'yii\caching\FileCache'])) {
             $config['components']['cache'] = [
                 'class' => $cacheClass,
-                'keyPrefix' => Yii::$app->id
+                'keyPrefix' => $cacheKeyPrefix,
             ];
         } elseif ($cacheClass == 'yii\caching\ApcCache' && (function_exists('apcu_add') || function_exists('apc_add'))) {
             $config['components']['cache'] = [
                 'class' => $cacheClass,
-                'keyPrefix' => Yii::$app->id,
-                'useApcu' => (function_exists('apcu_add'))
+                'keyPrefix' => $cacheKeyPrefix,
+                'useApcu' => (function_exists('apcu_add')),
             ];
         } elseif ($cacheClass === \yii\redis\Cache::class) {
             $config['components']['cache'] = [
                 'class' => \yii\redis\Cache::class,
-                'keyPrefix' => Yii::$app->id
+                'keyPrefix' => $cacheKeyPrefix,
             ];
         }
 
@@ -141,6 +127,14 @@ class DynamicConfig extends BaseObject
         // Cleanups
         unset($config['components']['db']['charset']);
         unset($config['components']['formatterApp']);
+
+        // Remove old localisation options
+        unset($config['timeZone']);
+        unset($config['language']);
+        unset($config['components']['formatter']['defaultTimeZone']);
+        if (empty($config['components']['formatter'])) {
+            unset($config['components']['formatter']);
+        }
 
         $config['params']['config_created_at'] = time();
         $config['params']['horImageScrollOnMobile'] = Yii::$app->settings->get('horImageScrollOnMobile');
@@ -196,7 +190,7 @@ class DynamicConfig extends BaseObject
     public static function needRewrite($moduleId, $name)
     {
         return (in_array($name, [
-            'name', 'defaultLanguage', 'timeZone', 'cache.class', 'mailer.transportType',
+            'name', 'defaultLanguage', 'timeZone', 'cacheClass', 'mailer.transportType',
             'mailer.hostname', 'mailer.username', 'mailer.password', 'mailer.encryption',
             'mailer.port', 'horImageScrollOnMobile']));
     }
@@ -204,5 +198,10 @@ class DynamicConfig extends BaseObject
     public static function getConfigFilePath()
     {
         return Yii::getAlias(Yii::$app->params['dynamicConfigFile']);
+    }
+
+    public static function exist()
+    {
+        return file_exists(self::getConfigFilePath());
     }
 }

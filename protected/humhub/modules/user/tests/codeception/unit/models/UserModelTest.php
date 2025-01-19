@@ -2,8 +2,8 @@
 
 namespace tests\codeception\unit\models;
 
+use humhub\modules\admin\permissions\ManageAllContent;
 use humhub\modules\space\models\Space;
-use humhub\modules\user\models\Group;
 use humhub\modules\user\models\Invite;
 use humhub\modules\user\models\User;
 use tests\codeception\_support\HumHubDbTestCase;
@@ -50,18 +50,18 @@ class UserModelTest extends HumHubDbTestCase
         $this->assertFalse($user->super_admin);
     }
 
-    public function testCheckCanViewAllContent()
+    public function testManageAllContentPermission()
     {
-        $admin = User::findOne(['username' => 'Admin']);
-        $this->assertFalse($admin->canViewAllContent());
+        $user = User::findOne(['username' => 'User2']);
+        $this->assertFalse($user->canManageAllContent());
 
-        $user = User::findOne(['username' => 'User1']);
-        $this->assertFalse($user->canViewAllContent());
+        Yii::$app->getModule('admin')->enableManageAllContentPermission = true;
 
-        Yii::$app->getModule('content')->adminCanViewAllContent = true;
+        $this->assertFalse($user->canManageAllContent());
 
-        $this->assertTrue($admin->canViewAllContent());
-        $this->assertFalse($user->canViewAllContent());
+        self::setGroupPermission(3, new ManageAllContent());
+
+        $this->assertTrue($user->canManageAllContent());
     }
 
     public function testGetProfileInfo()
@@ -69,7 +69,7 @@ class UserModelTest extends HumHubDbTestCase
         $user = new User();
         $user->scenario = 'registration';
         $user->load([
-            'username' => 'uniquename'
+            'username' => 'uniquename',
         ], '');
         $this->assertTrue($user->validate());
         $this->assertTrue($user->save());
@@ -107,12 +107,16 @@ class UserModelTest extends HumHubDbTestCase
         $this->assertEquals('Admin Tester', $user->getDisplayName());
 
         Yii::$app->settings->set('displayNameFormat', '');
+
+        Yii::$app->runtimeCache->flush();
         $this->assertEquals('Admin', $user->getDisplayName());
 
         $userModule = Yii::$app->getModule('user');
         $userModule->displayNameCallback = function () {
             return 'Callback display name';
         };
+
+        Yii::$app->runtimeCache->flush();
         $this->assertEquals('Callback display name', $user->getDisplayName());
     }
 
@@ -130,7 +134,7 @@ class UserModelTest extends HumHubDbTestCase
             'email' => $uniqueEmail,
             'source' => Invite::SOURCE_INVITE,
             'user_originator_id' => $admin->id,
-            'space_invite_id' => $space1->id
+            'space_invite_id' => $space1->id,
         ], '');
         $this->assertTrue($model->save());
 
@@ -138,7 +142,7 @@ class UserModelTest extends HumHubDbTestCase
         $user->scenario = 'registration_email';
         $user->load([
             'username' => 'uniquename',
-            'email' => $uniqueEmail
+            'email' => $uniqueEmail,
         ], '');
         $this->assertTrue($user->validate());
         $this->assertTrue($user->save());

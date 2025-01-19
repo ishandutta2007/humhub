@@ -20,14 +20,18 @@ use humhub\modules\admin\models\UserSearch;
 use humhub\modules\admin\permissions\ManageGroups;
 use humhub\modules\admin\permissions\ManageSettings;
 use humhub\modules\admin\permissions\ManageUsers;
+use humhub\modules\user\models\forms\Invite as InviteForm;
 use humhub\modules\user\models\forms\Registration;
 use humhub\modules\user\models\Invite;
 use humhub\modules\user\models\Profile;
 use humhub\modules\user\models\ProfileField;
 use humhub\modules\user\models\User;
+use humhub\modules\user\services\LinkRegistrationService;
 use Yii;
+use yii\base\Exception;
 use yii\db\Query;
 use yii\web\HttpException;
+use yii\web\Response;
 
 /**
  * User management
@@ -59,7 +63,7 @@ class UserController extends Controller
     {
         return [
             ['permissions' => [ManageUsers::class, ManageGroups::class]],
-            ['permissions' => [ManageSettings::class], 'actions' => ['index']]
+            ['permissions' => [ManageSettings::class], 'actions' => ['index']],
         ];
     }
 
@@ -82,12 +86,13 @@ class UserController extends Controller
         $searchModel = new UserSearch();
         $searchModel->status = User::STATUS_ENABLED;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $showPendingRegistrations = (Invite::find()->count() > 0 && Yii::$app->user->can([new ManageUsers(), new ManageGroups()]));
+        $showPendingRegistrations = Invite::find()->where(Invite::filterSource())->exists() &&
+            Yii::$app->user->can([ManageUsers::class, ManageGroups::class]);
 
         return $this->render('list', [
             'dataProvider' => $dataProvider,
             'searchModel' => $searchModel,
-            'showPendingRegistrations' => $showPendingRegistrations
+            'showPendingRegistrations' => $showPendingRegistrations,
         ]);
     }
 
@@ -144,7 +149,7 @@ class UserController extends Controller
                     'type' => 'text',
                     'class' => 'form-control',
                     'maxlength' => 100,
-                    'readonly' => !$user->getAuthClientUserService()->canChangeEmail()
+                    'readonly' => !$user->getAuthClientUserService()->canChangeEmail(),
                 ],
                 'groupSelection' => [
                     'id' => 'user_edit_groups',
@@ -153,10 +158,10 @@ class UserController extends Controller
                     'options' => [
                         'data-placeholder' => Yii::t('AdminModule.user', 'Select Groups'),
                         'data-placeholder-more' => Yii::t('AdminModule.user', 'Add Groups...'),
-                        'data-tags' => 'false'
+                        'data-tags' => 'false',
                     ],
                     'maxSelection' => 250,
-                    'isVisible' => Yii::$app->user->can(new ManageGroups())
+                    'isVisible' => Yii::$app->user->can(new ManageGroups()),
                 ],
             ],
         ];
@@ -232,6 +237,9 @@ class UserController extends Controller
             if ($user->canEditPassword()) {
                 if (!empty($password->newPassword)) {
                     $password->setPassword($password->newPassword);
+                } elseif ($user->canEditAdminFields()) {
+                    // Allow admin to save user without password
+                    unset($form->models['Password']);
                 }
                 $user->setMustChangePassword($password->mustChangePassword);
             }
@@ -247,7 +255,7 @@ class UserController extends Controller
 
         return $this->render('edit', [
             'hForm' => $form,
-            'user' => $user
+            'user' => $user,
         ]);
     }
 
@@ -262,11 +270,12 @@ class UserController extends Controller
             return $this->redirect(['edit', 'id' => $registration->getUser()->id]);
         }
 
+        $invite = new InviteForm(['target' => LinkRegistrationService::TARGET_ADMIN]);
+
         return $this->render('add', [
             'hForm' => $registration,
-            'canInviteByEmail' => Yii::$app->getModule('user')->settings->get('auth.internalUsersCanInviteByEmail'),
-            'canInviteByLink' => Yii::$app->getModule('user')->settings->get('auth.internalUsersCanInviteByLink'),
-            'adminIsAlwaysAllowed' => false,
+            'canInviteByEmail' => $invite->canInviteByEmail(),
+            'canInviteByLink' => $invite->canInviteByLink(),
         ]);
     }
 
@@ -374,10 +383,10 @@ class UserController extends Controller
     /**
      * Export user list as csv or xlsx
      * @param string $format supported format by phpspreadsheet
-     * @return \yii\web\Response
+     * @return Response
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
-     * @throws \yii\base\Exception
+     * @throws Exception
      */
     public function actionExport($format)
     {

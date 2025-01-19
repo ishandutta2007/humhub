@@ -14,7 +14,6 @@ use kartik\select2\Select2;
 use Yii;
 use yii\web\JsExpression;
 
-
 /**
  * IconPicker form field widget
  *
@@ -41,7 +40,7 @@ class IconPicker extends Select2
         $this->options['placeholder'] = Yii::t('UiModule.form', 'Select icon');
         $this->theme = Select2::THEME_BOOTSTRAP;
         $this->pluginOptions = [
-            'escapeMarkup' => new JsExpression("function(m) { return m; }")
+            'escapeMarkup' => new JsExpression("function(m) { return m; }"),
         ];
         parent::init();
     }
@@ -51,7 +50,7 @@ class IconPicker extends Select2
      */
     public function run()
     {
-        $this->value = (strpos($this->value, 'fa-') === 0)
+        $this->value = (strpos((string)$this->value, 'fa-') === 0)
             ? substr($this->value, 3, strlen($this->value))
             : $this->value;
 

@@ -19,7 +19,6 @@ use humhub\modules\ui\form\widgets\JsInputWidget;
  */
 class ColorPicker extends JsInputWidget
 {
-
     /**
      * @deprecated since v1.2.2 use $attribute instead
      */
@@ -65,7 +64,7 @@ class ColorPicker extends JsInputWidget
             'model' => $this->model,
             'field' => $this->attribute,
             'container' => $this->container,
-            'inputId' => $this->getId(true)
+            'inputId' => $this->getId(true),
         ]);
     }
 

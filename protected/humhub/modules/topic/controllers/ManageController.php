@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2018 HumHub GmbH & Co. KG
@@ -8,14 +9,15 @@
 
 namespace humhub\modules\topic\controllers;
 
-use humhub\modules\user\models\User;
-use humhub\widgets\ModalClose;
 use humhub\modules\content\components\ContentContainerController;
 use humhub\modules\topic\models\Topic;
 use humhub\modules\topic\permissions\ManageTopics;
+use humhub\modules\user\models\User;
+use humhub\widgets\ModalClose;
 use Yii;
 use yii\data\ActiveDataProvider;
-use yii\web\HttpException;
+use yii\web\ForbiddenHttpException;
+use yii\web\NotFoundHttpException;
 
 class ManageController extends ContentContainerController
 {
@@ -27,7 +29,7 @@ class ManageController extends ContentContainerController
         return [
             ['login'],
             ['permission' => ManageTopics::class],
-            ['json' => ['delete']]
+            ['json' => ['delete']],
         ];
     }
 
@@ -35,9 +37,18 @@ class ManageController extends ContentContainerController
     {
         parent::init();
 
-        if($this->contentContainer instanceof User) {
+        if ($this->contentContainer instanceof User) {
             $this->subLayout = "@humhub/modules/user/views/account/_layout";
         }
+    }
+
+    public function beforeAction($action)
+    {
+        if (!Topic::isAllowedToCreate($this->contentContainer)) {
+            throw new ForbiddenHttpException();
+        }
+
+        return parent::beforeAction($action);
     }
 
     public function actionIndex()
@@ -60,14 +71,14 @@ class ManageController extends ContentContainerController
             'contentContainer' => $this->contentContainer,
             'dataProvider' => $this->getTopicProvider(),
             'addModel' => new Topic(),
-            'title' => $title
+            'title' => $title,
         ]);
     }
 
     private function getTopicProvider()
     {
         return new ActiveDataProvider([
-            'query' =>  Topic::findByContainer($this->contentContainer)->orderBy('sort_order, name'),
+            'query' => Topic::findByContainer($this->contentContainer)->orderBy('sort_order, name'),
             'pagination' => [
                 'pageSize' => 20,
             ],
@@ -78,27 +89,33 @@ class ManageController extends ContentContainerController
     {
         $this->forcePostRequest();
 
-        $topic = Topic::findOne(['id' => $id]);
-        if ($topic) {
-            $topic->delete();
-            return ['success' => true, 'message' => Yii::t('TopicModule.base', 'Topic has been deleted!')];
+        $topic = Topic::find()
+            ->where(['id' => $id, 'contentcontainer_id' => $this->contentContainer->contentcontainer_id])
+            ->one();
+
+        if (!$topic) {
+            throw new NotFoundHttpException();
         }
 
-        return ['success' => false];
+        $topic->delete();
+
+        return ['success' => true, 'message' => Yii::t('TopicModule.base', 'Topic has been deleted!')];
     }
 
     public function actionEdit($id)
     {
-        $topic = Topic::findOne(['id' => $id]);
+        $topic = Topic::find()
+            ->where(['id' => $id, 'contentcontainer_id' => $this->contentContainer->contentcontainer_id])
+            ->one();
 
         if (!$topic) {
-            throw new HttpException(404);
+            throw new NotFoundHttpException();
         }
 
         if ($topic->load(Yii::$app->request->post()) && $topic->save()) {
             return ModalClose::widget([
                 'saved' => true,
-                'reload' => true
+                'reload' => true,
             ]);
         }
 

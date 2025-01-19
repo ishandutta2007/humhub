@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2018 HumHub GmbH & Co. KG
@@ -7,7 +8,6 @@
 
 namespace humhub\modules\ui;
 
-
 /**
  * Event Handling Callbacks
  *
@@ -15,5 +15,4 @@ namespace humhub\modules\ui;
  */
 class Events
 {
-
 }

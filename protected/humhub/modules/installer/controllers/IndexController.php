@@ -8,10 +8,9 @@
 
 namespace humhub\modules\installer\controllers;
 
-
 use humhub\components\access\ControllerAccess;
 use humhub\components\Controller;
-
+use humhub\libs\DynamicConfig;
 
 /**
  * Index Controller shows a simple welcome page.
@@ -40,7 +39,7 @@ class IndexController extends Controller
      */
     public function actionGo()
     {
-        if ($this->module->checkDBConnection()) {
+        if (DynamicConfig::exist() && $this->module->checkDBConnection()) {
             return $this->redirect(['setup/finalize']);
         } else {
             return $this->redirect(['setup/prerequisites']);

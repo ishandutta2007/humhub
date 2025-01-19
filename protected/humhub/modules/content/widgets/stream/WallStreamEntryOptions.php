@@ -1,6 +1,5 @@
 <?php
 
-
 namespace humhub\modules\content\widgets\stream;
 
 use humhub\modules\comment\widgets\Comments;
@@ -19,6 +18,7 @@ use humhub\modules\file\widgets\ShowFiles;
 use humhub\modules\space\models\Space;
 use humhub\modules\topic\widgets\ContentTopicButton;
 use humhub\modules\ui\menu\MenuEntry;
+use Yii;
 use yii\base\Model;
 
 /**
@@ -45,7 +45,7 @@ class WallStreamEntryOptions extends StreamEntryOptions
     /**
      * Used when rendering the entry on the dashboard
      */
-    const VIEW_CONTEXT_SEARCH = 'search';
+    public const VIEW_CONTEXT_SEARCH = 'search';
 
     /**
      * @var array contains option settings for wall entry addons widgets, e.g. used to disable widgets
@@ -81,6 +81,20 @@ class WallStreamEntryOptions extends StreamEntryOptions
      * @var bool whether or not the container information should be rendered in the main title
      */
     public $enableContainerInformationInTitle = false;
+
+    public static function getInstanceFromRequest(): ?self
+    {
+        $viewContext = Yii::$app->request->get('viewContext');
+        if (empty($viewContext)) {
+            $viewContext = Yii::$app->request->post('viewContext');
+        }
+
+        if (empty($viewContext)) {
+            return null;
+        }
+
+        return (new self())->viewContext($viewContext);
+    }
 
     /**
      * Defines if the sub headline author information should be enabled
@@ -314,7 +328,7 @@ class WallStreamEntryOptions extends StreamEntryOptions
     }
 
     /**
-     * @return boolean checks if the given addon widget class is disabled
+     * @return bool checks if the given addon widget class is disabled
      */
     public function isAddonDisabled($widgetClass)
     {

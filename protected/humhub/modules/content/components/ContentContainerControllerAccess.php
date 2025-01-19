@@ -1,20 +1,12 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
  * @license https://www.humhub.com/licences
- *
- */
-
-/**
- * Created by PhpStorm.
- * User: buddha
- * Date: 26.07.2017
- * Time: 18:11
  */
 
 namespace humhub\modules\content\components;
-
 
 use Yii;
 use humhub\components\access\StrictAccess;
@@ -31,11 +23,11 @@ use humhub\modules\user\models\User;
  */
 class ContentContainerControllerAccess extends StrictAccess
 {
-    const RULE_SPACE_ONLY = 'space';
-    const RULE_PROFILE_ONLY = 'profile';
+    public const RULE_SPACE_ONLY = 'space';
+    public const RULE_PROFILE_ONLY = 'profile';
 
-    const RULE_USER_GROUP_ONLY = 'userGroup';
-    const RULE_CONTAINER_ACCESS = 'containerAccess';
+    public const RULE_USER_GROUP_ONLY = 'userGroup';
+    public const RULE_CONTAINER_ACCESS = 'containerAccess';
 
     /**
      * @var ContentContainerActiveRecord
@@ -84,7 +76,7 @@ class ContentContainerControllerAccess extends StrictAccess
      */
     public function validateContainerAccess()
     {
-        if($this->isSpaceController()) {
+        if ($this->isSpaceController()) {
             return $this->canAccessSpace();
         } else {
             return $this->canAccessUser();
@@ -96,17 +88,17 @@ class ContentContainerControllerAccess extends StrictAccess
      */
     private function canAccessSpace()
     {
-        if($this->contentContainer->isVisibleFor(Space::VISIBILITY_ALL)) {
+        if ($this->contentContainer->isVisibleFor(Space::VISIBILITY_ALL)) {
             return true;
         }
 
         // don't allow guests since visibility != VISIBILITY_ALL
-        if($this->isGuest()) {
+        if ($this->isGuest()) {
             $this->code = 401;
             return false;
         }
 
-        if($this->user->isSystemAdmin()) {
+        if ($this->user->isSystemAdmin()) {
             return true;
         }
 
@@ -117,7 +109,7 @@ class ContentContainerControllerAccess extends StrictAccess
             return true;
         }
 
-        if($this->isVisibleFor(Space::VISIBILITY_NONE)) {
+        if ($this->isVisibleFor(Space::VISIBILITY_NONE)) {
             $this->code = 404;
             $this->reason = Yii::t('ContentModule.base', 'This space is not visible!');
             return false;
@@ -131,11 +123,11 @@ class ContentContainerControllerAccess extends StrictAccess
      */
     private function getSpaceMembership()
     {
-        if(!$this->isSpaceController() || $this->isGuest()) {
+        if (!$this->isSpaceController() || $this->isGuest()) {
             return null;
         }
 
-        if($this->_membership === false) {
+        if ($this->_membership === false) {
             $this->_membership = $this->contentContainer->getMembership($this->user->id);
         }
 
@@ -147,13 +139,13 @@ class ContentContainerControllerAccess extends StrictAccess
      */
     private function canAccessUser()
     {
-        if($this->contentContainer->status == User::STATUS_NEED_APPROVAL) {
+        if ($this->contentContainer->status == User::STATUS_NEED_APPROVAL) {
             $this->reason = Yii::t('UserModule.profile', 'This user account is not approved yet!');
             $this->code = 404;
             return false;
         }
 
-        if($this->isGuest() && $this->contentContainer->isVisibleFor(User::VISIBILITY_ALL)) {
+        if ($this->isGuest() && $this->contentContainer->isVisibleFor(User::VISIBILITY_ALL)) {
             $this->code = 401;
             $this->reason = Yii::t('UserModule.profile', 'You need to login to view this user profile!');
             return false;

@@ -22,12 +22,12 @@ class MailHeadline extends \yii\base\Widget
      * @var string button text
      */
     public $text;
-    
+
     /**
      * @var int headline level 1-3
      */
     public $level;
-    
+
     /**
      * @var string optional additional text style
      */
@@ -38,14 +38,14 @@ class MailHeadline extends \yii\base\Widget
      */
     public function run()
     {
-        if(!$this->level) {
+        if (!$this->level) {
             $this->level = 1;
         }
-        
+
         return $this->render('mailHeadline', [
-                    'text' => $this->text,
-                    'level' => $this->level,
-                    'style' => $this->style
+            'text' => $this->text,
+            'level' => $this->level,
+            'style' => $this->style,
         ]);
     }
 

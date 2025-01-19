@@ -18,7 +18,6 @@ use humhub\components\assets\AssetBundle;
  */
 class NProgressAsset extends AssetBundle
 {
-
     /**
      * @inheritdoc
      */
@@ -28,7 +27,7 @@ class NProgressAsset extends AssetBundle
      * @inheritdoc
      */
     public $js = [
-        'nprogress.js'
+        'nprogress.js',
     ];
 
 
@@ -38,7 +37,7 @@ class NProgressAsset extends AssetBundle
     public $publishOptions = [
         'only' => [
             '/nprogress.css',
-            '/nprogress.js'
+            '/nprogress.js',
         ],
     ];
 
@@ -46,6 +45,6 @@ class NProgressAsset extends AssetBundle
      * @inheritdoc
      */
     public $depends = [
-        NProgressStyleAsset::class
+        NProgressStyleAsset::class,
     ];
 }

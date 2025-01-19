@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2021 HumHub GmbH & Co. KG
@@ -20,7 +21,6 @@ use yii\helpers\Url;
  */
 class CommentControls extends Menu
 {
-
     /**
      * @var Comment
      */
@@ -68,7 +68,7 @@ class CommentControls extends Menu
                 'id' => $this->comment->id,
             ]);
 
-            if($isAdmin) {
+            if ($isAdmin) {
                 $adminDeleteModalUrl = Url::to(['/comment/comment/get-admin-delete-modal',
                     'objectModel' => $this->comment->object_model,
                     'objectId' => $this->comment->object_id,
@@ -78,10 +78,10 @@ class CommentControls extends Menu
 
             $htmlOptions = [
                 'data-action-click' => $isAdmin ? 'adminDelete' : 'delete',
-                'data-content-delete-url' => $deleteUrl
+                'data-content-delete-url' => $deleteUrl,
             ];
 
-            if($isAdmin) {
+            if ($isAdmin) {
                 $htmlOptions['data-admin-delete-modal-url'] = $adminDeleteModalUrl;
             }
 
@@ -102,7 +102,7 @@ class CommentControls extends Menu
     public function getAttributes()
     {
         return [
-            'class' => 'nav nav-pills preferences'
+            'class' => 'nav nav-pills preferences',
         ];
     }
 

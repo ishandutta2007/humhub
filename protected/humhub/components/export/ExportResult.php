@@ -25,7 +25,6 @@ use yii\web\Response;
  */
 class ExportResult extends BaseObject
 {
-
     /**
      * @var string base path for the temporary directory and files.
      */
@@ -102,11 +101,11 @@ class ExportResult extends BaseObject
 
     /**
      * Deletes associated directory with all internal files.
-     * @return boolean whether file has been deleted.
+     * @return bool whether file has been deleted.
      */
     public function delete()
     {
-        if (!empty($this->tempFileName) && is_writable($this->tempFileName)) {
+        if (!empty($this->tempFileName) && is_writable(realpath($this->tempFileName))) {
             FileHelper::unlink($this->tempFileName);
             return true;
         }

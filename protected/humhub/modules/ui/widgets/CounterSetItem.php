@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2018 HumHub GmbH & Co. KG
@@ -10,7 +11,6 @@ namespace humhub\modules\ui\widgets;
 use Yii;
 use yii\base\BaseObject;
 
-
 /**
  * Class CounterSetItem
  *
@@ -20,7 +20,6 @@ use yii\base\BaseObject;
  */
 class CounterSetItem extends BaseObject
 {
-
     /**
      * @var int the numberic value of this counter item
      */

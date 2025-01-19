@@ -1,5 +1,5 @@
 <?php
-return array (
+return [
   'Activity' => 'Händelse',
   'Add or remove link' => 'Lägg till eller ta bort länk',
   'Animals & Nature' => 'Djur &amp; natur',
@@ -33,6 +33,7 @@ return array (
   'Paragraph' => 'Paragraf',
   'People' => 'Personer',
   'Rows' => 'Rader',
+  'Switch editor mode' => 'Byt redigeringsläge',
   'Symbols' => 'Symboler',
   'Title' => 'Rubrik',
   'Toggle code font' => 'Växla kodfont',
@@ -51,4 +52,4 @@ return array (
   '[Image]' => '[Bild]',
   '[Invalid file]' => '[Felaktig fil]',
   '[Table]' => '[Tabell]',
-);
+];

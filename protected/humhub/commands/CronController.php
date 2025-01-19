@@ -9,6 +9,7 @@
 namespace humhub\commands;
 
 use DateTime;
+use humhub\libs\SelfTest;
 use Yii;
 use yii\console\Controller;
 use yii\console\ExitCode;
@@ -21,22 +22,31 @@ use yii\helpers\Console;
  */
 class CronController extends Controller
 {
-
     /**
      * @event Event an event that is triggered when the hourly cron is started.
      */
-    const EVENT_ON_HOURLY_RUN = "hourly";
+    public const EVENT_ON_HOURLY_RUN = "hourly";
 
     /**
      * @event Event an event that is triggered when the daily cron is started.
      */
-    const EVENT_ON_DAILY_RUN = "daily";
+    public const EVENT_ON_DAILY_RUN = "daily";
 
 
     /**
      * @var string mutex to acquire
      */
-    const MUTEX_ID = 'cron-mutex';
+    public const MUTEX_ID = 'cron-mutex';
+
+    public function beforeAction($action)
+    {
+        Yii::$app->cache->set(SelfTest::PHP_INFO_CACHE_KEY, [
+            'version' => phpversion(),
+            'user' => get_current_user(),
+        ]);
+
+        return parent::beforeAction($action);
+    }
 
 
     /**
@@ -117,7 +127,7 @@ class CronController extends Controller
             $lastTime = new DateTime('@' . $lastRun);
             $todayTime = DateTime::createFromFormat(
                 'Y-m-d H:i',
-                date('Y-m-d') . ' ' . Yii::$app->params['dailyCronExecutionTime']
+                date('Y-m-d') . ' ' . Yii::$app->params['dailyCronExecutionTime'],
             );
             $nowTime = new DateTime();
 

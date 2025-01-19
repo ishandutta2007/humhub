@@ -58,8 +58,8 @@ class NewComment extends BaseNotification
             'user_id' => $user->id,
             'source_class' => get_class($this->source),
             'source_pk' => $this->source->getPrimaryKey()])->count() > 0) {
-                return;
-            }
+            return;
+        }
 
         parent::send($user);
     }
@@ -71,11 +71,11 @@ class NewComment extends BaseNotification
     {
         $model = $this->getCommentedRecord();
 
-        if(!$model) {
+        if (!$model) {
             return null;
         }
 
-		return get_class($model) . '-' . $model->getPrimaryKey();
+        return get_class($model) . '-' . $model->getPrimaryKey();
     }
 
     /**
@@ -91,7 +91,7 @@ class NewComment extends BaseNotification
         $user = $this->record->user;
         $contentRecord = $this->getCommentedRecord();
 
-        if(!$contentRecord) {
+        if (!$contentRecord) {
             return '';
         }
 
@@ -100,7 +100,7 @@ class NewComment extends BaseNotification
                 return Yii::t('CommentModule.notification', "{displayName} just commented your {contentTitle} in space {space}", [
                     'displayName' => $this->originator->displayName,
                     'contentTitle' => $this->getContentPlainTextInfo($contentRecord, true),
-                    'space' => $space->displayName
+                    'space' => $space->displayName,
                 ]);
             }
 
@@ -114,7 +114,7 @@ class NewComment extends BaseNotification
             return Yii::t('CommentModule.notification', "{displayName} commented {contentTitle} in space {space}", [
                 'displayName' => $this->originator->displayName,
                 'contentTitle' => $this->getContentPlainTextInfo($contentRecord, true),
-                'space' => $space->displayName
+                'space' => $space->displayName,
             ]);
         }
 
@@ -130,7 +130,7 @@ class NewComment extends BaseNotification
         $user = $this->record->user;
         $contentRecord = $this->getCommentedRecord();
 
-        if(!$contentRecord) {
+        if (!$contentRecord) {
             return '';
         }
 
@@ -139,7 +139,7 @@ class NewComment extends BaseNotification
                 return Yii::t('CommentModule.notification', "{displayNames} just commented your {contentTitle} in space {space}", [
                     'displayNames' => $this->getGroupUserDisplayNames(false),
                     'contentTitle' => $this->getContentPlainTextInfo($this->getCommentedRecord()),
-                    'space' => $space->displayName
+                    'space' => $space->displayName,
                 ]);
             }
 
@@ -153,7 +153,7 @@ class NewComment extends BaseNotification
             return Yii::t('CommentModule.notification', "{displayNames} commented {contentTitle} in space {space}", [
                 'displayNames' => $this->getGroupUserDisplayNames(false),
                 'contentTitle' => $this->getContentPlainTextInfo($this->getCommentedRecord()),
-                'space' => $space->displayName
+                'space' => $space->displayName,
             ]);
         }
 
@@ -177,12 +177,12 @@ class NewComment extends BaseNotification
         if ($this->groupCount > 1) {
             return Yii::t('CommentModule.notification', "{displayNames} commented {contentTitle}.", [
                 'displayNames' => $this->getGroupUserDisplayNames(),
-                'contentTitle' => $contentInfo
+                'contentTitle' => $contentInfo,
             ]);
         }
         return Yii::t('CommentModule.notification', "{displayName} commented {contentTitle}.", [
             'displayName' => Html::tag('strong', Html::encode($this->originator->displayName)),
-            'contentTitle' => $contentInfo
+            'contentTitle' => $contentInfo,
         ]);
     }
 

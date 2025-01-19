@@ -1,5 +1,5 @@
 <?php
-return array (
+return [
   ' Remove panel' => 'Ta bort panelen',
   '<strong>Account</strong> Menu' => '<strong> Konto </strong> -meny',
   '<strong>Getting</strong> Started' => '<strong> Komma </strong> igång',
@@ -29,7 +29,7 @@ return array (
   'Your lastname' => 'Ditt efternamn',
   'Your mobile phone number' => 'Ditt mobilnummer',
   'Your phone number at work' => 'Ditt telefonnummer på jobbet',
-  'Your skills, knowledge and experience (comma seperated)' => 'Dina färdigheter, kunskaper och erfarenheter (kommaseparerade)',
+  'Your skills, knowledge and experience' => 'Din kompetens, kunskap och erfarenhet',
   'Your title or position' => 'Din titel eller position',
   '« Prev' => '« Föregående',
-);
+];

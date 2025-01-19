@@ -13,12 +13,11 @@ use yii\web\View;
 
 class AdminGroupAsset extends AssetBundle
 {
-
     /**
      * @inheritdoc
      */
     public $jsOptions = [
-        'position' => View::POS_END
+        'position' => View::POS_END,
     ];
     public $sourcePath = '@admin/resources';
 
@@ -26,7 +25,7 @@ class AdminGroupAsset extends AssetBundle
      * @inheritdoc
      */
     public $js = [
-        'js/humhub.admin.group.js'
+        'js/humhub.admin.group.js',
     ];
 
 }

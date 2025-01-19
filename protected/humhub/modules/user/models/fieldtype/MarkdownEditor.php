@@ -14,7 +14,7 @@ use Yii;
 
 /**
  * Markdown Profile Field
- * 
+ *
  * @since 1.1
  */
 class MarkdownEditor extends BaseType
@@ -30,12 +30,22 @@ class MarkdownEditor extends BaseType
     public function getFormDefinition($definition = [])
     {
         return parent::getFormDefinition([
-                    get_class($this) => [
-                        'type' => 'form',
-                        'title' => Yii::t('UserModule.profile', 'Text area field options'),
-                        'elements' => [
-                        ]
-                    ]]);
+            get_class($this) => [
+                'type' => 'form',
+                'title' => Yii::t('UserModule.profile', 'Text area field options'),
+                'elements' => [
+                ],
+            ]]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFieldFormDefinition(User $user = null, array $options = []): array
+    {
+        return parent::getFieldFormDefinition($user, array_merge([
+            'htmlOptions' => ['backupInterval' => 0],
+        ], $options));
     }
 
     /**
@@ -61,15 +71,4 @@ class MarkdownEditor extends BaseType
         return parent::getFieldRules($rules);
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getFieldFormDefinition(User $user = null, array $options = []): array
-    {
-        return parent::getFieldFormDefinition($user, array_merge([
-            'rows' => '3'
-        ], $options));
-    }
-
 }
-?>

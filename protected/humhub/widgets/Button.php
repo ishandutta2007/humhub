@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
@@ -23,7 +24,6 @@ use yii\helpers\Url;
  */
 class Button extends BootstrapComponent
 {
-
     public $_loader = true;
     public $_link = false;
 
@@ -64,7 +64,8 @@ class Button extends BootstrapComponent
         return self::defaultType($text)->link($url)->icon('back')->right()->loader(true)->sm();
     }
 
-    public static function userPickerSelfSelect($selector, $text = null) {
+    public static function userPickerSelfSelect($selector, $text = null)
+    {
         if (!$text) {
             $text = Yii::t('base', 'Select Me');
         }
@@ -166,14 +167,14 @@ class Button extends BootstrapComponent
      */
     public function onAction($event, $handler, $url = null, $target = null)
     {
-        $this->htmlOptions['data-action-'.$event] = $handler;
+        $this->htmlOptions['data-action-' . $event] = $handler;
 
         if ($url) {
-            $this->htmlOptions['data-action-'.$event.'-url'] = Url::to($url);
+            $this->htmlOptions['data-action-' . $event . '-url'] = Url::to($url);
         }
 
         if ($target) {
-            $this->htmlOptions['data-action-'.$event.'-target'] = $target;
+            $this->htmlOptions['data-action-' . $event . '-target'] = $target;
         }
 
         return $this;
@@ -221,7 +222,7 @@ class Button extends BootstrapComponent
         }
 
         // Workaround since data-method handler prevents confirm or other action handlers from being executed.
-        if(isset($this->htmlOptions['data-action-confirm']) && isset($this->htmlOptions['data-method'])) {
+        if (isset($this->htmlOptions['data-action-confirm']) && isset($this->htmlOptions['data-method'])) {
             $method = $this->htmlOptions['data-method'];
             $this->htmlOptions['data-method'] = null;
             $this->htmlOptions['data-action-method'] = $method;
@@ -261,6 +262,6 @@ class Button extends BootstrapComponent
      */
     public function getTypedClass($type)
     {
-        return 'btn-'.$type;
+        return 'btn-' . $type;
     }
 }

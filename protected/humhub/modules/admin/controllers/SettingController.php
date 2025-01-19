@@ -8,7 +8,11 @@
 
 namespace humhub\modules\admin\controllers;
 
+use Exception;
 use humhub\libs\LogoImage;
+use humhub\models\UrlOembed;
+use humhub\modules\admin\components\Controller;
+use humhub\modules\admin\models\forms\AddTopicForm;
 use humhub\modules\admin\models\forms\BasicSettingsForm;
 use humhub\modules\admin\models\forms\CacheSettingsForm;
 use humhub\modules\admin\models\forms\DesignSettingsForm;
@@ -19,15 +23,17 @@ use humhub\modules\admin\models\forms\OEmbedProviderForm;
 use humhub\modules\admin\models\forms\OEmbedSettingsForm;
 use humhub\modules\admin\models\forms\ProxySettingsForm;
 use humhub\modules\admin\models\forms\StatisticSettingsForm;
+use humhub\modules\admin\models\Log;
 use humhub\modules\admin\permissions\ManageSettings;
+use humhub\modules\notification\models\forms\NotificationSettings;
+use humhub\modules\topic\models\Topic;
 use humhub\modules\user\models\User;
 use humhub\modules\web\pwa\widgets\SiteIcon;
+use humhub\widgets\ModalClose;
 use Yii;
-use humhub\libs\Helpers;
-use humhub\models\UrlOembed;
-use humhub\modules\admin\components\Controller;
-use humhub\modules\admin\models\Log;
-use humhub\modules\notification\models\forms\NotificationSettings;
+use yii\data\ActiveDataProvider;
+use yii\db\Expression;
+use yii\web\NotFoundHttpException;
 
 /**
  * SettingController
@@ -36,7 +42,6 @@ use humhub\modules\notification\models\forms\NotificationSettings;
  */
 class SettingController extends Controller
 {
-
     /**
      * @inheritdoc
      */
@@ -73,7 +78,7 @@ class SettingController extends Controller
     protected function getAccessRules()
     {
         return [
-            ['permissions' => ManageSettings::class]
+            ['permissions' => ManageSettings::class],
         ];
     }
 
@@ -94,7 +99,7 @@ class SettingController extends Controller
         }
 
         return $this->render('basic', [
-            'model' => $form
+            'model' => $form,
         ]);
     }
 
@@ -125,18 +130,15 @@ class SettingController extends Controller
      */
     public function actionCaching()
     {
-        $form = new CacheSettingsForm;
+        $form = new CacheSettingsForm();
         if ($form->load(Yii::$app->request->post()) && $form->validate() && $form->save()) {
-            Yii::$app->cache->flush();
-            Yii::$app->assetManager->clear();
-            Yii::$app->view->theme->variables->flushCache();
             $this->view->success(Yii::t('AdminModule.settings', 'Saved and flushed cache'));
             return $this->redirect(['/admin/setting/caching']);
         }
 
         return $this->render('caching', [
             'model' => $form,
-            'cacheTypes' => $form->getTypes()
+            'cacheTypes' => $form->getTypes(),
         ]);
     }
 
@@ -145,16 +147,16 @@ class SettingController extends Controller
      */
     public function actionStatistic()
     {
-        $form = new StatisticSettingsForm;
+        $form = new StatisticSettingsForm();
         if ($form->load(Yii::$app->request->post()) && $form->validate() && $form->save()) {
             $this->view->saved();
             return $this->redirect([
-                '/admin/setting/statistic'
+                '/admin/setting/statistic',
             ]);
         }
 
         return $this->render('statistic', [
-            'model' => $form
+            'model' => $form,
         ]);
     }
 
@@ -169,7 +171,7 @@ class SettingController extends Controller
         }
 
         return $this->render('notification', [
-            'model' => $form
+            'model' => $form,
         ]);
     }
 
@@ -178,14 +180,14 @@ class SettingController extends Controller
      */
     public function actionMailingServer()
     {
-        $form = new MailingSettingsForm;
+        $form = new MailingSettingsForm();
         if ($form->load(Yii::$app->request->post()) && $form->validate() && $form->save()) {
             return $this->redirect(['/admin/setting/mailing-server-test']);
         }
 
         return $this->render('mailing_server', [
             'model' => $form,
-            'settings' => Yii::$app->settings
+            'settings' => Yii::$app->settings,
         ]);
     }
 
@@ -196,21 +198,23 @@ class SettingController extends Controller
 
         try {
             $mail = Yii::$app->mailer->compose(['html' => '@humhub/views/mail/TextOnly'], [
-                'message' => Yii::t('AdminModule.settings', 'Test message')
+                'message' => Yii::t('AdminModule.settings', 'Test message'),
             ]);
             $mail->setTo($user->email);
             $mail->setSubject(Yii::t('AdminModule.settings', 'Test message'));
 
             if ($mail->send()) {
                 $this->view->info(
-                    Yii::t('AdminModule.settings', 'Saved and sent test email to: {address}',
-                        ['address' => $user->email]
-                    )
+                    Yii::t(
+                        'AdminModule.settings',
+                        'Saved and sent test email to: {address}',
+                        ['address' => $user->email],
+                    ),
                 );
             } else {
                 $this->view->error(Yii::t('AdminModule.settings', 'Could not send test email.'));
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->view->error(Yii::t('AdminModule.settings', 'Could not send test email.') . ' ' . $e->getMessage());
         }
 
@@ -220,11 +224,11 @@ class SettingController extends Controller
 
     public function actionDesign()
     {
-        $form = new DesignSettingsForm;
+        $form = new DesignSettingsForm();
         if ($form->load(Yii::$app->request->post()) && $form->validate() && $form->save()) {
             $this->view->saved();
             return $this->redirect([
-                '/admin/setting/design'
+                '/admin/setting/design',
             ]);
         }
 
@@ -238,33 +242,12 @@ class SettingController extends Controller
      */
     public function actionFile()
     {
-        $form = new FileSettingsForm;
+        $form = new FileSettingsForm();
         if ($form->load(Yii::$app->request->post()) && $form->validate() && $form->save()) {
             $this->view->saved();
-            return $this->redirect([
-                '/admin/setting/file'
-            ]);
         }
 
-        // Determine PHP Upload Max FileSize
-        $maxUploadSize = Helpers::getBytesOfIniValue(ini_get('upload_max_filesize'));
-        $fileSizeKey = 'upload_max_filesize';
-        if ($maxUploadSize > Helpers::getBytesOfIniValue(ini_get('post_max_size'))) {
-            $maxUploadSize = Helpers::getBytesOfIniValue(ini_get('post_max_size'));
-            $fileSizeKey = 'post_max_size';
-        }
-
-        $maxUploadSize = floor($maxUploadSize / 1024 / 1024);
-        $maxUploadSizeText = "(" . $fileSizeKey . "): " . $maxUploadSize;
-
-        return $this->render(
-            'file',
-            [
-                'model' => $form,
-                'maxUploadSize' => $maxUploadSize,
-                'maxUploadSizeText' => $maxUploadSizeText,
-            ]
-        );
+        return $this->render('file', ['model' => $form]);
     }
 
     /**
@@ -272,7 +255,7 @@ class SettingController extends Controller
      */
     public function actionProxy()
     {
-        $form = new ProxySettingsForm;
+        $form = new ProxySettingsForm();
 
 
         if ($form->load(Yii::$app->request->post()) && $form->validate() && $form->save()) {
@@ -298,9 +281,9 @@ class SettingController extends Controller
         }
 
         return $this->render('oembed', [
-                'providers' => $providers,
-                'settings' => $settings,
-            ]);
+            'providers' => $providers,
+            'settings' => $settings,
+        ]);
     }
 
     public function actionLogs()
@@ -313,12 +296,12 @@ class SettingController extends Controller
 
         // I wish..
         if ($dating) {
-            $dating = date('Y-m-d H:i:s', (int) $dating->log_time);
+            $dating = date('Y-m-d H:i:s', (int)$dating->log_time);
         } else {
             $dating = "the begining of time";
         }
 
-        $form = new LogsSettingsForm;
+        $form = new LogsSettingsForm();
         $limitAgeOptions = $form->options;
         if ($form->load(Yii::$app->request->post()) && $form->validate() && $form->save()) {
 
@@ -326,7 +309,7 @@ class SettingController extends Controller
             Log::deleteAll(['<', 'log_time', $timeAgo]);
             Yii::$app->getSession()->setFlash('data-saved', Yii::t('AdminModule.settings', 'Saved'));
             return $this->redirect([
-                '/admin/setting/logs'
+                '/admin/setting/logs',
             ]);
         }
 
@@ -334,7 +317,88 @@ class SettingController extends Controller
             'logsCount' => $logsCount,
             'model' => $form,
             'limitAgeOptions' => $limitAgeOptions,
-            'dating' => $dating
+            'dating' => $dating,
+        ]);
+    }
+
+    public function actionTopics()
+    {
+        $model = new AddTopicForm();
+        $suggestGlobalConversion = false;
+
+        if ($model->load(Yii::$app->request->post())) {
+            $model->on($model::EVENT_GLOBAL_CONVERSION_SUGGESTION, function () use (&$suggestGlobalConversion) {
+                $suggestGlobalConversion = true;
+            });
+
+            if (!!$model->convertToGlobal) {
+                Topic::convertToGlobal(null, $model->name);
+
+                $model->name = '';
+                $this->view->saved();
+            } elseif ($model->save()) {
+                $model->name = '';
+                $this->view->saved();
+            }
+        }
+
+        return $this->render('topics', [
+            'contentContainer' => null,
+            'dataProvider' => new ActiveDataProvider([
+                'query' => Topic::find()
+                    ->orderBy('sort_order, name')
+                    ->where(['is', 'contentcontainer_id', new Expression('NULL')])
+                    ->andWhere(['module_id' => (new Topic())->moduleId, 'type' => Topic::class]),
+                'pagination' => [
+                    'pageSize' => 20,
+                ],
+            ]),
+            'addModel' => $model,
+            'suggestGlobalConversion' => $suggestGlobalConversion,
+        ]);
+    }
+
+    public function actionDeleteTopic($id)
+    {
+        $this->forcePostRequest();
+
+        $topic = Topic::find()
+            ->where(['id' => $id])
+            ->andWhere(['is', 'contentcontainer_id', new Expression('NULL')])
+            ->one();
+
+        if (!$topic) {
+            throw new NotFoundHttpException();
+        }
+
+        $topic->delete();
+
+        return $this->asJson([
+            'success' => true,
+            'message' => Yii::t('AdminModule.settings', 'Topic has been deleted!'),
+        ]);
+    }
+
+    public function actionEditTopic($id)
+    {
+        $topic = Topic::find()
+            ->where(['id' => $id])
+            ->andWhere(['is', 'contentcontainer_id', new Expression('NULL')])
+            ->one();
+
+        if (!$topic) {
+            throw new NotFoundHttpException();
+        }
+
+        if ($topic->load(Yii::$app->request->post()) && $topic->save()) {
+            return ModalClose::widget([
+                'saved' => true,
+                'reload' => true,
+            ]);
+        }
+
+        return $this->renderAjax('@topic/views/manage/editModal', [
+            'model' => $topic,
         ]);
     }
 
@@ -343,7 +407,7 @@ class SettingController extends Controller
      */
     public function actionOembedEdit()
     {
-        $form = new OEmbedProviderForm;
+        $form = new OEmbedProviderForm();
 
         $name = Yii::$app->request->get('name');
         $providers = UrlOembed::getProviders();
@@ -360,7 +424,7 @@ class SettingController extends Controller
             }
             $providers[$form->name] = [
                 'endpoint' => $form->endpoint,
-                'pattern' => $form->pattern
+                'pattern' => $form->pattern,
             ];
             UrlOembed::setProviders($providers);
 
@@ -368,9 +432,9 @@ class SettingController extends Controller
         }
 
         return $this->render('oembed_edit', [
-                'model' => $form,
-                'name' => $name
-            ]);
+            'model' => $form,
+            'name' => $name,
+        ]);
     }
 
     /**
@@ -387,7 +451,7 @@ class SettingController extends Controller
             UrlOembed::setProviders($providers);
         }
         return $this->redirect([
-            '/admin/setting/oembed'
+            '/admin/setting/oembed',
         ]);
     }
 
@@ -395,8 +459,8 @@ class SettingController extends Controller
     {
         return $this->redirect(
             [
-                'caching'
-            ]);
+                'caching',
+            ],
+        );
     }
-
 }

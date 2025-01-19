@@ -9,6 +9,7 @@
 namespace humhub\modules\user\models\forms;
 
 use Yii;
+use yii\base\Model;
 use yii\helpers\Url;
 use humhub\modules\user\models\User;
 use humhub\modules\user\components\CheckPasswordValidator;
@@ -18,9 +19,8 @@ use humhub\modules\user\components\CheckPasswordValidator;
  *
  * @since 0.5
  */
-class AccountChangeEmail extends \yii\base\Model
+class AccountChangeEmail extends Model
 {
-
     /**
      * @var string the users password
      */
@@ -38,6 +38,7 @@ class AccountChangeEmail extends \yii\base\Model
     {
         $rules = [
             ['newEmail', 'required'],
+            ['newEmail', 'string', 'max' => 150],
             ['newEmail', 'email'],
             ['newEmail', 'unique', 'targetAttribute' => 'email', 'targetClass' => User::class, 'message' => '{attribute} "{value}" is already in use!'],
         ];
@@ -72,8 +73,8 @@ class AccountChangeEmail extends \yii\base\Model
 
         $mail = Yii::$app->mailer->compose([
             'html' => '@humhub/modules/user/views/mails/ChangeEmail',
-            'text' => '@humhub/modules/user/views/mails/plaintext/ChangeEmail'
-                ], [
+            'text' => '@humhub/modules/user/views/mails/plaintext/ChangeEmail',
+        ], [
             'user' => $user,
             'newEmail' => $this->newEmail,
             'approveUrl' => Url::to([empty($approveUrl) ? "/user/account/change-email-validate" : $approveUrl, 'email' => $this->newEmail, 'token' => $token], true),

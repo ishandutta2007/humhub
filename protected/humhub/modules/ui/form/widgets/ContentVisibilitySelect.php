@@ -11,11 +11,12 @@ namespace humhub\modules\ui\form\widgets;
 use humhub\modules\content\components\ContentActiveRecord;
 use humhub\modules\content\components\ContentContainerActiveRecord;
 use humhub\modules\content\models\Content;
+use humhub\modules\content\permissions\CreatePublicContent;
 use humhub\modules\space\models\Space;
+use humhub\modules\user\helpers\AuthHelper;
 use Yii;
-use yii\bootstrap\InputWidget;
 use yii\bootstrap\Html;
-
+use yii\bootstrap\InputWidget;
 
 /**
  * ContentVisibilitySelect is a uniform form field for setting the visibility of a content.
@@ -78,6 +79,14 @@ class ContentVisibilitySelect extends InputWidget
                 Yii::t('ContentModule.base', '(Also visible to non-members of this space)');
         }
 
+        if (
+            $this->getContentContainer() === null
+            && AuthHelper::isGuestAccessEnabled()
+        ) {
+            $this->options['label'] .= ' ' .
+                Yii::t('ContentModule.base', '(Also visible to people who are not logged in)');
+        }
+
         $this->options['title'] =
             Yii::t('ContentModule.base', 'Specify who can see this content.');
 
@@ -116,11 +125,21 @@ class ContentVisibilitySelect extends InputWidget
         $contentContainer = $this->getContentContainer();
 
         // Should hide on private spaces (Only provide private content visibility option)
-        if ($contentContainer instanceof Space) {
+        // or if user has no permission to create public content
+        if ($contentContainer instanceof Space && $contentContainer->visibility !== Space::VISIBILITY_ALL) {
             /** @var Space $contentContainer */
-            if ($contentContainer->visibility == Space::VISIBILITY_NONE) {
+            if ($contentContainer->visibility === Space::VISIBILITY_NONE ||
+                !$contentContainer->can(CreatePublicContent::class)) {
                 return true;
             }
+        }
+
+        // Should hide on global content if Guest access is disabled
+        if (
+            $contentContainer === null
+            && !AuthHelper::isGuestAccessEnabled()
+        ) {
+            return true;
         }
 
         return false;

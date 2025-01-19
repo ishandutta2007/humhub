@@ -1,5 +1,5 @@
 <?php
-return array (
+return [
   '<strong>Invite</strong> new people' => '<strong>Bjud in</strong> nya personer',
   'Click here to create an account:' => 'Klicka här för att skapa ett konto:',
   'Email' => 'E-post',
@@ -10,6 +10,7 @@ return array (
   'You\'ve been invited to join %appName%' => 'Du har blivit inbjuden att gå med i %appName%',
   '{email} is already registered!' => '{email} är redan registrerad!',
   '{email} is not valid!' => '{email} är ogiltig!',
+  '{email} should contain at most {charNum} characters.' => '{email} bör innehålla högst {charNum} tecken.',
   '{username} invited you to join "{space}" on {name}.' => '{username} bjöd in dig till "{space}" via {name}.',
   '{username} invited you to {name}.' => '{username} bjöd in dig till {name}.',
-);
+];

@@ -13,7 +13,6 @@ use humhub\modules\notification\targets\WebTarget;
 
 class NotificationCategoryTest extends HumHubDbTestCase
 {
-
     use Specify;
 
     /**
@@ -35,7 +34,7 @@ class NotificationCategoryTest extends HumHubDbTestCase
             'settings' => [
                 $mailTarget->getSettingKey($category) => true,
                 $webTarget->getSettingKey($category) => false,
-            ]
+            ],
         ]);
 
         $settingForm->save();
@@ -64,7 +63,7 @@ class NotificationCategoryTest extends HumHubDbTestCase
             'settings' => [
                 $mailTarget->getSettingKey($category) => true,
                 $webTarget->getSettingKey($category) => true,
-            ]
+            ],
         ]);
 
         $settingForm->save();
@@ -94,7 +93,7 @@ class NotificationCategoryTest extends HumHubDbTestCase
             'settings' => [
                 $mailTarget->getSettingKey($category) => true,
                 $webTarget->getSettingKey($category) => true,
-            ]
+            ],
         ]);
 
         $settingForm->save();
@@ -108,7 +107,7 @@ class NotificationCategoryTest extends HumHubDbTestCase
             'settings' => [
                 $mailTarget->getSettingKey($category) => true,
                 $webTarget->getSettingKey($category) => true,
-            ]
+            ],
         ]);
 
         $settingForm->save($user);
@@ -139,7 +138,7 @@ class NotificationCategoryTest extends HumHubDbTestCase
             'settings' => [
                 $mailTarget->getSettingKey($category) => false,
                 $webTarget->getSettingKey($category) => false,
-            ]
+            ],
         ]);
 
         $settingForm->save();
@@ -156,7 +155,7 @@ class NotificationCategoryTest extends HumHubDbTestCase
             'settings' => [
                 $mailTarget->getSettingKey($category) => true,
                 $webTarget->getSettingKey($category) => true,
-            ]
+            ],
         ]);
 
         $userSettings->save();
@@ -169,5 +168,4 @@ class NotificationCategoryTest extends HumHubDbTestCase
         $this->assertTrue($mailTarget->isEnabled($notification, $user));
         $this->assertTrue($webTarget->isEnabled($notification, $user));
     }
-
 }

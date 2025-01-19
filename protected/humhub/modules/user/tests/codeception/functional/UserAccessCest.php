@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
@@ -13,7 +14,6 @@ use user\FunctionalTester;
 
 class UserAccessCest
 {
-
     public function testDisabledUserAccess(FunctionalTester $I)
     {
         $I->wantTo('ensure that disabled users have no access');

@@ -29,7 +29,6 @@ use yii\web\UploadedFile;
  */
 class ProfileBannerImage extends ProfileImage
 {
-
     /**
      * @var Integer width of the Image
      */
@@ -91,11 +90,11 @@ class ProfileBannerImage extends ProfileImage
      */
     public function render($width = 32, $cfg = [])
     {
-        if(is_int($width)) {
+        if (is_int($width)) {
             $width .= 'px';
         }
 
         Html::addCssStyle($cfg, ['width' => $width]);
-        return Html::img($this->getUrl(),$cfg);
+        return Html::img($this->getUrl(), $cfg);
     }
 }

@@ -1,5 +1,5 @@
 <?php
-return array (
+return [
   'Activity' => 'Aktywność',
   'Add or remove link' => 'Dodaj lub usuń odnośnik',
   'Animals & Nature' => 'Zwierzęta i Natura',
@@ -33,6 +33,7 @@ return array (
   'Paragraph' => 'Paragraf',
   'People' => 'Ludzie',
   'Rows' => 'Wiersze',
+  'Switch editor mode' => 'Przełącz tryb edytora',
   'Symbols' => 'Symbole',
   'Title' => 'Tytuł',
   'Toggle code font' => 'Przełącz czcionkę kodu',
@@ -51,4 +52,4 @@ return array (
   '[Image]' => '[Obraz]',
   '[Invalid file]' => '[błędny plik]',
   '[Table]' => '[Tabela]',
-);
+];

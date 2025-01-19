@@ -10,11 +10,11 @@ namespace humhub\modules\marketplace\jobs;
 
 use humhub\modules\file\libs\FileHelper;
 use humhub\modules\marketplace\Module;
-use humhub\modules\queue\ActiveJob;
+use humhub\modules\queue\LongRunningActiveJob;
 use Yii;
 use yii\base\ErrorException;
 
-class ModuleCleanupsJob extends ActiveJob
+class ModuleCleanupsJob extends LongRunningActiveJob
 {
     public $backupKeepTime = 60 * 60 * 24 * 14;
     public $downloadKeepTime = 60 * 60 * 24 * 30;
@@ -35,7 +35,7 @@ class ModuleCleanupsJob extends ActiveJob
     {
         /** @var Module $module */
         $module = Yii::$app->getModule('marketplace');
-        $moduleDownloadFolder = Yii::getAlias($module->modulesDownloadPath);
+        $moduleDownloadFolder = realpath(Yii::getAlias($module->modulesDownloadPath));
 
         if (!is_dir($moduleDownloadFolder)) {
             return;
@@ -54,7 +54,7 @@ class ModuleCleanupsJob extends ActiveJob
      */
     private function cleanupModuleBackups()
     {
-        $moduleBackupFolder = Yii::getAlias('@runtime/module_backups');
+        $moduleBackupFolder = realpath(Yii::getAlias('@runtime/module_backups'));
 
         if (!is_dir($moduleBackupFolder)) {
             return;

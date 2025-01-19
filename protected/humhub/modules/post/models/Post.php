@@ -12,23 +12,21 @@ use humhub\modules\content\widgets\richtext\RichText;
 use humhub\modules\content\components\ContentActiveRecord;
 use humhub\modules\post\permissions\CreatePost;
 use humhub\modules\post\widgets\WallEntry;
-use humhub\modules\search\interfaces\Searchable;
-use humhub\modules\user\models\User;
 use Yii;
 use yii\helpers\Url;
 
 /**
  * This is the model class for table "post".
  *
- * @property integer $id
+ * @property int $id
  * @property string $message
  * @property string $url
  * @property string $created_at
- * @property integer $created_by
+ * @property int $created_by
  * @property string $updated_at
- * @property integer $updated_by
+ * @property int $updated_by
  */
-class Post extends ContentActiveRecord implements Searchable
+class Post extends ContentActiveRecord
 {
     /**
      * @inheritdoc
@@ -46,9 +44,14 @@ class Post extends ContentActiveRecord implements Searchable
     public $canMove = CreatePost::class;
 
     /**
-     * Scenarios
+     * Scenario - when validating with ajax
      */
-    const SCENARIO_AJAX_VALIDATION = 'ajaxValidation';
+    public const SCENARIO_AJAX_VALIDATION = 'ajaxValidation';
+
+    /**
+     * Scenario - when related content has attached files
+     */
+    public const SCENARIO_HAS_FILES = 'hasFiles';
 
     /**
      * @inheritdoc
@@ -69,9 +72,9 @@ class Post extends ContentActiveRecord implements Searchable
     public function rules()
     {
         return [
-            [['message'], 'required', 'except' => self::SCENARIO_AJAX_VALIDATION],
+            [['message'], 'required', 'except' => [self::SCENARIO_AJAX_VALIDATION, self::SCENARIO_HAS_FILES]],
             [['message'], 'string'],
-            [['url'], 'string', 'max' => 255]
+            [['url'], 'string', 'max' => 255],
         ];
     }
 
@@ -119,7 +122,7 @@ class Post extends ContentActiveRecord implements Searchable
      */
     public function getIcon()
     {
-        return 'fa-comment';
+        return 'fa-comment-o';
     }
 
     /**
@@ -135,30 +138,11 @@ class Post extends ContentActiveRecord implements Searchable
      */
     public function getSearchAttributes()
     {
-        $attributes = [
+        return [
             'message' => $this->message,
-            'url' => $this->url,
-            'user' => $this->getPostAuthorName()
         ];
-
-        $this->trigger(self::EVENT_SEARCH_ADD, new \humhub\modules\search\events\SearchAddEvent($attributes));
-
-        return $attributes;
     }
 
-    /**
-     * @return string
-     */
-    private function getPostAuthorName()
-    {
-        $user = User::findOne(['id' => $this->created_by]);
-
-        if ($user !== null && $user->isActive()) {
-            return $user->getDisplayName();
-        }
-
-        return '';
-    }
 
     /**
      * @inheritDoc

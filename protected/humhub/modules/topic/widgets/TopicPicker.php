@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
@@ -10,9 +11,9 @@ namespace humhub\modules\topic\widgets;
 
 use humhub\modules\content\components\ContentContainerActiveRecord;
 use humhub\modules\content\helpers\ContentContainerHelper;
-use humhub\modules\topic\permissions\AddTopic;
 use humhub\modules\content\widgets\ContentTagPicker;
 use humhub\modules\topic\models\Topic;
+use humhub\modules\topic\permissions\AddTopic;
 use Yii;
 use yii\helpers\Url;
 
@@ -50,8 +51,7 @@ class TopicPicker extends ContentTagPicker
             $this->url = Url::to(['/topic/topic/search']);
         }
 
-        $this->addOptions = static::canAddTopic($this->contentContainer);
-
+        $this->addOptions = static::canAddTopic($this->contentContainer) && Topic::isAllowedToCreate($this->contentContainer);
         parent::init();
     }
 
@@ -60,7 +60,7 @@ class TopicPicker extends ContentTagPicker
      */
     public function run()
     {
-        if(!static::canAddTopic($this->contentContainer) && !static::hasTopics($this->contentContainer)) {
+        if (!static::canAddTopic($this->contentContainer) && !static::hasTopics($this->contentContainer)) {
             return $this->emptyResult();
         }
 
@@ -97,11 +97,11 @@ class TopicPicker extends ContentTagPicker
      */
     private static function hasTopics(ContentContainerActiveRecord $container = null)
     {
-        if(!$container) {
-            return (bool) Topic::find()->count();
+        if (!$container) {
+            return (bool)Topic::find()->count();
         }
 
-        return (bool) Topic::findByContainer($container)->count();
+        return (bool)Topic::findByContainer($container)->count();
     }
 
     /**
@@ -112,7 +112,7 @@ class TopicPicker extends ContentTagPicker
     public static function jsonResult($tags)
     {
         $result = parent::jsonResult($tags);
-        foreach($result as $key => $tag) {
+        foreach ($result as $key => $tag) {
             $result[$key]['image'] = Yii::$app->getModule('topic')->icon;
         }
 

@@ -8,11 +8,11 @@
 
 namespace humhub\modules\admin\models;
 
+use humhub\modules\space\models\Membership;
+use humhub\modules\space\models\Space;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use humhub\modules\space\models\Space;
-use humhub\modules\space\models\Membership;
 
 /**
  * SpaceSearch for administration
@@ -21,7 +21,6 @@ use humhub\modules\space\models\Membership;
  */
 class SpaceSearch extends Space
 {
-
     public $freeText;
     public $memberCount;
     public $owner;
@@ -49,18 +48,10 @@ class SpaceSearch extends Space
     /**
      * @inheritdoc
      */
-    public static function className()
-    {
-        return Space::class;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), [
-            'memberCount' => 'Members'
+            'memberCount' => 'Members',
         ]);
     }
 
@@ -86,12 +77,16 @@ class SpaceSearch extends Space
         $dataProvider->setSort([
             'attributes' => [
                 'id',
+                'sort_order',
                 'name',
                 'visibility',
                 'join_policy',
                 'memberCount',
-            ]
+            ],
         ]);
+
+        $dataProvider->sort->defaultOrder = ['sort_order' => SORT_ASC, 'name' => SORT_ASC];
+
         $dataProvider->sort->attributes['ownerUser.profile.lastname'] = [
             'asc' => ['profile.lastname' => SORT_ASC],
             'desc' => ['profile.lastname' => SORT_DESC],
@@ -117,7 +112,7 @@ class SpaceSearch extends Space
                 ['like', 'user.username', $this->freeText],
                 ['like', 'user.email', $this->freeText],
                 ['like', 'profile.firstname', $this->freeText],
-                ['like', 'profile.lastname', $this->freeText]
+                ['like', 'profile.lastname', $this->freeText],
             ]);
         }
 
@@ -127,7 +122,7 @@ class SpaceSearch extends Space
             $query->andWhere([
                 'OR',
                 ['space.visibility' => Space::VISIBILITY_REGISTERED_ONLY],
-                ['space.visibility' => Space::VISIBILITY_ALL]
+                ['space.visibility' => Space::VISIBILITY_ALL],
             ]);
         }
 

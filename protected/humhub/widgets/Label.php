@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
@@ -12,7 +13,6 @@ use humhub\components\Widget;
 use humhub\libs\Html;
 use Yii;
 
-
 /**
  * Labels for Wall Entries
  * This widget will attached labels like Pinned, Archived to Wall Entries
@@ -21,7 +21,6 @@ use Yii;
  */
 class Label extends BootstrapComponent
 {
-
     /**
      * @since 1.9
      */
@@ -64,7 +63,7 @@ class Label extends BootstrapComponent
 
     public function withLink($link)
     {
-        if($link instanceof Link) {
+        if ($link instanceof Link) {
             $this->_link = $link;
         }
 
@@ -77,7 +76,7 @@ class Label extends BootstrapComponent
     public function renderComponent()
     {
         $result = Html::tag('span', $this->getText(), $this->htmlOptions);
-        if($this->_link) {
+        if ($this->_link) {
             $result = (string) $this->_link->setText($result);
         }
         return $result;
@@ -96,7 +95,7 @@ class Label extends BootstrapComponent
      */
     public function getTypedClass($type)
     {
-        return 'label-'.$type;
+        return 'label-' . $type;
     }
 
     public function getWidgetOptions()
@@ -121,5 +120,3 @@ class Label extends BootstrapComponent
         return $labels;
     }
 }
-
-?>

@@ -8,84 +8,86 @@
 
 namespace humhub\modules\space\models;
 
-use humhub\modules\content\components\ContentContainerSettingsManager;
-use humhub\modules\search\interfaces\Searchable;
-use humhub\modules\search\events\SearchAddEvent;
-use humhub\modules\search\jobs\DeleteDocument;
-use humhub\modules\search\jobs\UpdateDocument;
-use humhub\modules\space\behaviors\SpaceModelMembership;
-use humhub\modules\space\behaviors\SpaceController;
-use humhub\modules\space\components\ActiveQuerySpace;
-use humhub\modules\space\Module;
-use humhub\modules\user\behaviors\Followable;
 use humhub\components\behaviors\GUID;
+use humhub\libs\UUIDValidator;
+use humhub\modules\admin\permissions\ManageSpaces;
+use humhub\modules\content\components\ContentContainerActiveRecord;
+use humhub\modules\content\components\ContentContainerSettingsManager;
+use humhub\modules\content\models\Content;
+use humhub\modules\space\activities\Created;
+use humhub\modules\space\behaviors\SpaceController;
+use humhub\modules\space\behaviors\SpaceModelMembership;
+use humhub\modules\space\components\ActiveQuerySpace;
+use humhub\modules\space\components\UrlValidator;
+use humhub\modules\space\Module;
+use humhub\modules\space\notifications\SpaceCreated;
 use humhub\modules\space\permissions\CreatePrivateSpace;
 use humhub\modules\space\permissions\CreatePublicSpace;
-use humhub\modules\space\components\UrlValidator;
-use humhub\modules\space\activities\Created;
-use humhub\modules\content\components\ContentContainerActiveRecord;
-use humhub\modules\content\models\Content;
+use humhub\modules\space\services\MemberListService;
+use humhub\modules\user\behaviors\Followable;
+use humhub\modules\user\components\PermissionManager;
 use humhub\modules\user\helpers\AuthHelper;
-use humhub\modules\user\models\GroupSpace;
-use humhub\modules\user\models\User;
 use humhub\modules\user\models\Follow;
+use humhub\modules\user\models\GroupSpace;
 use humhub\modules\user\models\Invite;
-use humhub\modules\space\widgets\Wall;
-use humhub\modules\user\models\User as UserModel;
+use humhub\modules\user\models\User;
 use Yii;
+use yii\base\InvalidConfigException;
+use yii\db\ActiveQuery;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "space".
  *
- * @property integer $id
- * @property string $guid
  * @property string $name
  * @property string $description
  * @property string $about
  * @property string $url
- * @property integer $join_policy
- * @property integer $visibility
- * @property integer $status
- * @property string $created_at
- * @property integer $created_by
- * @property string $updated_at
- * @property integer $updated_by
- * @property integer $auto_add_new_members
- * @property integer $contentcontainer_id
- * @property integer $default_content_visibility
+ * @property int $join_policy
+ * @property int $status
+ * @property int $sort_order
+ * @property int $auto_add_new_members
+ * @property int $default_content_visibility
  * @property string $color
  * @property User $ownerUser the owner of this space
+ * @property-read AdvancedSettings $advancedSettings
+ * @property-read mixed $applicants
+ * @property-read GroupSpace[] $groupSpaces
+ * @property-read Membership[] $memberships
+ * @property-read mixed $nonMembershipUser
+ * @property-read array $privilegedGroupUsers
+ * @property-read array $searchAttributes
  *
- * @mixin \humhub\components\behaviors\GUID
- * @mixin \humhub\modules\space\behaviors\SpaceModelMembership
- * @mixin \humhub\modules\user\behaviors\Followable
+ * @mixin GUID
+ * @mixin SpaceModelMembership
+ * @mixin Followable
+ * @noinspection PropertiesInspection
  */
-class Space extends ContentContainerActiveRecord implements Searchable
+class Space extends ContentContainerActiveRecord
 {
-
     // Join Policies
-    const JOIN_POLICY_NONE = 0; // No Self Join Possible
-    const JOIN_POLICY_APPLICATION = 1; // Invitation and Application Possible
-    const JOIN_POLICY_FREE = 2; // Free for All
+    public const JOIN_POLICY_NONE = 0; // No Self Join Possible
+    public const JOIN_POLICY_APPLICATION = 1; // Invitation and Application Possible
+    public const JOIN_POLICY_FREE = 2; // Free for All
     // Visibility: Who can view the space content.
-    const VISIBILITY_NONE = 0; // Private: This space is invisible for non-space-members
-    const VISIBILITY_REGISTERED_ONLY = 1; // Only registered users (no guests)
-    const VISIBILITY_ALL = 2; // Public: All Users (Members and Guests)
+    public const VISIBILITY_NONE = 0; // Private: This space is invisible for non-space-members
+    public const VISIBILITY_REGISTERED_ONLY = 1; // Only registered users (no guests)
+    public const VISIBILITY_ALL = 2; // Public: All Users (Members and Guests)
     // Status
-    const STATUS_DISABLED = 0;
-    const STATUS_ENABLED = 1;
-    const STATUS_ARCHIVED = 2;
+    public const STATUS_DISABLED = 0;
+    public const STATUS_ENABLED = 1;
+    public const STATUS_ARCHIVED = 2;
     // UserGroups
-    const USERGROUP_OWNER = 'owner';
-    const USERGROUP_ADMIN = 'admin';
-    const USERGROUP_MODERATOR = 'moderator';
-    const USERGROUP_MEMBER = 'member';
-    const USERGROUP_USER = 'user';
-    const USERGROUP_GUEST = 'guest';
+    public const USERGROUP_OWNER = 'owner';
+    public const USERGROUP_ADMIN = 'admin';
+    public const USERGROUP_MODERATOR = 'moderator';
+    public const USERGROUP_MEMBER = 'member';
+    public const USERGROUP_USER = 'user';
+    public const USERGROUP_GUEST = 'guest';
     // Model Scenarios
-    const SCENARIO_CREATE = 'create';
-    const SCENARIO_EDIT = 'edit';
-    const SCENARIO_SECURITY_SETTINGS = 'security_settings';
+    public const SCENARIO_CREATE = 'create';
+    public const SCENARIO_EDIT = 'edit';
+    public const SCENARIO_SECURITY_SETTINGS = 'security_settings';
 
     /**
      * @inheritdoc
@@ -116,15 +118,17 @@ class Space extends ContentContainerActiveRecord implements Searchable
     public function rules()
     {
         $rules = [
-            [['join_policy', 'visibility', 'status', 'auto_add_new_members', 'default_content_visibility'], 'integer'],
+            [['join_policy', 'visibility', 'status', 'sort_order', 'auto_add_new_members', 'default_content_visibility'], 'integer'],
             [['name'], 'required'],
+            [['name'], 'string', 'max' => 45, 'min' => 2],
             [['description', 'about', 'color'], 'string'],
             [['tagsField', 'blockedUsersField'], 'safe'],
             [['description'], 'string', 'max' => 100],
             [['join_policy'], 'in', 'range' => [0, 1, 2]],
             [['visibility'], 'in', 'range' => [0, 1, 2]],
             [['visibility'], 'checkVisibility'],
-            [['guid', 'name'], 'string', 'max' => 45, 'min' => 2],
+            [['guid'], UUIDValidator::class],
+            [['guid'], 'unique'],
             [['url'], UrlValidator::class, 'space' => $this],
         ];
 
@@ -248,26 +252,28 @@ class Space extends ContentContainerActiveRecord implements Searchable
 
     /**
      * @inheritdoc
+     * @throws InvalidConfigException
+     * @throws \Throwable
      */
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);
 
-        Yii::$app->queue->push(new UpdateDocument([
-            'activeRecordClass' => get_class($this),
-            'primaryKey' => $this->id
-        ]));
-
         $user = User::findOne(['id' => $this->created_by]);
 
-        if ($insert) {
+        if ($insert && $user) {
             // Auto add creator as admin
             $this->addMember($user->id, 1, true, self::USERGROUP_ADMIN);
 
-            $activity = new Created;
+            $activity = new Created();
             $activity->source = $this;
             $activity->originator = $user;
             $activity->create();
+
+            // If the space creator is not allowed to manage spaces, notify space managers
+            if (!(new PermissionManager(['subject' => $user]))->can(ManageSpaces::class)) {
+                SpaceCreated::instance()->from($user)->about($this)->sendBulk(PermissionManager::findUsersByPermission(new ManageSpaces()));
+            }
         }
 
         Yii::$app->cache->delete('userSpaces_' . $user->id);
@@ -283,7 +289,7 @@ class Space extends ContentContainerActiveRecord implements Searchable
         }
 
         if (empty($this->url)) {
-            $this->url = new \yii\db\Expression('NULL');
+            $this->url = new Expression('NULL');
         }
 
         // Make sure visibility attribute is not empty
@@ -308,16 +314,10 @@ class Space extends ContentContainerActiveRecord implements Searchable
             $this->moduleManager->disable($module);
         }
 
-        Yii::$app->queue->push(new DeleteDocument([
-            'activeRecordClass' => get_class($this),
-            'primaryKey' => $this->id
-        ]));
-
-
         $this->getProfileImage()->delete();
         $this->getProfileBannerImage()->delete();
 
-        Follow::deleteAll(['object_id' => $this->id, 'object_model' => 'Space']);
+        Follow::deleteAll(['object_id' => $this->id, 'object_model' => static::class]);
 
         foreach (Membership::findAll(['space_id' => $this->id]) as $spaceMembership) {
             $spaceMembership->delete();
@@ -342,29 +342,31 @@ class Space extends ContentContainerActiveRecord implements Searchable
     /**
      * Indicates that this user can join this workspace
      *
-     * @param $userId User Id of User
+     * @param $userId int|string|null User Id of User
      */
-    public function canJoin($userId = '')
+    public function canJoin($userId = null): bool
     {
-        if (Yii::$app->user->isGuest) {
+        // Take current userId if none is given
+        $userId ??= Yii::$app->user->id;
+
+        if (!$userId) {
             return false;
         }
 
-        // Take current userId if none is given
-        if ($userId == '') {
-            $userId = Yii::$app->user->id;
-        }
-
-        // Checks if User is already member
+        // Checks if User is already a member
         if ($this->isMember($userId)) {
             return false;
         }
 
-        if ($this->join_policy == self::JOIN_POLICY_NONE) {
+        if ($this->join_policy === self::JOIN_POLICY_NONE) {
             return false;
         }
 
-        if ($this->isBlockedForUser(User::findOne($userId))) {
+        $user = Yii::$app->runtimeCache->getOrSet(User::class . '#' . $userId, function () use ($userId) {
+            return User::findOne($userId);
+        });
+
+        if ($this->isBlockedForUser($user)) {
             return false;
         }
 
@@ -396,24 +398,6 @@ class Space extends ContentContainerActiveRecord implements Searchable
         return false;
     }
 
-    /**
-     * Returns an array of informations used by search subsystem.
-     * Function is defined in interface ISearchable
-     *
-     * @return array
-     */
-    public function getSearchAttributes()
-    {
-        $attributes = [
-            'title' => $this->name,
-            'tags' => implode(', ', $this->getTags()),
-            'description' => $this->description
-        ];
-
-        $this->trigger(self::EVENT_SEARCH_ADD, new SearchAddEvent($attributes));
-
-        return $attributes;
-    }
 
     /**
      * Archive this Space
@@ -436,7 +420,7 @@ class Space extends ContentContainerActiveRecord implements Searchable
     /**
      * Returns wether or not a Space is archived.
      *
-     * @return boolean
+     * @return bool
      * @since 1.2
      */
     public function isArchived()
@@ -515,13 +499,6 @@ class Space extends ContentContainerActiveRecord implements Searchable
         return ($this->isMember($user));
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getWallOut()
-    {
-        return Wall::widget(['space' => $this]);
-    }
 
     /**
      * Returns all Membership relations with status = STATUS_MEMBER.
@@ -529,10 +506,10 @@ class Space extends ContentContainerActiveRecord implements Searchable
      * Be aware that this function will also include disabled users, in order to only include active and visible users use:
      *
      * ```
-     * Membership::getSpaceMembersQuery($this->space)->active()->visible()->count()
+     * $this->getMemberListService()->getQuery()
      * ```
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getMemberships()
     {
@@ -574,7 +551,7 @@ class Space extends ContentContainerActiveRecord implements Searchable
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getOwnerUser()
     {
@@ -593,7 +570,7 @@ class Space extends ContentContainerActiveRecord implements Searchable
             self::USERGROUP_ADMIN => Yii::t('SpaceModule.base', 'Administrators'),
             self::USERGROUP_MODERATOR => Yii::t('SpaceModule.base', 'Moderators'),
             self::USERGROUP_MEMBER => Yii::t('SpaceModule.base', 'Members'),
-            self::USERGROUP_USER => Yii::t('SpaceModule.base', 'Users')
+            self::USERGROUP_USER => Yii::t('SpaceModule.base', 'Users'),
         ];
 
         // Add guest groups if enabled
@@ -669,11 +646,13 @@ class Space extends ContentContainerActiveRecord implements Searchable
         $owner = $this->getOwnerUser()->one();
         $groups[self::USERGROUP_OWNER][] = $owner;
 
-        $query = Membership::find()->joinWith('user');
-        $query->andWhere(['IN', 'group_id', [self::USERGROUP_ADMIN, self::USERGROUP_MODERATOR]]);
-        $query->andWhere(['space_id' => $this->id]);
-        $query->andWhere(['!=', 'user_id', $owner->id]);
-        $query->andWhere(['user.status' => UserModel::STATUS_ENABLED]);
+        $query = Membership::find()
+            ->joinWith('user')
+            ->with('user.profile')
+            ->andWhere(['IN', 'group_id', [self::USERGROUP_ADMIN, self::USERGROUP_MODERATOR]])
+            ->andWhere(['space_id' => $this->id])
+            ->andWhere(['!=', 'user_id', $owner->id])
+            ->andWhere(['user.status' => User::STATUS_ENABLED]);
 
         foreach ($query->all() as $membership) {
             $groups[$membership->group_id][] = $membership->user;
@@ -685,7 +664,7 @@ class Space extends ContentContainerActiveRecord implements Searchable
     /**
      * Gets query for [[GroupSpace]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      * @since 1.8
      */
     public function getGroupSpaces()
@@ -700,5 +679,14 @@ class Space extends ContentContainerActiveRecord implements Searchable
     public function isModuleEnabled($id)
     {
         return $this->moduleManager->isEnabled($id);
+    }
+
+    /**
+     * @return MemberListService
+     * @since 1.14
+     */
+    public function getMemberListService(): MemberListService
+    {
+        return new MemberListService($this);
     }
 }

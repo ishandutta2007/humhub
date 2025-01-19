@@ -9,20 +9,26 @@
 namespace humhub\modules\activity;
 
 use humhub\components\ActiveRecord;
+use humhub\helpers\ControllerHelper;
 use humhub\modules\activity\components\MailSummary;
 use humhub\modules\activity\helpers\ActivityHelper;
 use humhub\modules\activity\jobs\SendMailSummary;
 use humhub\modules\activity\models\Activity;
 use humhub\modules\admin\permissions\ManageSettings;
 use humhub\modules\admin\widgets\SettingsMenu;
+use humhub\modules\content\models\Content;
 use humhub\modules\ui\menu\MenuLink;
 use humhub\modules\user\widgets\AccountMenu;
+use Throwable;
 use Yii;
 use yii\base\ActionEvent;
 use yii\base\BaseObject;
 use yii\base\Event;
 use yii\base\InvalidArgumentException;
+use yii\db\ActiveQuery;
+use yii\db\AfterSaveEvent;
 use yii\db\IntegrityException;
+use yii\db\StaleObjectException;
 
 /**
  * Events provides callbacks to handle events.
@@ -31,7 +37,6 @@ use yii\db\IntegrityException;
  */
 class Events extends BaseObject
 {
-
     /**
      * Handles cron hourly run event to send mail summaries to the users
      *
@@ -54,8 +59,11 @@ class Events extends BaseObject
         $module = static::getModule();
         if ($module->enableMailSummaries) {
             Yii::$app->queue->push(new SendMailSummary(['interval' => MailSummary::INTERVAL_DAILY]));
-            if (date('w') == $module->weeklySummaryDay) {
+            if (date('w') === (string)$module->weeklySummaryDay) {
                 Yii::$app->queue->push(new SendMailSummary(['interval' => MailSummary::INTERVAL_WEEKLY]));
+            }
+            if (date('j') === (string)$module->monthlySummaryDay) {
+                Yii::$app->queue->push(new SendMailSummary(['interval' => MailSummary::INTERVAL_MONTHLY]));
             }
         }
     }
@@ -86,7 +94,7 @@ class Events extends BaseObject
                 'icon' => 'envelope',
                 'url' => ['/activity/user'],
                 'sortOrder' => 105,
-                'isActive' => MenuLink::isActiveState('activity')
+                'isActive' => ControllerHelper::isActivePath('activity'),
             ]));
         }
     }
@@ -102,8 +110,8 @@ class Events extends BaseObject
                 'label' => Yii::t('ActivityModule.base', 'E-Mail Summaries'),
                 'url' => ['/activity/admin/defaults'],
                 'sortOrder' => 300,
-                'isActive' => MenuLink::isActiveState('activity', 'admin', 'defaults'),
-                'isVisible' => Yii::$app->user->can(ManageSettings::class)
+                'isActive' => ControllerHelper::isActivePath('activity', 'admin', 'defaults'),
+                'isVisible' => Yii::$app->user->can(ManageSettings::class),
             ]));
         }
     }
@@ -112,8 +120,8 @@ class Events extends BaseObject
      * Callback to validate module database records.
      *
      * @param Event $event
-     * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
+     * @throws Throwable
+     * @throws StaleObjectException
      */
     public static function onIntegrityCheck($event)
     {
@@ -147,6 +155,32 @@ class Events extends BaseObject
         }
     }
 
+    /**
+     * @param AfterSaveEvent $event
+     */
+    public static function onContentAfterUpdate($event)
+    {
+        if (!array_key_exists('visibility', $event->changedAttributes)) {
+            return;
+        }
+
+        /* @var Content $content */
+        $content = $event->sender;
+
+        if ($content->object_model === Activity::class) {
+            return;
+        }
+
+        // Activities should be updated to same visibility as parent Record
+        $activitiesQuery = ActivityHelper::getActivitiesQuery($content->getModel());
+        if ($activitiesQuery instanceof ActiveQuery) {
+            foreach ($activitiesQuery->each() as $activity) {
+                /* @var Activity $activity */
+                $activity->content->visibility = $content->visibility;
+                $activity->content->save();
+            }
+        }
+    }
 
     /**
      * @return Module

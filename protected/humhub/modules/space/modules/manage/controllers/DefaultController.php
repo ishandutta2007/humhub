@@ -28,7 +28,6 @@ use yii\helpers\Url;
  */
 class DefaultController extends Controller
 {
-
     /**
      * @inheritdoc
      */
@@ -38,7 +37,7 @@ class DefaultController extends Controller
             ['login'],
             [ContentContainerControllerAccess::RULE_USER_GROUP_ONLY => [Space::USERGROUP_ADMIN], 'actions' => ['index', 'advanced']],
             [ContentContainerControllerAccess::RULE_USER_GROUP_ONLY => [Space::USERGROUP_OWNER], 'actions' => ['archive', 'unarchive', 'delete']],
-            [ContentContainerControllerAccess::RULE_POST => ['archive', 'unarchive']]
+            [ContentContainerControllerAccess::RULE_POST => ['archive', 'unarchive']],
         ];
     }
 
@@ -79,7 +78,7 @@ class DefaultController extends Controller
         return $this->render('advanced', [
             'model' => $model,
             'space' => $this->contentContainer,
-            'indexModuleSelection' => $indexModuleSelection
+            'indexModuleSelection' => $indexModuleSelection,
         ]);
     }
 
@@ -96,7 +95,7 @@ class DefaultController extends Controller
 
         return $this->asJson([
             'success' => true,
-            'space' => Chooser::getSpaceResult($space, true, ['isMember' => true])
+            'space' => Chooser::getSpaceResult($space, true, ['isMember' => true]),
         ]);
     }
 
@@ -115,7 +114,7 @@ class DefaultController extends Controller
             Yii::$app->response->format = 'json';
             return [
                 'success' => true,
-                'space' => Chooser::getSpaceResult($space, true, ['isMember' => true])
+                'space' => Chooser::getSpaceResult($space, true, ['isMember' => true]),
             ];
         }
 

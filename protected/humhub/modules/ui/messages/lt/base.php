@@ -2,7 +2,8 @@
 
 return [
     'Collapse' => 'Sutraukti',
-    'Read more' => '',
-    'Reset filters' => '',
-    'User Interface' => '',
+    'Read more' => 'Skaityti daugiau',
+    'Reset filters' => 'Panaikinti filtrus',
+    'User Interface' => 'Vartotojo sąsaja',
+    'Select' => '',
 ];

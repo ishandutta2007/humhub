@@ -18,7 +18,6 @@ use humhub\components\assets\AssetBundle;
  */
 class ContentContainerAsset extends AssetBundle
 {
-
     /**
      * @inheritdoc
      */
@@ -28,7 +27,7 @@ class ContentContainerAsset extends AssetBundle
      * @inheritdoc
      */
     public $js = [
-        'js/humhub.content.container.js'
+        'js/humhub.content.container.js',
     ];
 
 }

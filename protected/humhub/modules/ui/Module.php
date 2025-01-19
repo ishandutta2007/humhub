@@ -17,7 +17,6 @@ use Yii;
  */
 class Module extends \humhub\components\Module
 {
-
     /**
      * @inheritdoc
      */
@@ -38,7 +37,7 @@ class Module extends \humhub\components\Module
         'remove' => 'times',
         'controls' => 'cog',
         'about' => 'info-circle',
-        'stream' => 'bars'
+        'stream' => 'bars',
     ];
 
     /**
@@ -46,8 +45,8 @@ class Module extends \humhub\components\Module
      */
     public static function getModuleInstance()
     {
-        /* @var $module static*/
-        $module =  Yii::$app->getModule('ui');
+        /* @var $module static */
+        $module = Yii::$app->getModule('ui');
         return $module;
     }
 
@@ -60,7 +59,6 @@ class Module extends \humhub\components\Module
         return $this->iconAlias[$name] ?? $name;
     }
 
-
     /**
      * @inheritdoc
      */
@@ -68,5 +66,4 @@ class Module extends \humhub\components\Module
     {
         return Yii::t('UiModule.base', 'User Interface');
     }
-
 }

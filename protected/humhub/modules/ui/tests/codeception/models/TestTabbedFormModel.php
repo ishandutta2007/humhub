@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2021 HumHub GmbH & Co. KG
@@ -84,7 +85,7 @@ class TestTabbedFormModel extends Model implements TabbedFormModel
                 'label' => 'Second tab',
                 'view' => 'tab-second',
                 'fields' => ['countryId', 'stateId', 'cityId'],
-            ]
+            ],
         ];
     }
 }

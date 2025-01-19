@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2018 HumHub GmbH & Co. KG
@@ -51,7 +52,7 @@ class TimeZoneDropdownAddition extends JsInputWidget
             'name' => $this->name,
             'currentTimeZoneLabel' => $this->getCurrentLabel(),
             'value' => $this->value,
-            'timeZoneItems' => $this->getTimeZoneItems()
+            'timeZoneItems' => $this->getTimeZoneItems(),
         ]);
     }
 

@@ -9,12 +9,16 @@
 namespace humhub\modules\content\components;
 
 use humhub\components\ActiveRecord;
+use humhub\interfaces\DeletableInterface;
+use humhub\interfaces\EditableInterface;
+use humhub\interfaces\ViewableInterface;
 use humhub\modules\content\interfaces\ContentOwner;
 use humhub\modules\content\models\Content;
-use humhub\modules\content\Module;
 use humhub\modules\user\models\User;
+use Throwable;
 use Yii;
 use yii\base\Exception;
+use yii\base\InvalidConfigException;
 
 /**
  * HActiveRecordContentAddon is the base active record for content addons.
@@ -36,16 +40,15 @@ use yii\base\Exception;
  * @package humhub.components
  * @since 0.5
  */
-class ContentAddonActiveRecord extends ActiveRecord implements ContentOwner
+class ContentAddonActiveRecord extends ActiveRecord implements ContentOwner, ViewableInterface, EditableInterface, DeletableInterface
 {
-
     /**
-     * @var boolean also update underlying contents last update stream sorting
+     * @var bool also update underlying contents last update stream sorting
      */
     protected $updateContentStreamSort = true;
 
     /**
-     * @var boolean automatic following of the addon creator to the related content
+     * @var bool automatic following of the addon creator to the related content
      */
     protected $automaticContentFollowing = true;
 
@@ -136,9 +139,9 @@ class ContentAddonActiveRecord extends ActiveRecord implements ContentOwner
      * Checks if the given / or current user can delete this content.
      * Currently only the creator can remove.
      *
-     * @return boolean
+     * @inheritdoc
      */
-    public function canDelete()
+    public function canDelete($userId = null): bool
     {
         if ($this->created_by == Yii::$app->user->id) {
             return true;
@@ -148,59 +151,66 @@ class ContentAddonActiveRecord extends ActiveRecord implements ContentOwner
     }
 
     /**
-     * Check if current user can read this object
-     *
-     * @return boolean
+     * @deprecated Use canView() instead. It will be deleted since v1.17
      */
-    public function canRead()
+    public function canRead($user = null): bool
     {
-        return $this->content->canView();
+        return $this->canView($user);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canView($user = null): bool
+    {
+        return $this->content->canView($user);
     }
 
     /**
      * Checks if this content addon can be changed
      *
-     * @return boolean
+     * @return bool
      * @deprecated since 1.4
+     * @see static::canEdit()
      */
-    public function canWrite()
+    public function canWrite($userId = "")
     {
-        return $this->canEdit();
+        return $this->canEdit($userId);
     }
 
     /**
      * Checks if this record can be edited
      *
-     * @param User|null $user the user
-     * @return boolean
+     * @param User|int|null $user the user
+     * @return bool
+     * @throws InvalidConfigException
      * @since 1.4
      */
-    public function canEdit(User $user = null)
+    public function canEdit($user = null): bool
     {
         if ($user === null && Yii::$app->user->isGuest) {
             return false;
-        } elseif ($user === null) {
+        }
+
+        if ($user === null) {
             /** @var User $user */
             try {
                 $user = Yii::$app->user->getIdentity();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 Yii::error($e->getMessage());
                 return false;
             }
         }
 
-        if ($this->created_by == $user->id) {
+        if (!$user instanceof User && !($user = User::findOne(['id' => $user]))) {
+            return false;
+        }
+
+        if ($this->created_by === $user->id) {
             return true;
         }
 
-        /** @var Module $contentModule */
-        $contentModule = Yii::$app->getModule('content');
-
-        if ($contentModule->adminCanEditAllContent && Yii::$app->user->isAdmin()) {
-            return true;
-        }
-
-        return false;
+        return $user->canManageAllContent();
     }
 
     /**
@@ -211,7 +221,7 @@ class ContentAddonActiveRecord extends ActiveRecord implements ContentOwner
      */
     public function getContentName()
     {
-        return $this->className();
+        return static::getObjectModel();
     }
 
     /**
@@ -246,7 +256,7 @@ class ContentAddonActiveRecord extends ActiveRecord implements ContentOwner
     /**
      * After saving content addon, mark underlying content as updated.
      *
-     * @return boolean
+     * @return bool
      */
     public function afterSave($insert, $changedAttributes)
     {
@@ -265,5 +275,4 @@ class ContentAddonActiveRecord extends ActiveRecord implements ContentOwner
     {
         return $this->hasOne(User::class, ['id' => 'created_by']);
     }
-
 }

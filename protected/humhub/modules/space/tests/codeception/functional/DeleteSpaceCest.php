@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
@@ -26,6 +27,6 @@ class DeleteSpaceCest
 
     public function testSystemAdminDeletion(FunctionalTester $I)
     {
-        $I->assertSpaceAccessTrue('root', '/space/manage/default/delete', [],  ['DeleteForm[confirmSpaceName]' => 'Space 2']);
+        $I->assertSpaceAccessTrue('root', '/space/manage/default/delete', [], ['DeleteForm[confirmSpaceName]' => 'Space 2']);
     }
 }

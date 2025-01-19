@@ -8,7 +8,6 @@
 
 namespace humhub\components\db;
 
-
 use PDOException;
 use yii\db\mysql\Schema;
 
@@ -23,7 +22,6 @@ use yii\db\mysql\Schema;
  */
 class MysqlSchema extends Schema
 {
-
     /**
      * Collects the foreign key column details for the given table.
      * @param TableSchema $table the table metadata
@@ -62,7 +60,7 @@ SQL;
             foreach ($constraints as $name => $constraint) {
                 $table->foreignKeys[$name] = array_merge(
                     [$constraint['referenced_table_name']],
-                    $constraint['columns']
+                    $constraint['columns'],
                 );
             }
         } catch (\Exception $e) {

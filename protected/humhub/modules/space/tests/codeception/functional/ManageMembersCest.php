@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: kingb
@@ -10,7 +11,6 @@ namespace humhub\modules\space\tests\codeception\functional;
 
 use FunctionalTester;
 use humhub\modules\space\models\Space;
-
 
 class ManageMembersCest
 {
@@ -37,7 +37,7 @@ class ManageMembersCest
 
         $space = Space::findOne(4);
 
-        if(!$space->ownerUser->id === 2) {
+        if (!$space->ownerUser->id === 2) {
             $I->see('Change owner did not work');
         }
     }

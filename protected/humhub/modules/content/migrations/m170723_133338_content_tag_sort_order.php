@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
@@ -12,7 +13,7 @@ class m170723_133338_content_tag_sort_order extends Migration
 {
     public function safeUp()
     {
-        $this->addColumn('content_tag',  'sort_order', 'int(11) DEFAULT 0');
+        $this->addColumn('content_tag', 'sort_order', 'int(11) DEFAULT 0');
     }
 
     public function safeDown()

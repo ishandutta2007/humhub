@@ -10,12 +10,12 @@ use humhub\modules\space\models\Space;
 use humhub\modules\user\models\Mentioning;
 use humhub\modules\user\notifications\Mentioned;
 use tests\codeception\_support\HumHubDbTestCase;
+use yii\base\Exception;
 
 class MentionTest extends HumHubDbTestCase
 {
-
     /**
-     * @throws \yii\base\Exception
+     * @throws Exception
      */
     public function testPostMention()
     {
@@ -40,7 +40,7 @@ class MentionTest extends HumHubDbTestCase
         $comment = new Comment([
             'message' => 'Hi [url](mention:01e50e0d-82cd-41fc-8b0c-552392f5839c "url")',
             'object_model' => Post::class,
-            'object_id' => 7
+            'object_id' => 7,
         ]);
 
         $comment->save();
@@ -59,7 +59,7 @@ class MentionTest extends HumHubDbTestCase
         $comment = new Comment([
             'message' => 'Hi [url](mention:01e50e0d-82cd-41fc-8b0c-552392f5839d "url")',
             'object_model' => Post::class,
-            'object_id' => 7
+            'object_id' => 7,
         ]);
 
         $comment->save();

@@ -19,12 +19,11 @@ use yii\validators\DateValidator;
  */
 class DbDateValidator extends DateValidator
 {
-
     /**
      * Database Field - Validators
      */
-    const REGEX_DBFORMAT_DATE = '/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/';
-    const REGEX_DBFORMAT_DATETIME = '/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/';
+    public const REGEX_DBFORMAT_DATE = '/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/';
+    public const REGEX_DBFORMAT_DATETIME = '/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/';
 
     /**
      * @var string the format the value should converted to (database datetime or date format)
@@ -50,7 +49,7 @@ class DbDateValidator extends DateValidator
             $this->format = Yii::$app->formatter->dateInputFormat;
         }
 
-        if(!$this->timeZone) {
+        if (!$this->timeZone) {
             $this->timeZone = DateHelper::getUserTimeZone(true);
         }
 
@@ -63,7 +62,7 @@ class DbDateValidator extends DateValidator
     public function validateAttribute($model, $attribute)
     {
         // If the date is already in system format, we do not need any further translation or parsing
-        if(DateHelper::isInDbFormat($model->$attribute, $this->isDateOnly())) {
+        if (DateHelper::isInDbFormat($model->$attribute, $this->isDateOnly())) {
             return;
         }
 
@@ -121,7 +120,7 @@ class DbDateValidator extends DateValidator
     /**
      * Checks a time attribute name is given, if empty don't handle time
      *
-     * @return boolean
+     * @return bool
      */
     protected function hasTime()
     {

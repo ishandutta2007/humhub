@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2021 HumHub GmbH & Co. KG
@@ -12,13 +13,12 @@ use humhub\modules\space\models\Space;
 
 /**
  * SpaceDirectoryActionButtons shows space directory buttons (following and membership)
- * 
+ *
  * @since 1.9
  * @author Luke
  */
 class SpaceDirectoryActionButtons extends Widget
 {
-
     /**
      * @var Space
      */

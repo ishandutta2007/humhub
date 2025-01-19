@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2018 HumHub GmbH & Co. KG
@@ -66,7 +67,7 @@ class CheckboxFilterInput extends FilterInput
         return ArrayHelper::merge(parent::getWidgetOptions(), [
             'checked' => $this->checked,
             'iconActive' => $this->iconActive,
-            'iconInActive' => $this->iconInActive
+            'iconInActive' => $this->iconInActive,
         ]);
     }
 

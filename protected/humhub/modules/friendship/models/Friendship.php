@@ -8,45 +8,46 @@
 
 namespace humhub\modules\friendship\models;
 
+use humhub\components\ActiveRecord;
 use humhub\modules\user\models\User;
 use humhub\modules\friendship\FriendshipEvent;
 use humhub\modules\friendship\notifications\RequestDeclined;
 use humhub\modules\friendship\notifications\Request;
 use humhub\modules\friendship\notifications\RequestApproved;
+use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\db\Query;
 
 /**
  * This is the model class for table "user_friendship".
  *
- * @property integer $id
- * @property integer $user_id
- * @property integer $friend_user_id
+ * @property int $id
+ * @property int $user_id
+ * @property int $friend_user_id
  * @property string $created_at
  *
  * @property User $friendUser
  * @property User $user
  */
-class Friendship extends \humhub\components\ActiveRecord
+class Friendship extends ActiveRecord
 {
+    /**
+     * @event \humhub\modules\friendship\FriendshipEvent
+     */
+    public const EVENT_FRIENDSHIP_CREATED = 'friendshipCreated';
 
     /**
      * @event \humhub\modules\friendship\FriendshipEvent
      */
-    const EVENT_FRIENDSHIP_CREATED = 'friendshipCreated';
-
-    /**
-     * @event \humhub\modules\friendship\FriendshipEvent
-     */
-    const EVENT_FRIENDSHIP_REMOVED = 'friendshipRemoved';
+    public const EVENT_FRIENDSHIP_REMOVED = 'friendshipRemoved';
 
     /**
      * Friendship States
      */
-    const STATE_NONE = 0;
-    const STATE_FRIENDS = 1;
-    const STATE_REQUEST_RECEIVED = 2;
-    const STATE_REQUEST_SENT = 3;
+    public const STATE_NONE = 0;
+    public const STATE_FRIENDS = 1;
+    public const STATE_REQUEST_RECEIVED = 2;
+    public const STATE_REQUEST_SENT = 3;
 
     /**
      * @inheritdoc
@@ -64,7 +65,7 @@ class Friendship extends \humhub\components\ActiveRecord
         return [
             [['user_id', 'friend_user_id'], 'required'],
             [['user_id', 'friend_user_id'], 'integer'],
-            [['user_id', 'friend_user_id'], 'unique', 'targetAttribute' => ['user_id', 'friend_user_id'], 'message' => 'The combination of User ID and Friend User ID has already been taken.']
+            [['user_id', 'friend_user_id'], 'unique', 'targetAttribute' => ['user_id', 'friend_user_id'], 'message' => 'The combination of User ID and Friend User ID has already been taken.'],
         ];
     }
 
@@ -82,7 +83,7 @@ class Friendship extends \humhub\components\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getFriendUser()
     {
@@ -90,7 +91,7 @@ class Friendship extends \humhub\components\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getUser()
     {
@@ -152,8 +153,8 @@ class Friendship extends \humhub\components\ActiveRecord
     /**
      * Returns a query for friends of a user
      *
-     * @return \yii\db\ActiveQuery
      * @param User $user
+     * @return ActiveQuery
      */
     public static function getFriendsQuery(User $user)
     {
@@ -192,7 +193,7 @@ class Friendship extends \humhub\components\ActiveRecord
      * Returns a query for sent and not approved friend requests of an user
      *
      * @param User $user
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public static function getSentRequestsQuery(User $user)
     {
@@ -213,7 +214,7 @@ class Friendship extends \humhub\components\ActiveRecord
      * Returns a query for received and not responded friend requests of an user
      *
      * @param User $user
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public static function getReceivedRequestsQuery($user)
     {
@@ -276,7 +277,7 @@ class Friendship extends \humhub\components\ActiveRecord
         if ($myFriendship !== null && $friendsFriendship !== null) {
             // Trigger event is friendship was mutual
             FriendshipEvent::trigger(Friendship::class, Friendship::EVENT_FRIENDSHIP_REMOVED, new FriendshipEvent([
-                'user1' => $user, 'user2' => $friend
+                'user1' => $user, 'user2' => $friend,
             ]));
         }
     }

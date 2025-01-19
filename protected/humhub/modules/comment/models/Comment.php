@@ -16,9 +16,8 @@ use humhub\modules\comment\notifications\NewComment as NewCommentNotification;
 use humhub\modules\comment\widgets\ShowMore;
 use humhub\modules\content\components\ContentActiveRecord;
 use humhub\modules\content\components\ContentAddonActiveRecord;
-use humhub\modules\content\interfaces\ContentOwner;
+use humhub\modules\content\services\ContentSearchService;
 use humhub\modules\content\widgets\richtext\RichText;
-use humhub\modules\search\libs\SearchHelper;
 use humhub\modules\space\models\Space;
 use humhub\modules\user\models\User;
 use Yii;
@@ -26,26 +25,25 @@ use yii\base\Exception;
 use yii\db\ActiveRecord;
 use yii\helpers\Url;
 
-
 /**
  * This is the model class for table "comment".
  *
- * @property integer $id
+ * @property int $id
  * @property string $message
- * @property integer $object_id
+ * @property int $object_id
  * @property string $object_model
  * @property string $created_at
- * @property integer $created_by
+ * @property int $created_by
  * @property string $updated_at
- * @property integer $updated_by
+ * @property int $updated_by
  * @property-read string $url @since 1.10.2
  *
  * @since 0.5
  */
-class Comment extends ContentAddonActiveRecord implements ContentOwner
+class Comment extends ContentAddonActiveRecord
 {
-    const CACHE_KEY_COUNT = 'commentCount_%s_%s';
-    const CACHE_KEY_LIMITED = 'commentsLimited_%s_%s';
+    public const CACHE_KEY_COUNT = 'commentCount_%s_%s';
+    public const CACHE_KEY_LIMITED = 'commentsLimited_%s_%s';
 
     /**
      * @inheritdoc
@@ -75,8 +73,8 @@ class Comment extends ContentAddonActiveRecord implements ContentOwner
                 'class' => PolymorphicRelation::class,
                 'mustBeInstanceOf' => [
                     ActiveRecord::class,
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
@@ -102,12 +100,7 @@ class Comment extends ContentAddonActiveRecord implements ContentOwner
      */
     public function afterDelete()
     {
-        try {
-            $this->updateContentSearch();
-        } catch (Exception $ex) {
-            Yii::error($ex);
-        }
-
+        $this->updateContentSearch();
         parent::afterDelete();
     }
 
@@ -166,7 +159,7 @@ class Comment extends ContentAddonActiveRecord implements ContentOwner
                     'contentContainerId' => $this->content->container->id,
                     'visibility' => $this->content->visibility,
                     'contentId' => $this->content->id,
-                    'commentId' => $this->id
+                    'commentId' => $this->id,
                 ]));
             }
         }
@@ -183,17 +176,15 @@ class Comment extends ContentAddonActiveRecord implements ContentOwner
      */
     protected function updateContentSearch()
     {
-        /** @var ContentActiveRecord $content */
-        $contentRecord = $this->getCommentedRecord();
-        if ($contentRecord !== null) {
-            SearchHelper::queueUpdate($contentRecord);
+        if ($this->content) {
+            (new ContentSearchService($this->content))->update();
         }
     }
 
     /**
      * Returns the commented record e.g. a Post
      *
-     * @return \humhub\modules\content\components\ContentActiveRecord
+     * @return ContentActiveRecord
      */
     public function getCommentedRecord()
     {
@@ -261,7 +252,7 @@ class Comment extends ContentAddonActiveRecord implements ContentOwner
             $comments[$limit] = array_reverse($query->all());
 
             if ($useCaching) {
-                Yii::$app->cache->set($cacheID, $comments, Yii::$app->settings->get('cache.expireTime'));
+                Yii::$app->cache->set($cacheID, $comments, Yii::$app->settings->get('cacheExpireTime'));
             }
         }
 
@@ -283,7 +274,7 @@ class Comment extends ContentAddonActiveRecord implements ContentOwner
 
         if ($commentCount === false) {
             $commentCount = Comment::find()->where(['object_model' => $model, 'object_id' => $id])->count();
-            Yii::$app->cache->set($cacheID, $commentCount, Yii::$app->settings->get('cache.expireTime'));
+            Yii::$app->cache->set($cacheID, $commentCount, Yii::$app->settings->get('cacheExpireTime'));
         }
 
         return $commentCount;
@@ -343,7 +334,7 @@ class Comment extends ContentAddonActiveRecord implements ContentOwner
         return $this->message;
     }
 
-    public function canDelete($userId = '')
+    public function canDelete($userId = ''): bool
     {
 
         if ($userId == '') {
@@ -367,7 +358,7 @@ class Comment extends ContentAddonActiveRecord implements ContentOwner
 
     /**
      * TODO: Unify with Content::isUpdated() see https://github.com/humhub/humhub/pull/4380
-     * @returns boolean true if this comment has been updated, otherwise false
+     * @returns bool true if this comment has been updated, otherwise false
      * @since 1.7
      */
     public function isUpdated()

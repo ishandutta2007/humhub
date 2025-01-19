@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2022 HumHub GmbH & Co. KG
@@ -69,7 +70,7 @@ class WallCreateContentFormContainer extends Widget
 
             $forms[] = [
                 'class' => $wallEntryWidget->createFormClass,
-                'sortOrder' => [$wallEntryWidget->createFormSortOrder, ucfirst($content->getContentName())]
+                'sortOrder' => [$wallEntryWidget->createFormSortOrder, ucfirst($content->getContentName())],
             ];
         }
 

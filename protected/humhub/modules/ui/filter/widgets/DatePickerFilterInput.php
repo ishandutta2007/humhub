@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2022 HumHub GmbH & Co. KG
@@ -19,7 +20,7 @@ class DatePickerFilterInput extends FilterInput
      * @inheritdoc
      */
     public $type = 'date-picker';
-    
+
     /**
      * @var array Options for the DatePicker widget
      */

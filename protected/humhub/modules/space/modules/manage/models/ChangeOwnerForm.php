@@ -20,9 +20,8 @@ use humhub\modules\space\models\Membership;
  */
 class ChangeOwnerForm extends Model
 {
-
     /**
-     * @var \humhub\modules\space\models\Space
+     * @var Space
      */
     public $space;
 
@@ -38,7 +37,7 @@ class ChangeOwnerForm extends Model
     {
         return [
             ['ownerId', 'required'],
-            ['ownerId', 'in', 'range' => array_keys($this->getNewOwnerArray())]
+            ['ownerId', 'in', 'range' => array_keys($this->getNewOwnerArray())],
         ];
     }
 
@@ -54,7 +53,7 @@ class ChangeOwnerForm extends Model
 
     /**
      * Returns an array of all possible space owners
-     * 
+     *
      * @return array containing the user id as key and display name as value
      */
     public function getNewOwnerArray()

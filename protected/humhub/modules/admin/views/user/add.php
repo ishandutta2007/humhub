@@ -1,6 +1,7 @@
 <?php
 
 use humhub\compat\HForm;
+use humhub\modules\user\services\LinkRegistrationService;
 use humhub\widgets\Button;
 use humhub\widgets\ModalButton;
 use humhub\modules\ui\form\widgets\ActiveForm;
@@ -9,7 +10,6 @@ use humhub\modules\ui\form\widgets\ActiveForm;
  * @var $hForm HForm
  * @var $canInviteByEmail bool
  * @var $canInviteByLink bool
- * @var $adminIsAlwaysAllowed bool
  */
 ?>
 
@@ -21,7 +21,9 @@ use humhub\modules\ui\form\widgets\ActiveForm;
 
             <?php if ($canInviteByEmail || $canInviteByLink): ?>
                 <?= ModalButton::success(Yii::t('AdminModule.user', 'Invite new people'))
-                    ->load(['/user/invite', 'adminIsAlwaysAllowed' => $adminIsAlwaysAllowed])->icon('invite')->sm() ?>
+                    ->load(['/user/invite', 'target' => LinkRegistrationService::TARGET_ADMIN])
+                    ->icon('invite')
+                    ->sm() ?>
             <?php endif; ?>
         </div>
 
@@ -29,6 +31,6 @@ use humhub\modules\ui\form\widgets\ActiveForm;
     </div>
     <br>
     <?php $form = ActiveForm::begin(['options' => ['data-ui-widget' => 'ui.form.TabbedForm', 'data-ui-init' => ''], 'acknowledge' => true]); ?>
-        <?= $hForm->render($form); ?>
+    <?= $hForm->render($form); ?>
     <?php ActiveForm::end(); ?>
 </div>

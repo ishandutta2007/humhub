@@ -1,13 +1,5 @@
 <?php
-return array (
-  '{displayName} created the new space {spaceName}' => '{displayName} utworzył nową strefę {spaceName}',
-  '{displayName} created this space.' => '{displayName} utworzył tę strefę.',
-  '{displayName} joined the space {spaceName}' => '{displayName} dołączył do strefy {spaceName}',
-  '{displayName} joined this space.' => '{displayName} dołączył do tej strefy.',
-  '{displayName} left the space {spaceName}' => '{displayName} opuścił strefę {spaceName}',
-  '{displayName} left this space.' => '{displayName} opuścił tę strefę. ',
-  '{spaceName} has been archived' => '{spaceName} została zarchiwizowana.',
-  '{spaceName} has been unarchived' => '{spaceName} została przeniesiona z archiwizacji.',
+return [
   '<strong>E-Mail</strong> Summaries' => '<strong>Podsumowania</strong> email',
   '<strong>Latest</strong> activities' => '<strong>Najnowsza</strong> aktywność',
   'Activities' => 'Aktywności',
@@ -19,6 +11,7 @@ return array (
   'Hourly' => 'Godzinowo',
   'Interval' => 'Interwał',
   'Latest news' => 'Najnowsze wiadomości',
+  'Monthly' => 'Miesięcznie',
   'Never' => 'Nigdy',
   'On this page you can configure the contents and the interval of these e-mail updates.' => 'Na tej stronie możesz ustawić zawartość oraz interwał powiadomień emaIL.',
   'On this page you can define the default behavior for your users. These settings can be overwritten by users in their account settings page.' => 'Na tej stronie możesz ustalić domyślne zachowanie dla użytkowników. Ustawienia te mogą zostać nadpisane przez użytkowników w ich ustawieniach konta.',
@@ -30,8 +23,17 @@ return array (
   'Weekly' => 'Tygodniowo',
   'You will only receive an e-mail if there is something new.' => 'Otrzymasz emaila wyłącznie wtedy gdy pojawi się jakaś nowa informacja.',
   'Your daily summary' => 'Podsumowanie dzienne',
+  'Your monthly summary' => 'Podsumowanie miesięczne',
   'Your weekly summary' => 'Twoje tygodniowe podsumowanie',
   'see online' => 'zobacz zalogowanych',
   'via' => 'przez',
+  '{displayName} created the new space {spaceName}' => '{displayName} utworzył nową strefę {spaceName}',
+  '{displayName} created this space.' => '{displayName} utworzył tę strefę.',
+  '{displayName} joined the space {spaceName}' => '{displayName} dołączył do strefy {spaceName}',
+  '{displayName} joined this space.' => '{displayName} dołączył do tej strefy.',
+  '{displayName} left the space {spaceName}' => '{displayName} opuścił strefę {spaceName}',
+  '{displayName} left this space.' => '{displayName} opuścił tę strefę.',
+  '{spaceName} has been archived' => '{spaceName} została zarchiwizowana.',
+  '{spaceName} has been unarchived' => '{spaceName} została przeniesiona z archiwizacji.',
   '{user1} now follows {user2}.' => 'Od teraz {user1} obserwuje {user2}.',
-);
+];

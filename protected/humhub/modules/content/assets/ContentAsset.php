@@ -29,15 +29,15 @@ class ContentAsset extends AssetBundle
      */
     public $jsPosition = View::POS_HEAD;
 
-     /**
+    /**
      * @inheritdoc
      */
     public $sourcePath = '@content/resources';
 
-     /**
+    /**
      * @inheritdoc
      */
     public $js = [
-        'js/humhub.content.js'
+        'js/humhub.content.js',
     ];
 }

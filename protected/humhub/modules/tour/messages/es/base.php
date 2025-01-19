@@ -29,7 +29,7 @@ return array (
   'Your lastname' => 'Tu apellido',
   'Your mobile phone number' => 'Tu número de teléfono',
   'Your phone number at work' => 'Tu número de teléfono en el trabajo',
-  'Your skills, knowledge and experience (comma seperated)' => 'Sus habilidades, conocimientos y experiencia (separados por comas)',
+  'Your skills, knowledge and experience' => 'Tus habilidades, conocimiento y experiencia',
   'Your title or position' => 'Tu título o posición',
   '« Prev' => '<< Anterior',
 );

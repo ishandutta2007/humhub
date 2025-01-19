@@ -8,8 +8,9 @@
 
 namespace humhub\modules\admin\components;
 
-use Yii;
 use humhub\components\behaviors\AccessControl;
+use humhub\modules\admin\permissions\ManageSettings;
+use Yii;
 
 /**
  * Base controller for administration section
@@ -18,14 +19,13 @@ use humhub\components\behaviors\AccessControl;
  */
 class Controller extends \humhub\components\Controller
 {
-
     /**
      * @inheritdoc
      */
     public $subLayout = "@humhub/modules/admin/views/layouts/main";
 
     /**
-     * @var boolean if true only allows access for system admins else the access is restricted by getAccessRules()
+     * @var bool if true only allows access for system admins else the access is restricted by getAccessRules()
      */
     public $adminOnly = true;
 
@@ -38,7 +38,7 @@ class Controller extends \humhub\components\Controller
     {
         $this->appendPageTitle(Yii::t('AdminModule.base', 'Administration'));
 
-		parent::init();
+        parent::init();
     }
 
     /**
@@ -55,8 +55,8 @@ class Controller extends \humhub\components\Controller
             'acl' => [
                 'class' => AccessControl::class,
                 'adminOnly' => $this->adminOnly,
-                'rules' => $this->getAccessRules()
-            ]
+                'rules' => $this->getAccessRules(),
+            ],
         ];
     }
 
@@ -65,10 +65,10 @@ class Controller extends \humhub\components\Controller
      */
     protected function getAccessRules()
     {
-        // Use by default ManageModule permission, if method is not overwritten by custom module
-        if ($this->module->id != 'admin') {
+        // Use by default ManageSettings permission if method is not overwritten by custom module
+        if ($this->module->id !== 'admin') {
             return [
-                ['permission' => \humhub\modules\admin\permissions\ManageModules::class]
+                ['permission' => ManageSettings::class],
             ];
         }
 

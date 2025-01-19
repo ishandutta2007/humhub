@@ -7,10 +7,10 @@ use yii\db\ActiveRecord;
 /**
  * This is the model class for table "log".
  *
- * @property integer $id
- * @property integer $level
+ * @property int $id
+ * @property int $level
  * @property string $category
- * @property double $log_time
+ * @property float $log_time
  * @property string $prefix
  * @property string $message
  */
@@ -33,7 +33,7 @@ class Log extends ActiveRecord
             [['level'], 'integer'],
             [['log_time'], 'number'],
             [['prefix', 'message'], 'string'],
-            [['category'], 'string', 'max' => 255]
+            [['category'], 'string', 'max' => 255],
         ];
     }
 

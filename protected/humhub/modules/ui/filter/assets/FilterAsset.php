@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2018 HumHub GmbH & Co. KG
@@ -22,13 +23,13 @@ class FilterAsset extends AssetBundle
      * @inheritdoc
      */
     public $js = [
-        'js/humhub.ui.filter.js'
+        'js/humhub.ui.filter.js',
     ];
 
     /**
      * @inheritdoc
      */
     public $depends = [
-        TopicAsset::class
+        TopicAsset::class,
     ];
 }

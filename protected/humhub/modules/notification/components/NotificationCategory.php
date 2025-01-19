@@ -8,24 +8,23 @@
 
 namespace humhub\modules\notification\components;
 
-use humhub\modules\user\models\User;
 use humhub\modules\notification\targets\BaseTarget;
 use humhub\modules\notification\targets\MailTarget;
-use humhub\modules\notification\targets\WebTarget;
 use humhub\modules\notification\targets\MobileTarget;
+use humhub\modules\notification\targets\WebTarget;
+use humhub\modules\user\models\User;
 use yii\base\BaseObject;
 use yii\base\InvalidConfigException;
 
 /**
  * NotificationCategories are used to group different notifications in views and
  * configure the notifications in the notification settings.
- * 
+ *
  */
 abstract class NotificationCategory extends BaseObject
 {
-
     /**
-     * @var string the category id 
+     * @var string the category id
      */
     public $id;
 
@@ -60,26 +59,21 @@ abstract class NotificationCategory extends BaseObject
      * Returns the default enabled settings for the given $target.
      * In case the $target is unknown, subclasses can either return $target->defaultSetting
      * or another default value.
-     * 
+     *
      * @param BaseTarget $target
-     * @return boolean
+     * @return bool
      */
     public function getDefaultSetting(BaseTarget $target)
     {
-        if ($target->id === MailTarget::getId()) {
-            return true;
-        } elseif ($target->id === WebTarget::getId()) {
-            return true;
-        } elseif ($target->id === MobileTarget::getId()) {
-            return false;
-        }
-
-        return $target->defaultSetting;
+        return match ($target->id) {
+            MailTarget::getId(), WebTarget::getId(), MobileTarget::getId() => true,
+            default => $target->defaultSetting,
+        };
     }
 
     /**
      * Returns an array of target ids, which are not editable.
-     * 
+     *
      * @param BaseTarget $target
      */
     public function getFixedSettings()
@@ -89,7 +83,7 @@ abstract class NotificationCategory extends BaseObject
 
     /**
      * Checks if the given notification target is fixed for this category.
-     * 
+     *
      * @param type $target
      * @return type
      */
@@ -101,16 +95,15 @@ abstract class NotificationCategory extends BaseObject
     /**
      * Determines if this category is visible for the given $user.
      * This can be used if a category is only visible for users with certian permissions.
-     * 
+     *
      * Note if no user is given this function should return true in most cases, otherwise this
      * category won't be visible in the global notification settings.
-     * 
+     *
      * @param User $user
-     * @return boolean
+     * @return bool
      */
     public function isVisible(User $user = null)
     {
         return true;
     }
-
 }

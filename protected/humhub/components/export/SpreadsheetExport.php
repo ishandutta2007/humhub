@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2018 HumHub GmbH & Co. KG
@@ -7,6 +8,7 @@
 
 namespace humhub\components\export;
 
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Yii;
 use yii\base\Component;
@@ -14,6 +16,7 @@ use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
 use yii\data\BaseDataProvider;
 use yii\di\Instance;
+use yii\helpers\ArrayHelper;
 use yii\i18n\Formatter;
 
 /**
@@ -57,7 +60,6 @@ use yii\i18n\Formatter;
  */
 class SpreadsheetExport extends Component
 {
-
     /**
      * @var \yii\data\DataProviderInterface the data provider for the view.
      * This property can be omitted in case [[query]] is set.
@@ -73,15 +75,15 @@ class SpreadsheetExport extends Component
      */
     public $columns = [];
     /**
-     * @var boolean whether to show the header section of the sheet.
+     * @var bool whether to show the header section of the sheet.
      */
     public $showHeader = true;
     /**
-     * @var boolean whether to show the footer section of the sheet.
+     * @var bool whether to show the footer section of the sheet.
      */
     public $showFooter = false;
     /**
-     * @var boolean enable autosize for xlsx/xls export.
+     * @var bool enable autosize for xlsx/xls export.
      */
     public $autoSize = true;
     /**
@@ -133,7 +135,7 @@ class SpreadsheetExport extends Component
 
         if ($this->dataProvider === null && $this->query !== null) {
             $this->dataProvider = new ActiveDataProvider([
-                'query' => $this->query
+                'query' => $this->query,
             ]);
         }
 
@@ -152,7 +154,7 @@ class SpreadsheetExport extends Component
             if ($this->formatter === null) {
                 $this->formatter = Yii::$app->getFormatter();
             } else {
-                $this->formatter = Instance::ensure($this->formatter, Formatter::className());
+                $this->formatter = Instance::ensure($this->formatter, Formatter::class);
             }
         }
         return $this->formatter;
@@ -181,7 +183,7 @@ class SpreadsheetExport extends Component
                 $column = $this->createDataColumn($column);
             } else {
                 $column = Yii::createObject(array_merge([
-                    'class' => DataColumn::className(),
+                    'class' => DataColumn::class,
                     'grid' => $this,
                 ], $column));
             }
@@ -218,13 +220,13 @@ class SpreadsheetExport extends Component
         if (!preg_match('/^([^:]+)(:(\w*))?(:(.*))?$/', $text, $matches)) {
             throw new InvalidConfigException(
                 'The column must be specified in the format of "attribute", '
-                . '"attribute:format" or "attribute:format:label"'
+                . '"attribute:format" or "attribute:format:label"',
             );
         }
 
         /** @var DataColumn $column */
         $column = Yii::createObject([
-            'class' => DataColumn::className(),
+            'class' => DataColumn::class,
             'grid' => $this,
             'attribute' => $matches[1],
             'format' => isset($matches[3]) ? $matches[3] : 'text',
@@ -244,7 +246,7 @@ class SpreadsheetExport extends Component
     {
         /** @var ExportResult $result */
         $result = Yii::createObject(array_merge([
-            'class' => ExportResult::className(),
+            'class' => ExportResult::class,
         ], $this->resultConfig));
 
         $spreadsheet = $result->newSpreadsheet();
@@ -287,12 +289,29 @@ class SpreadsheetExport extends Component
         $row = $this->nextRow();
 
         foreach ($this->columns as $columnIndex => $column) {
-            $worksheet->setCellValueByColumnAndRow(
-                $columnIndex + 1,
-                $row,
-                $column->renderHeaderCellContent()
+            $coordinate = $this->getColumnLetter($columnIndex + 1) . $row;
+            $worksheet->setCellValue(
+                $coordinate,
+                $column->renderHeaderCellContent(),
             );
         }
+    }
+
+    /**
+     * Get the column letter based on column index.
+     * @param int $columnIndex
+     * @return string
+     */
+    protected function getColumnLetter($columnIndex)
+    {
+        $letters = range('A', 'Z');
+        $letter = '';
+        while ($columnIndex > 0) {
+            $remainder = ($columnIndex - 1) % 26;
+            $letter = $letters[$remainder] . $letter;
+            $columnIndex = floor(($columnIndex - $remainder) / 26);
+        }
+        return $letter;
     }
 
     /**
@@ -309,7 +328,7 @@ class SpreadsheetExport extends Component
             $worksheet->setCellValueByColumnAndRow(
                 $columnIndex + 1,
                 $row,
-                $column->renderFooterCellContent()
+                $column->renderFooterCellContent(),
             );
         }
     }
@@ -328,19 +347,48 @@ class SpreadsheetExport extends Component
         $row = $this->nextRow();
 
         foreach ($this->columns as $columnIndex => $column) {
-            $cell = $worksheet->getCellByColumnAndRow($columnIndex + 1, $row);
+            $coordinate = $this->getColumnLetter($columnIndex + 1) . $row;
             $value = $column->renderDataCellContent($model, $key, $index);
+            $value = $this->sanitizeValue($value);
 
             if ($column->dataType !== null) {
-                $cell->setValueExplicit($value, $column->dataType);
+                $worksheet->getCell($coordinate)->setValueExplicit($value, $column->dataType);
             } else {
-                $cell->setValue($value);
+                $worksheet->setCellValue($coordinate, $value);
             }
 
             if ($column->styles !== []) {
-                $cell->getStyle()->applyFromArray($column->styles);
+                $worksheet->getStyle($coordinate)->applyFromArray($column->styles);
             }
         }
+    }
+
+    /**
+     * Sanitize value to prevent injection.
+     */
+    private function sanitizeValue(?string $value): ?string
+    {
+        if (
+            empty($value) ||
+            !in_array(
+                ucfirst(ArrayHelper::getValue($this->resultConfig, 'writerType', (new ExportResult())->writerType)),
+                [IOFactory::WRITER_CSV, IOFactory::WRITER_XLSX, IOFactory::WRITER_XLS],
+            )
+        ) {
+            return $value;
+        }
+
+        // Check for risky starting characters or formula-like values and prepend single quote
+        if (strpbrk($value[0], '=+-@,;' . "\t" . "\r") !== false || preg_match('/^\d+[+\-*\/].+/', $value)) {
+            $value = "'" . $value;
+        }
+
+        // Sanitize escaping quotes, wrapping in double quotes if needed
+        if (strpbrk($value, "\"\n,") !== false) {
+            $value = '"' . str_replace('"', '""', $value) . '"';
+        }
+
+        return $value;
     }
 
     /**

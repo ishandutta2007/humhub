@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: kingb
@@ -8,10 +9,8 @@
 
 namespace humhub\modules\activity\tests\codeception\unit;
 
-
-use humhub\components\mail\Message;
-use Yii;
 use Codeception\Module\Yii2;
+use humhub\components\mail\Message;
 use humhub\modules\activity\components\MailSummary;
 use humhub\modules\activity\components\MailSummaryProcessor;
 use humhub\modules\activity\jobs\SendMailSummary;
@@ -24,6 +23,8 @@ use humhub\modules\space\activities\MemberAdded;
 use humhub\modules\space\models\Space;
 use humhub\modules\user\models\User;
 use tests\codeception\_support\HumHubDbTestCase;
+use Yii;
+use yii\base\InvalidConfigException;
 
 class MailSummaryTest extends HumHubDbTestCase
 {
@@ -34,7 +35,7 @@ class MailSummaryTest extends HumHubDbTestCase
         (new MailSummaryForm([
             'user' => User::findOne(['id' => 2]),
             'interval' => MailSummary::INTERVAL_HOURLY,
-            'activities' => [ContentCreated::class]
+            'activities' => [ContentCreated::class],
         ]))->save();
 
         $post = new Post(Space::findOne(['id' => 4]), ['message' => 'Daily Summary Test']);
@@ -48,7 +49,7 @@ class MailSummaryTest extends HumHubDbTestCase
         $yiiModule = $this->getModule('Yii2');
 
         /* @var $mail Message */
-        $mail =  $yiiModule->grabLastSentEmail();
+        $mail = $yiiModule->grabLastSentEmail();
         $this->assertArrayHasKey('user1@example.com', $mail->getTo());
         $this->assertEquals('Latest news', $mail->getSubject());
     }
@@ -60,7 +61,7 @@ class MailSummaryTest extends HumHubDbTestCase
         (new MailSummaryForm([
             'user' => User::findOne(['id' => 2]),
             'interval' => MailSummary::INTERVAL_DAILY,
-            'activities' => [ContentCreated::class]
+            'activities' => [ContentCreated::class],
         ]))->save();
 
         $post = new Post(Space::findOne(['id' => 4]), ['message' => 'Daily Summary Test']);
@@ -74,7 +75,7 @@ class MailSummaryTest extends HumHubDbTestCase
         $yiiModule = $this->getModule('Yii2');
 
         /* @var $mail Message */
-        $mail =  $yiiModule->grabLastSentEmail();
+        $mail = $yiiModule->grabLastSentEmail();
         $this->assertArrayHasKey('user1@example.com', $mail->getTo());
         $this->assertEquals('Your daily summary', $mail->getSubject());
     }
@@ -86,7 +87,7 @@ class MailSummaryTest extends HumHubDbTestCase
         (new MailSummaryForm([
             'user' => User::findOne(['id' => 2]),
             'interval' => MailSummary::INTERVAL_WEEKLY,
-            'activities' => [ContentCreated::class]
+            'activities' => [ContentCreated::class],
         ]))->save();
 
         $post = new Post(Space::findOne(['id' => 4]), ['message' => 'Daily Summary Test']);
@@ -100,9 +101,35 @@ class MailSummaryTest extends HumHubDbTestCase
         $yiiModule = $this->getModule('Yii2');
 
         /* @var $mail Message */
-        $mail =  $yiiModule->grabLastSentEmail();
+        $mail = $yiiModule->grabLastSentEmail();
         $this->assertArrayHasKey('user1@example.com', $mail->getTo());
         $this->assertEquals('Your weekly summary', $mail->getSubject());
+    }
+
+    public function testMonthlyProcess()
+    {
+        $this->becomeUser('Admin');
+        (new MailSummaryForm(['interval' => MailSummary::INTERVAL_NONE]))->save();
+        (new MailSummaryForm([
+            'user' => User::findOne(['id' => 2]),
+            'interval' => MailSummary::INTERVAL_MONTHLY,
+            'activities' => [ContentCreated::class],
+        ]))->save();
+
+        $post = new Post(Space::findOne(['id' => 4]), ['message' => 'Monthly Summary Test']);
+        $this->assertTrue($post->save());
+
+        MailSummaryProcessor::process(MailSummary::INTERVAL_MONTHLY);
+
+        $this->assertMailSent(1);
+
+        /* @var $yiiModule Yii2 */
+        $yiiModule = $this->getModule('Yii2');
+
+        /* @var $mail Message */
+        $mail = $yiiModule->grabLastSentEmail();
+        $this->assertArrayHasKey('user1@example.com', $mail->getTo());
+        $this->assertEquals('Your monthly summary', $mail->getSubject());
     }
 
     public function testNoneProcess()
@@ -112,7 +139,7 @@ class MailSummaryTest extends HumHubDbTestCase
         (new MailSummaryForm([
             'user' => User::findOne(['id' => 2]),
             'interval' => MailSummary::INTERVAL_NONE,
-            'activities' => [ContentCreated::class]
+            'activities' => [ContentCreated::class],
         ]))->save();
 
         $post = new Post(Space::findOne(['id' => 4]), ['message' => 'Daily Summary Test']);
@@ -130,7 +157,7 @@ class MailSummaryTest extends HumHubDbTestCase
         (new MailSummaryForm([
             'user' => User::findOne(['id' => 2]),
             'interval' => MailSummary::INTERVAL_DAILY,
-            'activities' => [ContentCreated::class]
+            'activities' => [ContentCreated::class],
         ]))->save();
 
         $post = new Post(Space::findOne(['id' => 4]), ['message' => 'Daily Summary Test']);
@@ -151,7 +178,7 @@ class MailSummaryTest extends HumHubDbTestCase
         (new MailSummaryForm([
             'user' => User::findOne(['id' => 2]),
             'interval' => MailSummary::INTERVAL_DAILY,
-            'activities' => [ContentCreated::class]
+            'activities' => [ContentCreated::class],
         ]))->save();
 
         $post = new Post(Space::findOne(['id' => 4]), ['message' => 'Daily Summary Test']);
@@ -165,7 +192,7 @@ class MailSummaryTest extends HumHubDbTestCase
         $yiiModule = $this->getModule('Yii2');
 
         /* @var $mail Message */
-        $mail =  $yiiModule->grabLastSentEmail();
+        $mail = $yiiModule->grabLastSentEmail();
         $this->assertArrayHasKey('user1@example.com', $mail->getTo());
         $this->assertEquals('Your daily summary', $mail->getSubject());
     }
@@ -177,7 +204,7 @@ class MailSummaryTest extends HumHubDbTestCase
         (new MailSummaryForm([
             'user' => User::findOne(['id' => 2]),
             'interval' => MailSummary::INTERVAL_DAILY,
-            'activities' => [ContentCreated::class]
+            'activities' => [ContentCreated::class],
         ]))->save();
 
         $post = new Post(Space::findOne(['id' => 4]), ['message' => 'Daily Summary Test']);
@@ -201,7 +228,7 @@ class MailSummaryTest extends HumHubDbTestCase
         (new MailSummaryForm([
             'user' => User::findOne(['id' => 2]),
             'interval' => MailSummary::INTERVAL_DAILY,
-            'activities' => [ContentCreated::class]
+            'activities' => [ContentCreated::class],
         ]))->save();
 
         MailSummaryProcessor::process(MailSummary::INTERVAL_DAILY);
@@ -212,11 +239,10 @@ class MailSummaryTest extends HumHubDbTestCase
         $yiiModule = $this->getModule('Yii2');
 
         /* @var $mail Message */
-        $mail =  $yiiModule->grabLastSentEmail();
+        $mail = $yiiModule->grabLastSentEmail();
         $this->assertArrayHasKey('user1@example.com', $mail->getTo());
         $this->assertEquals('Your daily summary', $mail->getSubject());
     }
-
 
 
     public function testResetUserSettings()
@@ -228,7 +254,7 @@ class MailSummaryTest extends HumHubDbTestCase
             'interval' => MailSummary::INTERVAL_DAILY,
             'activities' => [],
             'limitSpaces' => [Space::findOne(['id' => 3])->guid],
-            'limitSpacesMode' => MailSummaryForm::LIMIT_MODE_INCLUDE
+            'limitSpacesMode' => MailSummaryForm::LIMIT_MODE_INCLUDE,
         ]);
         $form->save();
 
@@ -261,7 +287,7 @@ class MailSummaryTest extends HumHubDbTestCase
         $comment = new Comment([
             'message' => 'Summary test comment!',
             'object_model' => Post::class,
-            'object_id' => $post->id
+            'object_id' => $post->id,
         ]);
         $this->assertTrue($comment->save());
 
@@ -272,9 +298,9 @@ class MailSummaryTest extends HumHubDbTestCase
         $summaryUser2 = $this->createSummary(User::findOne(['id' => 3]), MailSummary::INTERVAL_DAILY);
         $user2Activities = $summaryUser2->getActivities();
         $this->assertCount(3, $user2Activities);
-        $this->assertContainsActivity(ContentCreated::class, $user2Activities, 'User2 must contain '.ContentCreated::class);
-        $this->assertContainsActivity(NewComment::class, $user2Activities, 'User2 must contain '.NewComment::class);
-        $this->assertContainsActivity(MemberAdded::class, $user2Activities, 'User2 must contain '.MemberAdded::class);
+        $this->assertContainsActivity(ContentCreated::class, $user2Activities, 'User2 must contain ' . ContentCreated::class);
+        $this->assertContainsActivity(NewComment::class, $user2Activities, 'User2 must contain ' . NewComment::class);
+        $this->assertContainsActivity(MemberAdded::class, $user2Activities, 'User2 must contain ' . MemberAdded::class);
 
         // Set no activities by default
         (new MailSummaryForm([
@@ -282,16 +308,16 @@ class MailSummaryTest extends HumHubDbTestCase
             'activities' => [
                 ContentCreated::class,
                 NewComment::class,
-                MemberAdded::class
+                MemberAdded::class,
             ],
             'limitSpaces' => [Space::findOne(['id' => 3])->guid],
-            'limitSpacesMode' => MailSummaryForm::LIMIT_MODE_INCLUDE
+            'limitSpacesMode' => MailSummaryForm::LIMIT_MODE_INCLUDE,
         ]))->save();
 
         $user2Activities = $summaryUser2->getActivities();
         $this->assertCount(2, $user2Activities);
-        $this->assertContainsActivity(ContentCreated::class, $user2Activities, 'User2 must contain '.ContentCreated::class);
-        $this->assertContainsActivity(NewComment::class, $user2Activities, 'User2 must contain '.NewComment::class);
+        $this->assertContainsActivity(ContentCreated::class, $user2Activities, 'User2 must contain ' . ContentCreated::class);
+        $this->assertContainsActivity(NewComment::class, $user2Activities, 'User2 must contain ' . NewComment::class);
 
         // Set no activities by default
         (new MailSummaryForm([
@@ -300,15 +326,15 @@ class MailSummaryTest extends HumHubDbTestCase
             'activities' => [
                 ContentCreated::class,
                 NewComment::class,
-                MemberAdded::class
+                MemberAdded::class,
             ],
             'limitSpaces' => [Space::findOne(['id' => 3])->guid],
-            'limitSpacesMode' => MailSummaryForm::LIMIT_MODE_EXCLUDE
+            'limitSpacesMode' => MailSummaryForm::LIMIT_MODE_EXCLUDE,
         ]))->save();
 
         $user2Activities = $summaryUser2->getActivities();
         $this->assertCount(1, $user2Activities);
-        $this->assertContainsActivity(MemberAdded::class, $user2Activities, 'User2 must contain '.MemberAdded::class);
+        $this->assertContainsActivity(MemberAdded::class, $user2Activities, 'User2 must contain ' . MemberAdded::class);
     }
 
 
@@ -322,14 +348,14 @@ class MailSummaryTest extends HumHubDbTestCase
         $comment = new Comment([
             'message' => 'Summary test comment!',
             'object_model' => Post::class,
-            'object_id' => $post->id
+            'object_id' => $post->id,
         ]);
         $this->assertTrue($comment->save());
 
         // Set no activities by default
         (new MailSummaryForm([
             'interval' => MailSummary::INTERVAL_DAILY,
-            'activities' => []
+            'activities' => [],
         ]))->save();
 
         // Overwrite activity filter for User2
@@ -337,15 +363,16 @@ class MailSummaryTest extends HumHubDbTestCase
             'interval' => MailSummary::INTERVAL_DAILY,
             'user' => User::findOne(['id' => 3]), // User2
             'activities' => [
-                NewComment::class
-            ]
+                NewComment::class,
+            ],
         ]))->save();
 
         $summaryUser2 = $this->createSummary(User::findOne(['id' => 3]), MailSummary::INTERVAL_DAILY);
         $user2Activities = $summaryUser2->getActivities();
         $this->assertCount(1, $user2Activities);
-        $this->assertContainsActivity(NewComment::class, $user2Activities, 'User2 must contain '.NewComment::class);
+        $this->assertContainsActivity(NewComment::class, $user2Activities, 'User2 must contain ' . NewComment::class);
     }
+
     public function testSummaryGlobalActivityFilter()
     {
         $this->becomeUser('Admin');
@@ -356,7 +383,7 @@ class MailSummaryTest extends HumHubDbTestCase
         $comment = new Comment([
             'message' => 'Summary test comment!',
             'object_model' => Post::class,
-            'object_id' => $post->id
+            'object_id' => $post->id,
         ]);
         $this->assertTrue($comment->save());
 
@@ -369,17 +396,17 @@ class MailSummaryTest extends HumHubDbTestCase
         (new MailSummaryForm([
             'interval' => MailSummary::INTERVAL_DAILY,
             'activities' => [
-                ContentCreated::class
-            ]
+                ContentCreated::class,
+            ],
         ]))->save();
 
         $user2Activities = $summaryUser2->getActivities();
         $this->assertCount(1, $user2Activities);
-        $this->assertContainsActivity(ContentCreated::class, $user2Activities, 'User2 must contain '.ContentCreated::class);
+        $this->assertContainsActivity(ContentCreated::class, $user2Activities, 'User2 must contain ' . ContentCreated::class);
 
         (new MailSummaryForm([
             'interval' => MailSummary::INTERVAL_DAILY,
-            'activities' => []
+            'activities' => [],
         ]))->save();
 
         $user2Activities = $summaryUser2->getActivities();
@@ -403,25 +430,25 @@ class MailSummaryTest extends HumHubDbTestCase
         $comment = new Comment([
             'message' => 'Summary test comment!',
             'object_model' => Post::class,
-            'object_id' => $post->id
+            'object_id' => $post->id,
         ]);
         $this->assertTrue($comment->save());
 
         // Admin only gets comment activity
         $adminActivities = $summaryAdmin->getActivities();
         $this->assertCount(1, $adminActivities);
-        $this->assertContainsActivity(NewComment::class, $adminActivities, 'Admin must contain '.NewComment::class);
+        $this->assertContainsActivity(NewComment::class, $adminActivities, 'Admin must contain ' . NewComment::class);
 
         // Comment author only gets new content activity
         $user1Activities = $summaryUser1->getActivities();
         $this->assertCount(1, $user1Activities);
-        $this->assertContainsActivity(ContentCreated::class, $user1Activities, 'User1 must contain '.ContentCreated::class);
+        $this->assertContainsActivity(ContentCreated::class, $user1Activities, 'User1 must contain ' . ContentCreated::class);
 
         // Spae member gets both activities
         $user2Activities = $summaryUser2->getActivities();
         $this->assertCount(2, $user2Activities);
-        $this->assertContainsActivity(ContentCreated::class, $user2Activities, 'User2 must contain '.ContentCreated::class);
-        $this->assertContainsActivity(NewComment::class, $user2Activities, 'User2 must contain '.NewComment::class);
+        $this->assertContainsActivity(ContentCreated::class, $user2Activities, 'User2 must contain ' . ContentCreated::class);
+        $this->assertContainsActivity(NewComment::class, $user2Activities, 'User2 must contain ' . NewComment::class);
 
         $user3Activities = $summaryUser3->getActivities();
         $this->assertEmpty($user3Activities);
@@ -431,7 +458,7 @@ class MailSummaryTest extends HumHubDbTestCase
     public function assertContainsActivity($activityClass, $activities, $message = null)
     {
         foreach ($activities as $activity) {
-            if(get_class($activity) == $activityClass) {
+            if (get_class($activity) == $activityClass) {
                 $this->assertTrue(true, $message);
                 return;
             }
@@ -443,15 +470,15 @@ class MailSummaryTest extends HumHubDbTestCase
     /**
      * @param $user
      * @param $interval
-     * @throws \yii\base\InvalidConfigException
      * @return MailSummary
+     * @throws InvalidConfigException
      */
     public function createSummary($user, $interval)
     {
         return Yii::createObject([
             'class' => MailSummary::class,
             'user' => $user,
-            'interval' => $interval
+            'interval' => $interval,
         ]);
     }
 

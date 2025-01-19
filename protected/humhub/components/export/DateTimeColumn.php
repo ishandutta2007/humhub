@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2018 HumHub GmbH & Co. KG
@@ -21,8 +22,8 @@ class DateTimeColumn extends DataColumn
      */
     public $styles = [
         'numberFormat' => [
-            'formatCode' => NumberFormat::FORMAT_DATE_DATETIME
-        ]
+            'formatCode' => NumberFormat::FORMAT_DATE_DATETIME,
+        ],
     ];
 
     /**

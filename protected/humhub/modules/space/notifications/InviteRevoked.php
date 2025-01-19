@@ -14,7 +14,6 @@ use Yii;
 use yii\bootstrap\Html;
 use humhub\modules\notification\components\BaseNotification;
 
-
 /**
  * SpaceInviteDeclinedNotification is sent to the originator of the invite to
  * inform him about the decline.
@@ -24,7 +23,6 @@ use humhub\modules\notification\components\BaseNotification;
  */
 class InviteRevoked extends BaseNotification
 {
-
     /**
      * @inheritdoc
      */
@@ -36,15 +34,15 @@ class InviteRevoked extends BaseNotification
     public $viewName = 'inviteDeclined';
 
     /**
-     *  @inheritdoc
+     * @inheritdoc
      */
     public function category()
     {
-        return new SpaceMemberNotificationCategory;
+        return new SpaceMemberNotificationCategory();
     }
 
     /**
-     *  @inheritdoc
+     * @inheritdoc
      */
     public function getSpace()
     {
@@ -63,14 +61,15 @@ class InviteRevoked extends BaseNotification
     {
         return $this->getInfoText(
             Html::tag('strong', Html::encode($this->originator->displayName)),
-            Html::tag('strong', Html::encode($this->getSpace()->name)));
+            Html::tag('strong', Html::encode($this->getSpace()->name)),
+        );
     }
 
     private function getInfoText($displayName, $spaceName)
     {
         return Yii::t('SpaceModule.notification', '{displayName} revoked your invitation for the space {spaceName}', [
             '{displayName}' => $displayName,
-            '{spaceName}' => $spaceName
+            '{spaceName}' => $spaceName,
         ]);
     }
 }

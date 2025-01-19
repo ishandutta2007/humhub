@@ -10,6 +10,7 @@ namespace humhub\assets;
 
 use humhub\components\assets\WebStaticAssetBundle;
 use humhub\modules\content\assets\ContentAsset;
+use humhub\modules\content\assets\ContentHighlightAsset;
 use humhub\modules\file\assets\FileAsset;
 use yii\bootstrap\BootstrapAsset;
 use yii\bootstrap\BootstrapPluginAsset;
@@ -44,9 +45,9 @@ class AppAsset extends WebStaticAssetBundle
      */
     public $jsPosition = View::POS_HEAD;
 
-    const BUNDLE_NAME = 'app';
+    public const BUNDLE_NAME = 'app';
 
-    const STATIC_DEPENDS = [
+    public const STATIC_DEPENDS = [
         JqueryAsset::class,
         JuiBootstrapBridgeAsset::class,
         JuiAsset::class,
@@ -69,7 +70,6 @@ class AppAsset extends WebStaticAssetBundle
         NProgressStyleAsset::class,
         Select2StyleAsset::class,
         BlueimpGalleryStyleAsset::class,
-        FlatelementsStyleAsset::class,
 
 
         /**
@@ -84,6 +84,7 @@ class AppAsset extends WebStaticAssetBundle
          */
         CoreApiAsset::class,
         ContentAsset::class,
+        ContentHighlightAsset::class,
         FileAsset::class,
     ];
 

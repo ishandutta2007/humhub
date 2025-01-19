@@ -31,7 +31,6 @@ use yii\web\HttpException;
  */
 class GroupController extends Controller
 {
-
     /**
      * @inheritdoc
      */
@@ -99,8 +98,10 @@ class GroupController extends Controller
                         Yii::$app->queue->push($job);
                     }
 
-                    $this->view->info(Yii::t('AdminModule.user',
-                        'The Space memberships of all group members will be updated. This may take up to several minutes.'));
+                    $this->view->info(Yii::t(
+                        'AdminModule.user',
+                        'The Space memberships of all group members will be updated. This may take up to several minutes.',
+                    ));
                 }
             }
         }
@@ -118,18 +119,12 @@ class GroupController extends Controller
 
         $this->checkGroupAccess($group);
 
-        // Save changed permission states
-        if (!$group->isNewRecord && Yii::$app->request->post('dropDownColumnSubmit')) {
-            $permission = Yii::$app->user->permissionManager->getById(Yii::$app->request->post('permissionId'), Yii::$app->request->post('moduleId'));
-            if ($permission === null) {
-                throw new HttpException(500, 'Could not find permission!');
-            }
-            Yii::$app->user->permissionManager->setGroupState($group->id, $permission, Yii::$app->request->post('state'));
-
-            return $this->asJson([]);
+        if (!$group->isNewRecord) {
+            // Save changed permission state
+            $return = Yii::$app->user->permissionManager->handlePermissionStateChange($group->id);
         }
 
-        return $this->render('permissions', ['group' => $group]);
+        return $return ?? $this->render('permissions', ['group' => $group]);
     }
 
     public function actionManageGroupUsers()
@@ -156,11 +151,29 @@ class GroupController extends Controller
         $group = Group::findOne(['id' => $request->get('id')]);
         $this->checkGroupAccess($group);
 
-        $group->removeUser($request->get('userId'));
+        $userGroupsCount = GroupUser::find()
+            ->where(['user_id' => $request->get('userId')])
+            ->count();
+
+        $error = '';
+        if ($userGroupsCount > 1) {
+            if (!$group->removeUser($request->get('userId'))) {
+                $error = Yii::t('AdminModule.user', 'The user cannot be removed from this Group!');
+            }
+        } else {
+            $error = Yii::t('AdminModule.user', 'The user cannot be removed from this Group, as users are required to be assigned to at least one Group.');
+        }
 
         if ($request->isAjax) {
             Yii::$app->response->format = 'json';
-            return ['success' => true];
+            return [
+                'success' => $error === '',
+                'error' => $error,
+            ];
+        }
+
+        if ($error) {
+            $this->view->error($error);
         }
 
         return $this->redirect([
@@ -202,15 +215,17 @@ class GroupController extends Controller
         $value = Yii::$app->request->post('value');
 
         if ($value === null) {
-            throw new HttpException(400,
-                Yii::t('AdminModule.user', 'No value found!')
+            throw new HttpException(
+                400,
+                Yii::t('AdminModule.user', 'No value found!'),
             );
         }
 
         $groupUser = $group->getGroupUser(User::findOne(Yii::$app->request->post('userId')));
         if ($groupUser === null) {
-            throw new HttpException(404,
-                Yii::t('AdminModule.user', 'Group user not found!')
+            throw new HttpException(
+                404,
+                Yii::t('AdminModule.user', 'Group user not found!'),
             );
         }
 
@@ -255,8 +270,10 @@ class GroupController extends Controller
             'query' => $query,
             'fillUser' => true,
             'fillUserQuery' => $group->getUsers(),
-            'disabledText' => Yii::t('AdminModule.user',
-                'User is already a member of this group.'),
+            'disabledText' => Yii::t(
+                'AdminModule.user',
+                'User is already a member of this group.',
+            ),
         ]);
 
         return $result;

@@ -8,8 +8,11 @@
 
 namespace humhub\modules\content\widgets;
 
-use yii\helpers\Url;
+use humhub\modules\content\components\ContentActiveRecord;
 use humhub\modules\content\permissions\CreatePublicContent;
+use humhub\modules\user\helpers\AuthHelper;
+use yii\base\Widget;
+use yii\helpers\Url;
 
 /**
  * Visibility link for Wall Entries can be used to switch form public to private and vice versa.
@@ -17,11 +20,10 @@ use humhub\modules\content\permissions\CreatePublicContent;
  * @package humhub.modules_core.wall.widgets
  * @since 1.2
  */
-class VisibilityLink extends \yii\base\Widget
+class VisibilityLink extends Widget
 {
-
     /**
-     * @var \humhub\modules\content\components\ContentActiveRecord
+     * @var ContentActiveRecord
      */
     public $contentRecord;
 
@@ -31,23 +33,35 @@ class VisibilityLink extends \yii\base\Widget
     public function run()
     {
         $content = $this->contentRecord->content;
-        $contentContainer = $content->container;
-        
-        // If content is global
-        if ($contentContainer === null) {
-            return;
+
+        if (!$content->canEdit()) {
+            return '';
         }
 
         // Prevent Change to "Public" in private spaces
-        if(!$content->canEdit() || (!$content->visibility && !$contentContainer->visibility)) {
-            return;
-        } elseif($content->isPrivate() && !$contentContainer->permissionManager->can(new CreatePublicContent())) {
-            return;
+        if (
+            $content->container
+            && $content->isPrivate()
+            && (
+                !$content->container->visibility
+                || !$content->container->permissionManager->can(new CreatePublicContent())
+            )
+        ) {
+            return '';
         }
-        
-        return $this->render('visibilityLink', [ 
-                'content' => $content,
-                'toggleLink' => Url::to(['/content/content/toggle-visibility', 'id' => $content->id])
+
+        // Prevent Change to "Public" if content is global and Guest access is disabled
+        if (
+            $content->container === null
+            && $content->isPrivate()
+            && !AuthHelper::isGuestAccessEnabled()
+        ) {
+            return '';
+        }
+
+        return $this->render('visibilityLink', [
+            'content' => $content,
+            'toggleLink' => Url::to(['/content/content/toggle-visibility', 'id' => $content->id]),
         ]);
     }
 }

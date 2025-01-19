@@ -12,7 +12,6 @@ use Codeception\Module;
  */
 class CodeHelper extends Module
 {
-
     /**
      * Method called before any suite tests run. Loads User fixture login user
      * to use in acceptance and functional tests.
@@ -29,19 +28,19 @@ class CodeHelper extends Module
 
         $result = false;
         foreach ($model->errors as $errorMessages) {
-            if(in_array($message, $errorMessages)) {
+            if (in_array($message, $errorMessages)) {
                 $result = true;
                 break;
             }
         }
         $this->assertTrue($result);
     }
-    
+
     public function assertNotContainsError($model, $message)
     {
         $result = false;
         foreach ($model->errors as $errorMessages) {
-            if(in_array($message, $errorMessages)) {
+            if (in_array($message, $errorMessages)) {
                 $result = true;
                 break;
             }

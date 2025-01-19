@@ -1,7 +1,7 @@
 <?php
 
 return [
-    '<strong>Manage</strong> spaces' => '<strong>Upravljaj</strong> prostorima',
+    '<strong>Manage</strong> Spaces' => '<strong>Upravljaj</strong> prostorima',
     'Add new space' => 'Dodaj novi prostor',
     'Change owner' => 'Promijeni vlasnika',
     'Default Content Visiblity' => 'Zadana vidljivost sadržaja',
@@ -19,9 +19,20 @@ return [
     'Settings' => 'Postavke',
     'Space Settings' => 'Postavke Prostora',
     'This overview contains a list of each space with actions to view, edit and delete spaces.' => 'Ovaj pregled sadrži popis svake prostorije s akcijama za pregledavanje, uređivanje i brisanje razmaka.',
+    'All existing Space Topics will be converted to Global Topics.' => '',
+    'Allow individual topics in Spaces' => '',
     'By using user roles, you can create different permission groups within a Space. These can also be individualized by authorized users for each and every Space and are only relevant for that specific Space.' => '',
+    'Convert' => '',
+    'Convert Space Topics' => '',
+    'Default "Hide About Page"' => '',
+    'Default "Hide Activity Sidebar Widget"' => '',
+    'Default "Hide Followers"' => '',
+    'Default "Hide Members"' => '',
+    'Default Homepage' => '',
+    'Default Homepage (Non-members)' => '',
     'Default Space Permissions' => '',
     'Default Space(s)' => '',
+    'Default Stream Sort' => '',
     'These options allow you to set the default permissions for all Spaces. Authorized users are able individualize these for each Space. Further entries are added with the installation of new modules.' => '',
     'Update Space memberships also for existing members.' => '',
 ];

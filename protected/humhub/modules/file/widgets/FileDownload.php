@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
@@ -19,12 +20,12 @@ class FileDownload extends Button
 {
     public function file(File $file, $withIcon = true, $showSize = true, $download = false, $scheme = false)
     {
-        if($withIcon) {
+        if ($withIcon) {
             $mimeIconClass = MimeHelper::getMimeIconClassByExtension($file);
-            $this->icon(Html::tag('i', '', ['class' => 'mime '.$mimeIconClass, 'style' => 'width:10px;height:10px;']), false, true);
+            $this->icon(Html::tag('i', '', ['class' => 'mime ' . $mimeIconClass, 'style' => 'width:10px;height:10px;']), false, true);
         }
 
-        if($showSize) {
+        if ($showSize) {
             $this->text .= static::getFileSizeString($file);
         }
 
@@ -36,7 +37,7 @@ class FileDownload extends Button
 
     public static function getFileSizeString(File $file)
     {
-        return ' <small>('.Yii::$app->formatter->asShortSize($file->size, 1).')</small>';
+        return ' <small>(' . Yii::$app->formatter->asShortSize($file->size, 1) . ')</small>';
     }
 
     public static function getFileDataAttributes(File $file)

@@ -8,7 +8,6 @@ use user\AcceptanceTester;
 
 class LoginCest
 {
-
     public function testUserLogin(AcceptanceTester $I)
     {
         $I->wantTo('ensure that login works');
@@ -18,7 +17,7 @@ class LoginCest
         $I->amGoingTo('try to login with empty credentials');
         $loginPage->login('', '');
         $I->expectTo('see validations errors');
-        $I->waitForText('username or email cannot be blank.');
+        $I->waitForText('Username or Email cannot be blank.');
         $I->see('Password cannot be blank.');
 
         $I->amGoingTo('try to login with wrong credentials');
@@ -52,6 +51,14 @@ class LoginCest
         $I->waitForText('Your account is disabled!');
     }
 
+    public function testDisabledUserProfilePage(AcceptanceTester $I)
+    {
+        $I->wantTo('ensure that disabled user profile page is not viewable');
+        $I->amAdmin();
+        $I->amOnPage('/u/disableduser');
+        $I->waitForText('This profile is disabled!');
+    }
+
     public function testUnApprovedUser(AcceptanceTester $I)
     {
         $user = User::findOne(['id' => 4]);
@@ -64,7 +71,6 @@ class LoginCest
         $I->expectTo('see validations errors');
         $I->waitForText('Your account is not approved yet!');
     }
-
 
 
     public function testChangePassword(AcceptanceTester $I)

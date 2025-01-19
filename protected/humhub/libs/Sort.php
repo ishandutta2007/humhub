@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2018 HumHub GmbH & Co. KG
@@ -15,7 +16,6 @@ namespace humhub\libs;
  */
 class Sort
 {
-
     /**
      * @param array $arr The input array.
      * @param string $field The attribute or array key to which holds the sort order

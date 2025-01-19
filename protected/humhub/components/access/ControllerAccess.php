@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.humhub.org/
  * @copyright Copyright (c) 2017 HumHub GmbH & Co. KG
@@ -109,70 +110,70 @@ class ControllerAccess extends BaseObject
     /**
      * Allows the action rule setting only by extra option ['myRule', 'actions' => ['action1', 'action2']]
      */
-    const ACTION_SETTING_TYPE_OPTION_ONLY = 0;
+    public const ACTION_SETTING_TYPE_OPTION_ONLY = 0;
 
     /**
      * Allows the action rule setting by extra option ['myRule', 'actions' => ['action1', 'action2']]
      * or immediate ['myRule' => ['action1', 'action2']]
      */
-    const ACTION_SETTING_TYPE_BOTH = 1;
+    public const ACTION_SETTING_TYPE_BOTH = 1;
 
     /**
      * Only admins have access to the given set of actions e.g.: ['admin' => ['action1']]
      */
-    const RULE_ADMIN_ONLY = 'admin';
+    public const RULE_ADMIN_ONLY = 'admin';
 
     /**
      * Validate against a given set of permissions e.g.:
      * ['permission' => [MyPermission::class], 'actions' => ['action1']]
      */
-    const RULE_PERMISSION = 'permission';
+    public const RULE_PERMISSION = 'permission';
 
     /**
      * Only logged in user have access  e.g.: ['login' => ['action1', 'action2']]
      */
-    const RULE_LOGGED_IN_ONLY = 'login';
+    public const RULE_LOGGED_IN_ONLY = 'login';
 
     /**
      * Check guest mode  e.g.: ['strict'] (mainly used as global)
      */
-    const RULE_STRICT = 'strict';
+    public const RULE_STRICT = 'strict';
 
     /**
      * Check guest if user is disabled
      */
-    const RULE_DISABLED_USER = 'disabledUser';
+    public const RULE_DISABLED_USER = 'disabledUser';
 
     /**
      * Check guest if user is unnapproved
      */
-    const RULE_UNAPPROVED_USER = 'unapprovedUser';
+    public const RULE_UNAPPROVED_USER = 'unapprovedUser';
 
     /**
      * Check guest if user must change password
      * @since 1.8
      */
-    const RULE_MUST_CHANGE_PASSWORD = 'mustChangePassword';
+    public const RULE_MUST_CHANGE_PASSWORD = 'mustChangePassword';
 
     /**
      * Maintenance mode is active
      */
-    const RULE_MAINTENANCE_MODE = 'maintenance';
+    public const RULE_MAINTENANCE_MODE = 'maintenance';
 
     /**
      * Check guest if request method is post
      */
-    const RULE_POST = 'post';
+    public const RULE_POST = 'post';
 
     /**
      * Make sure response type is json
      */
-    const RULE_JSON = 'json';
+    public const RULE_JSON = 'json';
 
     /**
      * Only AJAX request is allowed for the actions
      */
-    const RULE_AJAX_ONLY = 'ajax';
+    public const RULE_AJAX_ONLY = 'ajax';
 
     /**
      * @var array fixed rules will always be added to the current rule set
@@ -239,22 +240,22 @@ class ControllerAccess extends BaseObject
         $this->registerValidator([
             self::RULE_STRICT => 'validateStrictMode',
             'reason' => Yii::t('error', 'Guest mode not active, please login first.'),
-            'code' => 401
+            'code' => 401,
         ]);
         $this->registerValidator([
             self::RULE_UNAPPROVED_USER => 'validateUnapprovedUser',
             'reason' => Yii::t('error', 'Your user account has not been approved yet, please try again later or contact a network administrator.'),
-            'code' => 401
+            'code' => 401,
         ]);
         $this->registerValidator([
             self::RULE_DISABLED_USER => 'validateDisabledUser',
             'reason' => Yii::t('error', 'Your user account is inactive, please login with an active account or contact a network administrator.'),
-            'code' => 401
+            'code' => 401,
         ]);
         $this->registerValidator([
             self::RULE_LOGGED_IN_ONLY => 'validateLoggedInOnly',
             'reason' => Yii::t('error', 'Login required for this section.'),
-            'code' => 401
+            'code' => 401,
         ]);
         $this->registerValidator([
             self::RULE_MAINTENANCE_MODE => 'validateMaintenanceMode',
@@ -273,20 +274,20 @@ class ControllerAccess extends BaseObject
         $this->registerValidator(GuestAccessValidator::class);
         $this->registerValidator([
             self::RULE_ADMIN_ONLY => 'validateAdminOnly',
-            'reason' => Yii::t('error', 'You need admin permissions to access this section.')
+            'reason' => Yii::t('error', 'You need admin permissions to access this section.'),
         ]);
         $this->registerValidator(PermissionAccessValidator::class);
         $this->registerValidator(DeprecatedPermissionAccessValidator::class);
         $this->registerValidator([
             self::RULE_POST => 'validatePostRequest',
             'reason' => Yii::t('base', 'Invalid request method!'),
-            'code' => 405
+            'code' => 405,
         ]);
         $this->registerValidator([self::RULE_JSON => 'validateJsonResponse']);
         $this->registerValidator([
             self::RULE_AJAX_ONLY => 'validateAjaxOnlyRequest',
             'reason' => Yii::t('error', 'The specified URL cannot be called directly.'),
-            'code' => 405
+            'code' => 405,
         ]);
     }
 
@@ -399,14 +400,14 @@ class ControllerAccess extends BaseObject
                 'access' => $this,
                 'owner' => $this->owner,
                 'handler' => $ruleName,
-                'name' => $ruleName
+                'name' => $ruleName,
             ]);
         }
 
         if (class_exists($ruleName)) {
             return Yii::createObject([
                 'class' => $ruleName,
-                'access' => $this
+                'access' => $this,
             ]);
         }
 

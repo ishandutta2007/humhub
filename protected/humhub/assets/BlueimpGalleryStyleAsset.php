@@ -17,7 +17,6 @@ use humhub\components\assets\AssetBundle;
  */
 class BlueimpGalleryStyleAsset extends AssetBundle
 {
-
     /**
      * @inheritdoc
      */
@@ -36,7 +35,7 @@ class BlueimpGalleryStyleAsset extends AssetBundle
     public $publishOptions = [
         'only' => [
             'css/*',
-            'img/*'
-        ]
+            'img/*',
+        ],
     ];
 }
